@@ -12,9 +12,24 @@ def find_lineup(race_id: str, datasource: Datasource, is_female: bool) -> List[L
     return client.get_lineup_by_race_id(race_id)
 
 
-def find_race(race_id: str, datasource: Datasource, is_female: bool, day: Optional[int] = None) -> Optional[Race]:
+def find_race(
+    race_id: str,
+    datasource: Datasource,
+    is_female: bool,
+    day: Optional[int] = None,
+    with_lineup: bool = False,
+) -> Optional[Race]:
     client = Client(source=datasource, is_female=is_female)  # type: ignore
-    return client.get_race_by_id(race_id, is_female=is_female, day=day)
+    race = client.get_race_by_id(race_id, is_female=is_female, day=day)
+    if race is not None and with_lineup:
+        try:
+            lineups = find_lineup(race_id, datasource, is_female=is_female)
+            for participant in race.participants:
+                lineup = [lin for lin in lineups if lin.club == participant.club_name]
+                participant.lineup = lineup[0] if len(lineup) == 1 else None
+        except NotImplementedError:
+            pass
+    return race
 
 
 def lemmatize(phrase: str, lang: str = "es") -> List[str]:

@@ -2,7 +2,7 @@ import collections
 import json
 from dataclasses import dataclass
 from enum import StrEnum, auto
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 RaceName = collections.namedtuple("RaceName", ["race_id", "name"])
 
@@ -83,10 +83,13 @@ class Race:
     race_lanes: Optional[int] = None
     cancelled: bool = False
 
-    def to_json(self) -> str:
+    def to_dict(self) -> Dict:
         d = {k: v for k, v in self.__dict__.items()}
-        d["participants"] = [{k: v for k, v in p.__dict__.items() if k not in ["race"]} for p in d["participants"]]
-        return json.dumps(d, indent=4, skipkeys=True, ensure_ascii=False)
+        d["participants"] = [p.to_dict() for p in d["participants"]]
+        return d
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_dict(), indent=4, skipkeys=True, ensure_ascii=False)
 
 
 @dataclass
@@ -107,6 +110,13 @@ class Participant:
 
     disqualified: bool = False
 
-    def to_json(self) -> str:
+    # extra arguments
+    lineup: Optional["Lineup"] = None
+
+    def to_dict(self) -> Dict:
         d = {k: v for k, v in self.__dict__.items() if k not in ["race"]}
-        return json.dumps(d, indent=4, skipkeys=True, ensure_ascii=False)
+        d["lineup"] = {k: v for k, v in self.lineup.__dict__.items() if k not in ["race"]} if self.lineup else None
+        return d
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_dict(), indent=4, skipkeys=True, ensure_ascii=False)

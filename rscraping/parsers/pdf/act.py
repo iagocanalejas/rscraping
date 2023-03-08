@@ -1,8 +1,10 @@
 from typing import List, Optional, Tuple
 
 from pypdf import PageObject
+from pyutils.lists import flatten
 from pyutils.strings import whitespaces_clean
 
+from rscraping.data.constants import SYNONYMS
 from rscraping.data.models import Datasource, Lineup
 
 from ._parser import PdfParser
@@ -11,8 +13,8 @@ from ._parser import PdfParser
 class ACTPdfParser(PdfParser):
     DATASOURCE = Datasource.ACT
 
-    _TRASH = ["FIRMA Y SELLO", "PROPIOS:", "CANTERANOS:", "NO PROPIOS:", "CAPITÁN"]
-    _CONDITION = ["CANTERANO", "CANTERANA", "PROPIO", "PROPIA", "NO PROPIO", "NO PROPIA"]
+    _TRASH = ["FIRMA Y SELLO", "PROPIOS:", "CANTERANOS:", "NO PROPIOS:", "CAPITÁN", "CAPITANA"]
+    _CONDITION = list(flatten([SYNONYMS["HOMEGROWN"], SYNONYMS["OWN"], SYNONYMS["NOT_OWN"]]))
 
     def parse_lineup(self, page: PageObject) -> Optional[Lineup]:
         text = [e for e in page.extract_text().split("\n") if e]
@@ -49,7 +51,11 @@ class ACTPdfParser(PdfParser):
         substitutes = []
 
         # find all substitutes (marked as 'Remero' | 'Patrón')
-        indexes = [i for i, rower in enumerate(rowers) if rower == "Remero" or rower == "Patrón"]
+        indexes = [
+            i
+            for i, rower in enumerate(rowers)
+            if rower.upper() in SYNONYMS["ROWER"] or rower.upper() in SYNONYMS["COXWAIN"]
+        ]
         # add next _CONDITION after the last found substitute to build the name
         indexes.append(
             next(indexes[-1] + i + 1 for i, x in enumerate(rowers[indexes[-1] :]) if x.upper() in self._CONDITION)

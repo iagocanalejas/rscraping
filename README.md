@@ -7,6 +7,7 @@ Tries to find the race information searching in the leagues webpages.
 ```sh
 python findrace.py <datasource> <race_id> <options>
     # --female=<bool>: Specifies if we need to search in the female pages.
+    # --lineups=<bool>: Tryies to fill the lineups.
 ```
 
 ## Find Lineup

@@ -100,6 +100,7 @@ def deacronym_race_name(name: str) -> str:
     name = re.sub(r"B\.? ", "BANDERA ", name)
     name = re.sub(r" SN ?", " SARI NAGUSIA ", name)
     name = re.sub(r"J\.? ?A\.? AGIRRE", "JOSE ANTONIO AGIRRE", name)
+    name = name.replace("BILBOKO BANDERA - BANDERA DE BILBAO", "BANDERA DE BILBAO")
 
     return whitespaces_clean(name)
 

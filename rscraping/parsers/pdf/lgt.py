@@ -3,8 +3,10 @@ import re
 from typing import List, Tuple
 
 from pypdf import PageObject
+from pyutils.lists import flatten
 from pyutils.strings import whitespaces_clean
 
+from rscraping.data.constants import SYNONYMS
 from rscraping.data.models import Datasource, Lineup
 
 from ._parser import PdfParser
@@ -15,19 +17,17 @@ logger = logging.getLogger(__name__)
 class LGTPdfParser(PdfParser):
     DATASOURCE = Datasource.LGT
 
-    _CONDITION = ["CANTEIRÁ", "CANTEIRÁN", "PROPIO", "PROPIA", "NON PROPIO", "NON PROPIA"]
-    _TOKEN = [
-        "DELEGADO",
-        "DELEGADA",
-        "ADESTRADOR",
-        "ADESTRADORA",
-        "ESTRIBOR",
-        "BABOR",
-        "PATRÓN",
-        "PATROA",
-        "PROEL",
-        "SUPLENTE",
-    ]
+    _CONDITION = list(flatten([SYNONYMS["HOMEGROWN"], SYNONYMS["OWN"], SYNONYMS["NOT_OWN"]]))
+    _TOKEN = list(
+        flatten(
+            [
+                SYNONYMS["COACH"],
+                SYNONYMS["DELEGATE"],
+                SYNONYMS["COXWAIN"],
+                ["ESTRIBOR", "BABOR", "PROEL", "SUPLENTE"],
+            ]
+        )
+    )
 
     def parse_lineup(self, page: PageObject) -> Lineup:
         text = page.extract_text().split("\n")
@@ -35,9 +35,9 @@ class LGTPdfParser(PdfParser):
         return Lineup(
             race=race,
             club=club,
-            coach=[r for t, r in rowers if t in ["ADESTRADOR", "ADESTRADORA"]][0],
-            delegate=[r for t, r in rowers if t in ["DELEGADO", "DELEGADA"]][0],
-            coxswain=[r for t, r in rowers if t in ["PATRÓN", "PATRON", "PATROA"]][0],
+            coach=[r for t, r in rowers if t in SYNONYMS["COACH"]][0],
+            delegate=[r for t, r in rowers if t in SYNONYMS["DELEGATE"]][0],
+            coxswain=[r for t, r in rowers if t in SYNONYMS["COXWAIN"]][0],
             starboard=[r for t, r in rowers if any(k in t for k in ["ESTRIBOR"])],
             larboard=[r for t, r in rowers if any(k in t for k in ["BABOR"])],
             substitute=[r for t, r in rowers if any(k in t for k in ["SUPLENTE"])],

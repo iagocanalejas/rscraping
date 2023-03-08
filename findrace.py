@@ -18,10 +18,11 @@ def _parse_arguments():
     parser.add_argument("datasource", type=str, help="Datasource from where to retrieve.")
     parser.add_argument("race_id", type=str, help="Race to find.")
     parser.add_argument("--female", action="store_true", default=False)
+    parser.add_argument("--lineups", action="store_true", default=False)
     return parser.parse_args()
 
 
-def main(race_id: str, datasource: str, is_female: bool):
+def main(race_id: str, datasource: str, is_female: bool, with_lineups: bool):
     if not Datasource.has_value(datasource):
         raise ValueError(f"invalid datasource={datasource}")
 
@@ -29,6 +30,7 @@ def main(race_id: str, datasource: str, is_female: bool):
         race_id=race_id,
         datasource=Datasource(datasource),
         is_female=is_female,
+        with_lineup=with_lineups,
     )
     if not race:
         raise ValueError(f"not found race for race_id={args.race_id}")
@@ -40,4 +42,4 @@ if __name__ == "__main__":
     args = _parse_arguments()
     logger.info(f"{os.path.basename(__file__)}:: args -> {args.__dict__}")
 
-    main(args.race_id, args.datasource, args.female)
+    main(args.race_id, args.datasource, args.female, args.lineups)
