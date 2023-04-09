@@ -1,0 +1,3 @@
+[submodule "ai_django"]
+	path = ai_django
+	url = https://github.com/AndIag/ai-django
