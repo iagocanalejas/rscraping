@@ -6,9 +6,9 @@ from typing import List
 
 from PyPDF2 import PdfReader
 
-from pdf.lineup import LineUpParser
-from utils.functions import expand_path, save_csv
-from utils.models import Datasource, LineUpItem
+from src.pdf.lineup import LineUpParser
+from src.utils.functions import expand_path, save_csv
+from src.utils.models import Datasource, LineUpItem
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)

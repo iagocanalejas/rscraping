@@ -2,7 +2,7 @@ import csv
 import os
 from typing import List
 
-from utils.models import LineUpItem
+from src.utils.models import LineUpItem, RaceItem
 
 
 def expand_path(path: str, valid_files: List[str]) -> List[str]:
@@ -14,7 +14,7 @@ def expand_path(path: str, valid_files: List[str]) -> List[str]:
     return [f for f in files if is_valid(f)]
 
 
-def save_csv(items: List[LineUpItem], file_name: str):
+def save_csv(items: List[RaceItem | LineUpItem], file_name: str):
     if not len(items):
         return
 

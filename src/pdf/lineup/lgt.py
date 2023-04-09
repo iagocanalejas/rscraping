@@ -6,8 +6,8 @@ from PyPDF2 import PageObject
 
 from ai_django.ai_core.utils.strings import whitespaces_clean
 
-from pdf.lineup._lineup import LineUpParser
-from utils.models import Datasource, LineUpItem
+from src.pdf.lineup._lineup import LineUpParser
+from src.utils.models import Datasource, LineUpItem
 
 logger = logging.getLogger(__name__)
 

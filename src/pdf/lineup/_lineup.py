@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 from PyPDF2 import PageObject
 
-from utils.models import LineUpItem
+from src.utils.models import LineUpItem
 
 logger = logging.getLogger(__name__)
 
