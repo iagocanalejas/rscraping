@@ -27,11 +27,11 @@ class LineUpItem:
     club: str
     coach: str
     delegate: str
-    coxswain: str
+    coxswain: Optional[str]
     starboard: List[str]
     larboard: List[str]
     substitute: List[str]
-    bow: str
+    bow: Optional[str]
 
 
 @dataclass

@@ -36,7 +36,7 @@ class LGTLineUpParser(LineUpParser, source=Datasource.LGT):
     @staticmethod
     def _parse_name(name: str) -> Tuple[str, str]:
         parts = name.split('-')
-        return whitespaces_clean(parts[0]), whitespaces_clean(' '.join(parts[1:]))
+        return whitespaces_clean(parts[0]).upper(), whitespaces_clean(' '.join(parts[1:])).upper()
 
     def _clean_rowers(self, rowers: List[str]) -> List[Tuple[str, str]]:
         new_rowers = []
@@ -44,7 +44,7 @@ class LGTLineUpParser(LineUpParser, source=Datasource.LGT):
             if 'Licenza' in raw_name:
                 raw_name = re.sub(r'Licenza: (FRS|FRD|FRJ|FRT|FRV)?\d+', '', raw_name, flags=re.IGNORECASE)
 
-            if raw_name and raw_name not in self._CONDITION:
+            if raw_name and raw_name.upper() not in self._CONDITION:
                 match = next((t for t in self._TOKEN if t in raw_name and not raw_name.startswith(t)), None)
                 if not match:
                     new_rowers.append(raw_name.upper())

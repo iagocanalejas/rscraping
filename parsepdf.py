@@ -25,7 +25,9 @@ def main(paths: List[str], datasource: str):
         with open(file, 'rb') as pdf:
             reader = PdfReader(pdf)
             for page in reader.pages:
-                parsed_items.append(parser.parse_page(page))
+                items = parser.parse_page(page)
+                if items:
+                    parsed_items.append(items)
 
     if _DEBUG:
         for item in parsed_items:
