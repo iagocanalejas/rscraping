@@ -1,6 +1,6 @@
 from typing import Optional, Tuple, List
 
-from PyPDF2 import PageObject
+from pypdf import PageObject
 
 from ai_django.ai_core.utils.strings import whitespaces_clean
 from src.pdf.lineup import LineUpParser

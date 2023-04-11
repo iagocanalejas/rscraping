@@ -1,7 +1,7 @@
 import logging
 from abc import ABC, abstractmethod
 
-from PyPDF2 import PageObject
+from pypdf import PageObject
 
 from src.utils.models import LineUpItem
 

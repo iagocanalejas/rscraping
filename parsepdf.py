@@ -4,7 +4,7 @@ import os
 import sys
 from typing import List
 
-from PyPDF2 import PdfReader
+from pypdf import PdfReader
 
 from src.pdf.lineup import LineUpParser
 from src.utils.functions import expand_path, save_csv
@@ -31,7 +31,7 @@ def main(paths: List[str], datasource: str):
 
     if _DEBUG:
         for item in parsed_items:
-            print(f"{item.race}::{item.club}")
+            print(f"{item.race}:: {item.club}")
             print(f"Adestrador: {item.coach}")
             print(f"Delegado: {item.delegate}")
             print(f"Patrón: {item.coxswain}")

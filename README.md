@@ -9,6 +9,10 @@ python parsepdf <path> <options>
     #     - arc
     # --debug: Plot the image processing steps and dataframes transformations done.
 ```
+#### Notes:
+    - ACT 
+        - Coxswain and bow are included in the rowers list.
+        - Starboard and larboard will contain the same list.
 ## Parse Image
 Tries to parse an Inforemo image to retrieve the race data and participants.
 ```sh
