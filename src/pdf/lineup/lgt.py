@@ -6,13 +6,13 @@ from pypdf import PageObject
 
 from ai_django.ai_core.utils.strings import whitespaces_clean
 
-from src.pdf.lineup._lineup import LineUpParser
+from src.pdf.lineup._lineup import LineupPdfParser
 from src.utils.models import Datasource, LineUpItem
 
 logger = logging.getLogger(__name__)
 
 
-class LGTLineUpParser(LineUpParser, source=Datasource.LGT):
+class LGTLineupPdfParser(LineupPdfParser, source=Datasource.LGT):
     DATASOURCE = Datasource.LGT
 
     _CONDITION = ["CANTEIRÁ", "CANTEIRÁN", "PROPIO", "PROPIA", "NON PROPIO", "NON PROPIA"]

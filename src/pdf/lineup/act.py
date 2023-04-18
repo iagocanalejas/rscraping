@@ -3,11 +3,11 @@ from typing import Optional, Tuple, List
 from pypdf import PageObject
 
 from ai_django.ai_core.utils.strings import whitespaces_clean
-from src.pdf.lineup import LineUpParser
+from src.pdf.lineup import LineupPdfParser
 from src.utils.models import Datasource, LineUpItem
 
 
-class ACTLineUpParser(LineUpParser, source=Datasource.ACT):
+class ACTLineupPdfParser(LineupPdfParser, source=Datasource.ACT):
     DATASOURCE = Datasource.ACT
 
     _TRASH = ["FIRMA Y SELLO", "PROPIOS:", "CANTERANOS:", "NO PROPIOS:", "CAPITÁN"]

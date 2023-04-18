@@ -6,7 +6,7 @@ from typing import List
 
 from pypdf import PdfReader
 
-from src.pdf.lineup import LineUpParser
+from src.pdf.lineup import LineupPdfParser
 from src.utils.functions import expand_path, save_csv
 from src.utils.models import Datasource, LineUpItem
 
@@ -18,14 +18,14 @@ _DEBUG = False
 
 
 def main(paths: List[str], datasource: str):
-    parser: LineUpParser = LineUpParser(source=datasource)
+    parser: LineupPdfParser = LineupPdfParser(source=datasource)
     parsed_items: List[LineUpItem] = []
 
     for file in paths:
         with open(file, 'rb') as pdf:
             reader = PdfReader(pdf)
             for page in reader.pages:
-                items = parser.parse_page(page)
+                items = parser.parse_page(page=page)
                 if items:
                     parsed_items.append(items)
 
@@ -58,6 +58,8 @@ if __name__ == '__main__':
     _DEBUG = args.debug
     if args.datasource.upper() not in Datasource.values():
         raise ValueError(f"invalid datasource={args.datasource}")
+    if args.datasource.lower() == Datasource.ARC:
+        raise NotImplementedError(f"no valid implementation for datasource={Datasource.ARC}")
 
     main(
         paths=expand_path(os.path.abspath(args.path), valid_files=['.PDF']),

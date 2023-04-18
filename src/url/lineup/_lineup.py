@@ -1,14 +1,9 @@
-import logging
 from abc import ABC, abstractmethod
-
-from pypdf import PageObject
 
 from src.utils.models import LineUpItem
 
-logger = logging.getLogger(__name__)
 
-
-class LineupPdfParser(ABC):
+class LineupUrlParser(ABC):
     _registry = {}
 
     DATASOURCE: str
@@ -19,12 +14,12 @@ class LineupPdfParser(ABC):
         if source:
             cls._registry[source] = cls
 
-    def __new__(cls, source: str, **kwargs) -> 'LineupPdfParser':  # pragma: no cover
+    def __new__(cls, source: str, **kwargs) -> 'LineupUrlParser':  # pragma: no cover
         subclass = cls._registry[source]
         final_obj = object.__new__(subclass)
 
         return final_obj
 
     @abstractmethod
-    def parse_page(self, page: PageObject) -> LineUpItem:
+    def parse_page(self, url: str) -> LineUpItem:
         raise NotImplementedError
