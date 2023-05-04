@@ -1,4 +1,14 @@
 # Commands
+## Build PDF
+Build all required files for a rower.
+```sh
+python fillforms <sign_on (DD/MM/YYYY)> <options>
+    # -p, --parent: Specifies if the rower requires parents data
+    # -t, --type: Specifies the type of forms to generate (['all']). ['national', 'image', 'fegar', 'xogade', 'all']
+    # --no-preset: Asks to input more information.
+    # --no-entity: Asks to input club information.
+    # --debug: Logs and autofilled data.
+```
 ## Parse PDF
 Tries to parse a line-up image to retrieve all the participants and the line-ups.
 ```sh
