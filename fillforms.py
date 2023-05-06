@@ -3,7 +3,7 @@ import logging
 import os
 import sys
 
-from src.pdf.builder import PDFItem, fill_national_form, prompt_rower_data, prompt_parent_data, prompt_extra_data, fill_image_form, \
+from src.pdf.builder import PdfItem, fill_national_form, prompt_rower_data, prompt_parent_data, prompt_extra_data, fill_image_form, \
     fill_xogade_form, fill_fegar_form, prompt_entity_data
 
 logger = logging.getLogger()
@@ -11,18 +11,20 @@ logger.setLevel(logging.INFO)
 logger.addHandler(logging.StreamHandler(sys.stdout))
 
 
+# TODO: add checkboxes
 def _parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('sign_on', help='Date signed (DD/MM/YYYY')
-    parser.add_argument('-t', '--type', help='Type of files to generate', nargs='*', default=['all'])
-    parser.add_argument('-p', '--parent', action='store_true', default=False)
-    parser.add_argument('--preset', action=argparse.BooleanOptionalAction, default=True)
-    parser.add_argument('--entity', action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument('-t', '--type', nargs='*', help='List of files to generate', default=['all'])
+    parser.add_argument('-p', '--parent', action='store_true', help='Whether to ask for parental data. (False)', default=False)
+    parser.add_argument('-i', '--images', type=str, action='store', help='Folder containing the images for fegar generator.', default=None)
+    parser.add_argument('--preset', action=argparse.BooleanOptionalAction, help='Whether to use the preset data. (True)', default=True)
+    parser.add_argument('--entity', action=argparse.BooleanOptionalAction, help='Whether to ask for entity data. (True)', default=True)
     parser.add_argument('--debug', action='store_true', default=False)
     return parser.parse_args()
 
 
-def _fill_data(data: PDFItem, debug: bool) -> PDFItem:
+def _fill_data(data: PdfItem, debug: bool) -> PdfItem:
     if debug:
         data.name = 'name'
         data.surname = 'surname'
@@ -55,7 +57,7 @@ if __name__ == '__main__':
     args = _parse_arguments()
     logging.info(f'{os.path.basename(__file__)}:: args -> {args.__dict__}')
 
-    values: PDFItem = PDFItem.preset(args.sign_on) if args.preset or args.debug else PDFItem()
+    values: PdfItem = PdfItem.preset(args.sign_on) if args.preset or args.debug else PdfItem()
     values = _fill_data(values, debug=args.debug)
 
     if 'national' in args.type or 'all' in args.type:
@@ -63,6 +65,6 @@ if __name__ == '__main__':
     if 'image' in args.type or 'all' in args.type:
         fill_image_form(values, with_parent=args.parent)
     if 'fegar' in args.type or 'all' in args.type:
-        fill_fegar_form(values, with_parent=args.parent)
+        fill_fegar_form(values, images_folder=args.images, with_parent=args.parent, remove_temp_files=not args.debug)
     if args.parent and ('xogade' in args.type or 'all' in args.type):
         fill_xogade_form(values)

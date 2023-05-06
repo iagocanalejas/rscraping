@@ -10,3 +10,4 @@ pytesseract==0.3.10
 requests==2.29.0
 Unidecode==1.3.6
 fillpdf==0.7.2
+reportlab~=4.0.0

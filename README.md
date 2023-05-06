@@ -3,10 +3,11 @@
 Build all required files for a rower.
 ```sh
 python fillforms <sign_on (DD/MM/YYYY)> <options>
-    # -p, --parent: Specifies if the rower requires parents data
-    # -t, --type: Specifies the type of forms to generate (['all']). ['national', 'image', 'fegar', 'xogade', 'all']
+    # -t, --type: Specifies the list of files to be generate (['all']). ['national', 'image', 'fegar', 'xogade', 'all']
+    # -p, --parent: Specifies if the rower requires parents data. (False)
+    # -i, --images: Folder containing the images for fegar generator.
     # --no-preset: Asks to input more information.
-    # --no-entity: Asks to input club information.
+    # --no-entity: Asks to input entity information.
     # --debug: Logs and autofilled data.
 ```
 ## Parse PDF
