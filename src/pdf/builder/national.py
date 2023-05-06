@@ -27,6 +27,9 @@ def fill_national_form(data: PdfItem, with_parent: bool):
         Field.FORM_SIGN_ON_DAY: data.sign_on_day,
         Field.FORM_SIGN_ON_MONTH: data.sign_on_month,
         Field.FORM_SIGN_ON_YEAR: data.sign_on_year[2:],
+        Field.FORM_ROWER: 'Yes' if data.is_rower else None,
+        Field.FORM_COACH: 'Yes' if data.is_coach else None,
+        Field.FORM_DIRECTIVE: 'Yes' if data.is_directive else None,
     }
 
     if with_parent:

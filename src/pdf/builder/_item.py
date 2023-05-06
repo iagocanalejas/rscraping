@@ -40,6 +40,10 @@ class PdfItem:
     parent_dni: Optional[str] = None
     parent_category: Optional[str] = None
 
+    is_rower: Optional[bool] = False
+    is_coach: Optional[bool] = False
+    is_directive: Optional[bool] = False
+
     @classmethod
     def preset(cls, sign_on: str) -> 'PdfItem':
         day, month, year = sign_on.split('/')
@@ -181,3 +185,7 @@ class Field:
     FORM_SIGN_ON_DAY = 'sign_on_day'
     FORM_SIGN_ON_MONTH = 'sign_on_month'
     FORM_SIGN_ON_YEAR = 'sign_on_year'
+
+    FORM_ROWER = 'checkbox_rower'
+    FORM_COACH = 'checkbox_coach'
+    FORM_DIRECTIVE = 'checkbox_directive'

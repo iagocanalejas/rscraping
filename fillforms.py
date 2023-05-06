@@ -11,7 +11,6 @@ logger.setLevel(logging.INFO)
 logger.addHandler(logging.StreamHandler(sys.stdout))
 
 
-# TODO: add checkboxes
 def _parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('sign_on', help='Date signed (DD/MM/YYYY')
@@ -20,6 +19,8 @@ def _parse_arguments():
     parser.add_argument('-i', '--images', type=str, action='store', help='Folder containing the images for fegar generator.', default=None)
     parser.add_argument('--preset', action=argparse.BooleanOptionalAction, help='Whether to use the preset data. (True)', default=True)
     parser.add_argument('--entity', action=argparse.BooleanOptionalAction, help='Whether to ask for entity data. (True)', default=True)
+    parser.add_argument('--coach', action='store_true', help='Whether the licence should be for a coach. (False)', default=False)
+    parser.add_argument('--directive', action='store_true', help='Whether the licence should be for a directive. (False)', default=False)
     parser.add_argument('--debug', action='store_true', default=False)
     return parser.parse_args()
 
@@ -59,6 +60,13 @@ if __name__ == '__main__':
 
     values: PdfItem = PdfItem.preset(args.sign_on) if args.preset or args.debug else PdfItem()
     values = _fill_data(values, debug=args.debug)
+
+    if args.coach:
+        values.is_coach = True
+    elif args.directive:
+        values.is_directive = True
+    else:
+        values.is_rower = True
 
     if 'national' in args.type or 'all' in args.type:
         fill_national_form(values, with_parent=args.parent)

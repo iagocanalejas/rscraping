@@ -37,6 +37,9 @@ def fill_fegar_form(data: PdfItem, with_parent: bool, images_folder: str = None,
         Field.FORM_SIGN_ON_YEAR: data.sign_on_year[2:],
         Field.FORM_ENTITY_ADDRESS: data.entity_town,
         Field.FORM_ENTITY_STATE: data.entity_state,
+        Field.FORM_ROWER: 'Yes' if data.is_rower else None,
+        Field.FORM_COACH: 'Yes' if data.is_coach else None,
+        Field.FORM_DIRECTIVE: 'Yes' if data.is_directive else None,
     }
 
     if with_parent:

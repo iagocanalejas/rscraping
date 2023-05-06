@@ -6,6 +6,8 @@ python fillforms <sign_on (DD/MM/YYYY)> <options>
     # -t, --type: Specifies the list of files to be generate (['all']). ['national', 'image', 'fegar', 'xogade', 'all']
     # -p, --parent: Specifies if the rower requires parents data. (False)
     # -i, --images: Folder containing the images for fegar generator.
+    # --coach: Create the files for a coach.
+    # --directive: Create the files for a delegate.
     # --no-preset: Asks to input more information.
     # --no-entity: Asks to input entity information.
     # --debug: Logs and autofilled data.
