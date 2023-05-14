@@ -2,7 +2,8 @@
 ## Build PDF
 Build all required files for a rower.
 ```sh
-python fillforms <sign_on (DD/MM/YYYY)> <options>
+python fillforms <options>
+    # -on: SignOn date to use in the documents (DD/MM/YYYY).
     # -t, --type: Specifies the list of files to be generate (['all']). ['national', 'image', 'fegar', 'xogade', 'all']
     # -p, --parent: Specifies if the rower requires parents data. (False)
     # -i, --images: Folder containing the images for fegar generator.

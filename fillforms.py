@@ -2,6 +2,7 @@ import argparse
 import logging
 import os
 import sys
+from datetime import datetime
 
 from src.pdf.builder import PdfItem, fill_national_form, prompt_rower_data, prompt_parent_data, prompt_extra_data, fill_image_form, \
     fill_xogade_form, fill_fegar_form, prompt_entity_data
@@ -13,7 +14,7 @@ logger.addHandler(logging.StreamHandler(sys.stdout))
 
 def _parse_arguments():
     parser = argparse.ArgumentParser()
-    parser.add_argument('sign_on', help='Date signed (DD/MM/YYYY')
+    parser.add_argument('-on', type=str, help='Date signed (DD/MM/YYYY', default=datetime.now().strftime('%d/%m/%Y'))
     parser.add_argument('-t', '--type', nargs='*', help='List of files to generate', default=['all'])
     parser.add_argument('-p', '--parent', action='store_true', help='Whether to ask for parental data. (False)', default=False)
     parser.add_argument('-i', '--images', type=str, action='store', help='Folder containing the images for fegar generator.', default=None)
@@ -58,8 +59,9 @@ if __name__ == '__main__':
     args = _parse_arguments()
     logging.info(f'{os.path.basename(__file__)}:: args -> {args.__dict__}')
 
-    values: PdfItem = PdfItem.preset(args.sign_on) if args.preset or args.debug else PdfItem()
+    values: PdfItem = PdfItem.preset() if args.preset or args.debug else PdfItem()
     values = _fill_data(values, debug=args.debug)
+    values.sign_on(args.sign_on)
 
     if args.coach:
         values.is_coach = True

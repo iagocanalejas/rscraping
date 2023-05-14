@@ -45,8 +45,7 @@ class PdfItem:
     is_directive: Optional[bool] = False
 
     @classmethod
-    def preset(cls, sign_on: str) -> 'PdfItem':
-        day, month, year = sign_on.split('/')
+    def preset(cls) -> 'PdfItem':
         return PdfItem(
             country='ESPAÑA',
             nationality='ESPAÑOLA',
@@ -55,12 +54,16 @@ class PdfItem:
             entity='CLUB REMO PUEBLA',
             entity_town='A POBRA DO CARAMIÑAL',
             entity_state='A CORUÑA',
-            sign_on_day=day,
-            sign_on_month=month,
-            sign_on_year=year,
             sign_in='A POBRA DO CARAMIÑAL',
             parent_category='TUTOR',
         )
+
+    def sign_on(self, date: str) -> 'PdfItem':
+        day, month, year = date.split('/')
+        self.sign_on_day = day
+        self.sign_on_month = month
+        self.sign_on_year = year
+        return self
 
 
 def prompt_rower_data(data: PdfItem) -> PdfItem:
