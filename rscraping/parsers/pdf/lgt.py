@@ -1,7 +1,7 @@
 import logging
 import re
 
-from ._lineup import LineupPdfParser
+from ._parser import PdfParser
 from typing import Tuple, List
 from pypdf import PageObject
 from pyutils.strings import whitespaces_clean
@@ -10,7 +10,7 @@ from data.models import Datasource, Lineup
 logger = logging.getLogger(__name__)
 
 
-class LGTLineupPdfParser(LineupPdfParser, source=Datasource.LGT):
+class LGTPdfParser(PdfParser):
     DATASOURCE = Datasource.LGT
 
     _CONDITION = ["CANTEIRÁ", "CANTEIRÁN", "PROPIO", "PROPIA", "NON PROPIO", "NON PROPIA"]
@@ -27,7 +27,7 @@ class LGTLineupPdfParser(LineupPdfParser, source=Datasource.LGT):
         "SUPLENTE",
     ]
 
-    def parse_page(self, page: PageObject) -> Lineup:
+    def parse_lineup(self, page: PageObject) -> Lineup:
         text = page.extract_text().split("\n")
         (race, club), rowers = self._parse_name(text[0]), self._clean_rowers(text[1:])
         return Lineup(

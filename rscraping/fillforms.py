@@ -8,14 +8,14 @@ import sys
 from datetime import datetime
 from builder import (
     PdfItem,
-    fill_national_form,
-    prompt_rower_data,
-    prompt_parent_data,
-    prompt_extra_data,
-    fill_image_form,
-    fill_xogade_form,
     fill_fegar_form,
+    fill_image_form,
+    fill_national_form,
+    fill_xogade_form,
     prompt_entity_data,
+    prompt_extra_data,
+    prompt_parent_data,
+    prompt_rower_data,
 )
 
 logger = logging.getLogger()

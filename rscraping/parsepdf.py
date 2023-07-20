@@ -7,7 +7,7 @@ import sys
 
 from typing import List
 from pypdf import PdfReader
-from parsers.pdf.lineup import LineupPdfParser
+from parsers.pdf import PdfParser, ACTPdfParser, LGTPdfParser
 from data.functions import expand_path, save_csv
 from data.models import Datasource, Lineup
 
@@ -19,14 +19,14 @@ _DEBUG = False
 
 
 def main(paths: List[str], datasource: Datasource):
-    parser: LineupPdfParser = LineupPdfParser(source=datasource)  # type: ignore
+    parser = _get_parser_by_datasource(datasource)
     parsed_items: List[Lineup] = []
 
     for file in paths:
         with open(file, "rb") as pdf:
             reader = PdfReader(pdf)
             for page in reader.pages:
-                items = parser.parse_page(page=page)
+                items = parser.parse_lineup(page=page)
                 if items:
                     parsed_items.append(items)
 
@@ -42,6 +42,14 @@ def main(paths: List[str], datasource: Datasource):
             print(f"Suplentes: {item.substitute}\n")
 
     save_csv(parsed_items, file_name=parser.DATASOURCE.value)
+
+
+def _get_parser_by_datasource(datasource: Datasource) -> PdfParser:
+    if datasource == Datasource.ACT:
+        return ACTPdfParser()
+    elif datasource == Datasource.LGT:
+        return LGTPdfParser()
+    raise NotImplementedError(f"no implementation for {datasource=}")
 
 
 def _parse_arguments():

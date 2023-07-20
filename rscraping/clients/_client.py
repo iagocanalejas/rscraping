@@ -1,10 +1,7 @@
-import re
 import logging
 from abc import ABC, abstractmethod
 from typing import List, Optional, Type
 
-from parsel import Selector
-from pyutils.strings.roman import find_roman, roman_to_int
 from data.models import Datasource, Lineup, Race
 
 
@@ -13,7 +10,6 @@ logger = logging.getLogger(__name__)
 
 class Client(ABC):
     _registry = {}
-    _selector: Selector
 
     DATASOURCE: Datasource
 
@@ -28,13 +24,6 @@ class Client(ABC):
         final_obj = object.__new__(subclass)
 
         return final_obj
-
-    @staticmethod
-    def get_edition(name: str) -> int:
-        name = re.sub(r"[\'\".:]", " ", name)
-
-        roman_options = list(filter(None, [find_roman(w) for w in name.split()]))
-        return roman_to_int(roman_options[0]) if roman_options else 1
 
     ####################################################
     #                     ABSTRACT                     #

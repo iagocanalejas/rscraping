@@ -1,17 +1,17 @@
-from ._lineup import LineupPdfParser
+from ._parser import PdfParser
 from typing import Optional, Tuple, List
 from pypdf import PageObject
 from pyutils.strings import whitespaces_clean
 from data.models import Datasource, Lineup
 
 
-class ACTLineupPdfParser(LineupPdfParser, source=Datasource.ACT):
+class ACTPdfParser(PdfParser):
     DATASOURCE = Datasource.ACT
 
     _TRASH = ["FIRMA Y SELLO", "PROPIOS:", "CANTERANOS:", "NO PROPIOS:", "CAPITÁN"]
     _CONDITION = ["CANTERANO", "CANTERANA", "PROPIO", "PROPIA", "NO PROPIO", "NO PROPIA"]
 
-    def parse_page(self, page: PageObject) -> Optional[Lineup]:
+    def parse_lineup(self, page: PageObject) -> Optional[Lineup]:
         text = [e for e in page.extract_text().split("\n") if e]
         if len(text) == 0:
             return None
