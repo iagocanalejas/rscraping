@@ -5,7 +5,7 @@ from pyutils.strings import whitespaces_clean
 
 logger = logging.getLogger(__name__)
 
-__NORMALIZED_MALE_TROPHIES = {
+__NORMALIZED_MALE_RACES = {
     "ZARAUZKO IKURRIÑA": ["ZARAUZKO ESTROPADAK", "ZARAUZKO IKURRIÑA"],
     "HONDARRIBIKO IKURRIÑA": ["HONDARRIBIKO IKURRIÑA", "HONDARRIBIKO BANDERA"],
     "EL CORREO IKURRIÑA": ["EL CORREO IKURRIÑA", "IKURRIÑA EL CORREO"],
@@ -16,7 +16,7 @@ __NORMALIZED_MALE_TROPHIES = {
     "BANDEIRA OUTÓN Y FERNÁNDEZ": ["OUTÓN Y FERNÁNDEZ", "OUTÓN FERNÁNDEZ", "OUTON FERNÁNDEZ"],
 }
 
-__NORMALIZED_FEMALE_TROPHIES = {
+__NORMALIZED_FEMALE_RACES = {
     "GRAN PREMIO FANDICOSTA FEMININO": ["GRAN PREMIO FANDICOSTA", "GP FANDICOSTA"],
     "BANDEIRA FEMININA CIDADE DE FERROL": ["MIGUEL DERUNGS"],
 }
@@ -30,14 +30,14 @@ __MISSPELLINGS = [
 ]
 
 
-def normalize_trophy_name(name: str, is_female: bool) -> str:
+def normalize_race_name(name: str, is_female: bool) -> str:
     name = whitespaces_clean(name).upper()
-    name = amend_trophy_name(name)
-    name = deacronym_trophy_name(name)
+    name = amend_race_name(name)
+    name = deacronym_race_name(name)
     name = remove_league_indicator(name)
 
-    normalizations = __NORMALIZED_FEMALE_TROPHIES if is_female else __NORMALIZED_MALE_TROPHIES
-    # specific trophy normalizations
+    normalizations = __NORMALIZED_FEMALE_RACES if is_female else __NORMALIZED_MALE_RACES
+    # specific race normalizations
     for k, v in normalizations.items():
         if name in v or any(part in name for part in v):
             name = k
@@ -50,7 +50,7 @@ def remove_league_indicator(name: str) -> str:
     return " ".join([w for w in name.split() if w not in ["B", "F"]])
 
 
-def deacronym_trophy_name(name: str) -> str:
+def deacronym_race_name(name: str) -> str:
     name = re.sub(r"G\.? ?P\.?", "GRAN PREMIO", name)
     name = re.sub(r" T\.? ?J\.?", " TIERRA DE JÚBILO", name)
     name = re.sub(r"B\.? ", "BANDERA ", name)
@@ -58,7 +58,7 @@ def deacronym_trophy_name(name: str) -> str:
     return whitespaces_clean(name)
 
 
-def amend_trophy_name(name: str) -> str:
+def amend_race_name(name: str) -> str:
     name = re.sub(r"[\'\".:ª]", " ", name)
     re.sub(r"(CONCELLO)( DE)?", "CONCELLO DE", name)
 

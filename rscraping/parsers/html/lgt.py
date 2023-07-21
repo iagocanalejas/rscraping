@@ -6,7 +6,7 @@ from ._parser import HtmlParser
 from typing import List, Optional, Tuple
 from parsel import Selector
 from pyutils.strings import remove_parenthesis, whitespaces_clean, remove_roman
-from data.constants import (
+from rscraping.data.constants import (
     GENDER_FEMALE,
     GENDER_MALE,
     PARTICIPANT_CATEGORY_ABSOLUT,
@@ -14,11 +14,11 @@ from data.constants import (
     RACE_TIME_TRIAL,
     RACE_TRAINERA,
 )
-from data.functions import is_play_off
-from data.models import Datasource, Participant, Race
-from data.normalization.clubs import normalize_club_name
-from data.normalization.times import normalize_lap_time
-from data.normalization.trophies import normalize_trophy_name
+from rscraping.data.functions import is_play_off
+from rscraping.data.models import Datasource, Participant, Race
+from rscraping.data.normalization.clubs import normalize_club_name
+from rscraping.data.normalization.times import normalize_lap_time
+from rscraping.data.normalization.races import normalize_race_name
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +52,7 @@ class LGTHtmlParser(HtmlParser):
 
         race = Race(
             name=name,
-            trophy_name=normalize_trophy_name(name, is_female),
+            trophy_name=normalize_race_name(name, is_female),
             date=t_date.strftime("%d/%m/%Y"),
             type=self.get_type(participants),
             edition=edition,
@@ -210,7 +210,7 @@ class LGTHtmlParser(HtmlParser):
         if "PLAY" in name:
             return "PLAY-OFF LGT"
 
-        name = normalize_trophy_name(name, is_female)
+        name = normalize_race_name(name, is_female)
         # remove gender
         for g in ["FEMENINA", "FEMININA"]:
             name = name.replace(g, "")

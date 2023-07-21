@@ -5,9 +5,9 @@ import requests
 from ._client import Client
 from typing import List, Optional
 from parsel import Selector
-from data.constants import HTTP_HEADERS
-from data.models import Datasource, Lineup, Race
-from parsers.html import ARCHtmlParser
+from rscraping.data.constants import HTTP_HEADERS
+from rscraping.data.models import Datasource, Lineup, Race
+from rscraping.parsers.html import ARCHtmlParser
 
 logger = logging.getLogger(__name__)
 

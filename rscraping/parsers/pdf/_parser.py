@@ -2,7 +2,7 @@ import logging
 
 from abc import ABC, abstractmethod
 from pypdf import PageObject
-from data.models import Datasource, Lineup
+from rscraping.data.models import Datasource, Lineup
 
 logger = logging.getLogger(__name__)
 

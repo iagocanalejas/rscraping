@@ -11,9 +11,9 @@ from typing import List, Optional, Tuple, Generator, Any
 from pandas import DataFrame
 from pytesseract import pytesseract
 from pyutils.strings import whitespaces_clean, remove_symbols
-from data.models import Participant, Race, OCR
-from data.normalization.times import normalize_lap_time
-from data.constants import (
+from rscraping.data.models import Participant, Race, OCR
+from rscraping.data.normalization.times import normalize_lap_time
+from rscraping.data.constants import (
     RACE_TRAINERA,
     GENDER_MALE,
     GENDER_FEMALE,

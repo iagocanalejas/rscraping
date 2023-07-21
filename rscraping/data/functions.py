@@ -2,7 +2,7 @@ import csv
 import os
 from typing import List
 
-from data.models import Lineup, Race
+from rscraping.data.models import Lineup, Race
 
 
 def is_play_off(name: str) -> bool:

@@ -6,8 +6,8 @@ import os
 import sys
 from typing import Optional
 
-from data.models import Datasource, Race
-from clients import Client
+from rscraping.data.models import Datasource, Race
+from rscraping.clients import Client
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)

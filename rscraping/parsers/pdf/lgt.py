@@ -5,7 +5,7 @@ from ._parser import PdfParser
 from typing import Tuple, List
 from pypdf import PageObject
 from pyutils.strings import whitespaces_clean
-from data.models import Datasource, Lineup
+from rscraping.data.models import Datasource, Lineup
 
 logger = logging.getLogger(__name__)
 

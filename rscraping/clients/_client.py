@@ -2,7 +2,7 @@ import logging
 from abc import ABC, abstractmethod
 from typing import List, Optional, Type
 
-from data.models import Datasource, Lineup, Race
+from rscraping.data.models import Datasource, Lineup, Race
 
 
 logger = logging.getLogger(__name__)

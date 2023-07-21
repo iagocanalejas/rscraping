@@ -6,7 +6,7 @@ import os
 import sys
 
 from datetime import datetime
-from builder import (
+from rscraping.builder import (
     PdfItem,
     fill_fegar_form,
     fill_image_form,

@@ -8,10 +8,10 @@ from io import BytesIO
 from pypdf import PdfReader
 from typing import Dict, List, Optional
 from parsel import Selector
-from data.constants import HTTP_HEADERS
-from data.models import Datasource, Lineup, Race
-from parsers.html import LGTHtmlParser
-from parsers.pdf import LGTPdfParser
+from rscraping.data.constants import HTTP_HEADERS
+from rscraping.data.models import Datasource, Lineup, Race
+from rscraping.parsers.html import LGTHtmlParser
+from rscraping.parsers.pdf import LGTPdfParser
 
 logger = logging.getLogger(__name__)
 

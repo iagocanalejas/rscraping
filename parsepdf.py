@@ -7,9 +7,9 @@ import sys
 
 from typing import List
 from pypdf import PdfReader
-from parsers.pdf import PdfParser, ACTPdfParser, LGTPdfParser
-from data.functions import expand_path, save_csv
-from data.models import Datasource, Lineup
+from rscraping.parsers.pdf import PdfParser, ACTPdfParser, LGTPdfParser
+from rscraping.data.functions import expand_path, save_csv
+from rscraping.data.models import Datasource, Lineup
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)

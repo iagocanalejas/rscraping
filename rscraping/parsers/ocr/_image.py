@@ -9,9 +9,9 @@ from typing import Any, List, Tuple, Optional, Generator
 from matplotlib import pyplot as plt
 from numpy.typing import NDArray
 from pandas import DataFrame
-from data.models import OCR, Race
-from data.normalization.clubs import normalize_club_name
-from data.normalization.trophies import normalize_trophy_name
+from rscraping.data.models import OCR, Race
+from rscraping.data.normalization.clubs import normalize_club_name
+from rscraping.data.normalization.races import normalize_race_name
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +76,7 @@ class ImageOCR(ABC):
     ####################################################
 
     def normalized_name(self, name: str, **_) -> str:
-        return normalize_trophy_name(name, False)
+        return normalize_race_name(name, False)
 
     def normalized_club_name(self, name: str, **_) -> str:
         return normalize_club_name(name)

@@ -6,9 +6,9 @@ import os
 import sys
 
 from typing import List
-from parsers.ocr import ImageOCR
-from data.functions import expand_path, save_csv
-from data.models import OCR, Datasource, Race
+from rscraping.parsers.ocr import ImageOCR
+from rscraping.data.functions import expand_path, save_csv
+from rscraping.data.models import OCR, Datasource, Race
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)

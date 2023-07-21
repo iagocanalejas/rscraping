@@ -6,9 +6,9 @@ import os
 import sys
 from typing import List
 
-from data.models import Datasource, Lineup
-from clients import Client
-from data.functions import save_csv
+from rscraping.data.models import Datasource, Lineup
+from rscraping.clients import Client
+from rscraping.data.functions import save_csv
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
