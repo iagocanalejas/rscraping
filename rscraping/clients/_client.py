@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 class Client(ABC):
     _registry = {}
+    _is_female = False
 
     DATASOURCE: Datasource
 
@@ -19,9 +20,10 @@ class Client(ABC):
         if source:
             cls._registry[source] = cls
 
-    def __new__(cls, source: Datasource, **kwargs) -> Type["Client"]:  # pyright: ignore
+    def __new__(cls, source: Datasource, is_female: bool = False, **kwargs) -> Type["Client"]:  # pyright: ignore
         subclass = cls._registry[source]
         final_obj = object.__new__(subclass)
+        final_obj._is_female = is_female
 
         return final_obj
 
@@ -31,7 +33,12 @@ class Client(ABC):
 
     @staticmethod
     @abstractmethod
-    def get_url(race_id: str, **kwargs) -> str:
+    def get_race_details_url(race_id: str, **kwargs) -> str:
+        raise NotImplementedError
+
+    @staticmethod
+    @abstractmethod
+    def get_races_url(year: int, **kwargs) -> str:
         raise NotImplementedError
 
     @staticmethod
@@ -41,6 +48,10 @@ class Client(ABC):
 
     @abstractmethod
     def get_race_by_id(self, race_id: str, **kwargs) -> Optional[Race]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_race_ids_by_year(self, year: int, **kwargs) -> List[str]:
         raise NotImplementedError
 
     @abstractmethod

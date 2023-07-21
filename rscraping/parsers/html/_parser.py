@@ -25,5 +25,9 @@ class HtmlParser(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    def parse_race_ids(self, selector: Selector, **kwargs) -> Optional[str]:
+        raise NotImplementedError
+
+    @abstractmethod
     def parse_lineup(self, selector: Selector, **kwargs) -> Lineup:
         raise NotImplementedError

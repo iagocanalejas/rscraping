@@ -76,6 +76,20 @@ class ARCHtmlParser(HtmlParser):
 
         return race
 
+    def parse_race_ids(self, selector: Selector, for_old_web: bool = False, **_) -> List[str]:
+        if for_old_web:
+            urls = selector.xpath('//*[@id="contenido"]/div[*]/a/@href').getall()
+            return [url_parts[-1] for url_parts in (url.split("id=") for url in urls)]
+        urls = selector.xpath('//*[@id="main"]/div[3]/div[15]/table/tbody/tr[*]/td[2]/span/a/@href').getall()
+        return [url_parts[-2] for url_parts in (url.split("/") for url in urls)]
+
+    def parse_club_ids(self, selector: Selector) -> List[str]:
+        urls = (
+            selector.xpath('//*[@id="main"]/div/div[2]/h2[*]/a/@href').getall()
+            + selector.xpath('//*[@id="main"]/div/div[3]/h2[*]/a/@href').getall()
+        )
+        return [url_parts[-2] for url_parts in (url.split("/") for url in urls)]
+
     def parse_lineup(self, selector: Selector, **_) -> Lineup:
         race = selector.xpath('//*[@id="main"]/div[2]/div[1]/h2/a/text()').get("")
         club = selector.xpath('//*[@id="main"]/div[2]/div[2]/div[1]/div[2]/div/h2/a/text()').get("")
@@ -264,3 +278,23 @@ class ARCHtmlParser(HtmlParser):
             return "PLAY-OFF ARC", (year - 2005), day
 
         return name, edition, day
+
+    # @staticmethod
+    # def _hardcoded_old_web_mappings(name: str, edition: int, day: int, year: int) -> Tuple[str, int, int]:
+    #     if "DONIBANE ZIBURUKO" in name:
+    #         return "DONIBANE ZIBURUKO ESTROPADAK", int(re.findall(r"\d+", name)[0]), 1
+    #     if "AMBILAMP" in name:
+    #         return "BANDERA AMBILAMP", edition, day
+    #     if "BANDERA DE CASTRO" in name:
+    #         return "BANDERA DE CASTRO", edition, day
+    #
+    #     if name == "PORTUGALETE 2 REGATA (ARC 2)":
+    #         return "REGATA PORTUGALETE (ARC 2)", 2, 1
+    #     if name == "IKURRIÑA ILTMO AYTO DE SANTURTZI":
+    #         return "IKURRIÑA DE SANTURTZI", edition, day
+    #
+    #     if is_play_off(name):
+    #         if any(e in name for e in ["ACT", "SAN MIGUEL"]):
+    #             return "PREVIO PLAY-OFF ACT (ARC - ALN)", (year - 2005), day
+    #         return "PLAY-OFF ARC", (year - 2005), day
+    #     return name, edition, day

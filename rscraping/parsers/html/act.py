@@ -82,6 +82,10 @@ class ACTHtmlParser(HtmlParser):
 
         return race
 
+    def parse_race_ids(self, selector: Selector, **_) -> List[str]:
+        urls = selector.xpath('//*[@id="col-a"]/div/section/div[5]/table/tbody/tr[*]/td[*]/a/@href').getall()
+        return [url_parts[-1] for url_parts in (url.split("r=") for url in urls)]
+
     def parse_lineup(self, **_):
         raise NotImplementedError
 

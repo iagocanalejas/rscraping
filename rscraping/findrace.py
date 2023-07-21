@@ -15,7 +15,7 @@ logger.addHandler(logging.StreamHandler(sys.stdout))
 
 
 def find_race(race_id: str, datasource: Datasource, is_female: bool) -> Optional[Race]:
-    client = Client(source=datasource)  # type: ignore
+    client = Client(source=datasource, is_female=is_female)  # type: ignore
     return client.get_race_by_id(race_id, is_female=is_female)
 
 

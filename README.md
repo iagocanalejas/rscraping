@@ -15,7 +15,6 @@ Tries to parse a line-up for a given race to retrieved all the participants.
 
 ```sh
 python findlineup <datasource> <race_id> <options>
-    # --club_id=<str>: Club to retrieve the lineup for [required for ARC].
     # --female=<bool>: Specifies if we need to search in the female pages.
 ```
 

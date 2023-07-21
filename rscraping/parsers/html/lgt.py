@@ -87,12 +87,18 @@ class LGTHtmlParser(HtmlParser):
 
         return race
 
+    def parse_race_ids(self, **_):
+        raise NotImplementedError
+
     def parse_lineup(self, **_):
         raise NotImplementedError
 
     ####################################################
     #                     GETTERS                      #
     ####################################################
+
+    def is_valid_race(self, selector: Selector) -> bool:
+        return bool(self.get_name(selector))
 
     def get_name(self, selector: Selector) -> str:
         return whitespaces_clean(selector.xpath('//*[@id="regata"]/div/div/div[3]/div[2]/h1/text()').get("")).upper()

@@ -1,3 +1,4 @@
+from datetime import date
 import logging
 import requests
 
@@ -5,7 +6,7 @@ import requests
 from ._client import Client
 from io import BytesIO
 from pypdf import PdfReader
-from typing import List, Optional
+from typing import Dict, List, Optional
 from parsel import Selector
 from data.constants import HTTP_HEADERS
 from data.models import Datasource, Lineup, Race
@@ -17,10 +18,69 @@ logger = logging.getLogger(__name__)
 
 class LGTClient(Client, source=Datasource.LGT):
     DATASOURCE = Datasource.LGT
+    _excluded_ids = [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        13,
+        14,
+        15,
+        23,
+        25,
+        26,
+        27,
+        28,
+        31,
+        32,
+        33,
+        34,
+        36,
+        37,
+        40,
+        41,
+        44,
+        50,
+        51,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        75,
+        88,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        103,
+        104,
+        105,
+        106,
+        108,
+        125,
+        131,
+        137,
+        138,
+        146,
+        147,
+        151,
+    ]  # weird races
 
     @staticmethod
-    def get_url(race_id: str, **_) -> str:
+    def get_race_details_url(race_id: str, **_) -> str:
         return f"https://www.ligalgt.com/principal/regata/{race_id}"
+
+    @staticmethod
+    def get_races_url(**_) -> str:
+        raise NotImplementedError
 
     @staticmethod
     def get_lineup_url(race_id: str, **_) -> str:
@@ -33,7 +93,10 @@ class LGTClient(Client, source=Datasource.LGT):
         return Selector(requests.post(url=url, headers=HTTP_HEADERS, data=data).text)
 
     def get_race_by_id(self, race_id: str, **_) -> Optional[Race]:
-        url = self.get_url(race_id)
+        if race_id in self._excluded_ids:
+            return None
+
+        url = self.get_race_details_url(race_id)
         self._selector = Selector(requests.get(url=url, headers=HTTP_HEADERS).text)
         self._results_selector = self.get_results_selector(race_id)
 
@@ -46,7 +109,57 @@ class LGTClient(Client, source=Datasource.LGT):
             race.url = url
         return race
 
+    def get_race_ids_by_year(self, year: int, **_) -> List[str]:
+        """
+        As this datasource doesn't give us an easy way of retrieving the races for a given year we need to bruteforce
+        it, this method will do a binary search for the 'upper' and 'lower' bounds of a season.
+
+        We also need to ignore a hole ton of useless IDs (_excluded_ids) that are not used or have invalid information.
+
+        Returns a list of unchecked IDs, note that this list can contain invalid values as this method does not check
+        each one of them.
+        """
+        since = 2020
+        today = date.today().year
+        if year < since or year > today:
+            raise ValueError(f"invalid 'year', available values are [{since}, {today}]")
+
+        parser = LGTHtmlParser()
+
+        # asume 30 races per year for lower bound and 50 for the upper bound
+        left, right = (year - since) * 20, (today - since + 1) * 50
+        while left <= right:
+            mid = left + (right - left) // 2
+            while mid in self._excluded_ids and mid > (left + 1):
+                mid -= 1
+
+            race_year = self._get_race_year(parser, str(mid))
+            if not race_year or race_year < year:
+                left = mid + 1
+            else:
+                right = mid - 1
+        lower_race_id = left
+
+        # asume 30 races per year for lower bound and 50 for the upper bound
+        left, right = (year - since) * 30, (today - since + 1) * 50
+        while left <= right:
+            mid = left + (right - left) // 2
+            while mid in self._excluded_ids and mid < (right - 1):
+                mid += 1
+
+            race_year = self._get_race_year(parser, str(mid))
+            if not race_year or race_year > year:
+                right = mid - 1
+            else:
+                left = mid + 1
+        upper_race_id = right
+
+        return [str(r) for r in range(lower_race_id, (upper_race_id + 1)) if r not in self._excluded_ids]
+
     def get_lineup_by_race_id(self, race_id: str, **_) -> List[Lineup]:
+        if race_id in self._excluded_ids:
+            return []
+
         url = self.get_lineup_url(race_id)
         raw_pdf = requests.get(url=url, headers=HTTP_HEADERS).content
 
@@ -60,3 +173,24 @@ class LGTClient(Client, source=Datasource.LGT):
                     parsed_items.append(items)
 
         return parsed_items
+
+    ####################################################
+    #                      UTILS                       #
+    ####################################################
+
+    _RACE_YEARS: Dict[str, Optional[int]] = {}
+
+    def _get_race_year(self, parser: LGTHtmlParser, race_id: str) -> Optional[int]:
+        if race_id in self._RACE_YEARS:
+            return self._RACE_YEARS[race_id]
+
+        url = self.get_race_details_url(race_id)
+
+        selector = Selector(requests.get(url=url, headers=HTTP_HEADERS).text)
+        if not parser.is_valid_race(selector):
+            self._RACE_YEARS[race_id] = None
+            return None
+        race_year = parser.get_date(selector).year
+
+        self._RACE_YEARS[race_id] = race_year
+        return race_year
