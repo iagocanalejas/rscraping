@@ -7,5 +7,11 @@ setup(
     version=VERSION,
     author="Iago Santos",
     packages=find_packages(),
-    install_requires=[],
+    install_requires=[
+        "parsel",
+        "pypdf",
+        "requests",
+        "Unidecode",
+    ],
+    dependency_links=["https://github.com/iagocanalejas/pyutils.git@master#egg=pyutils"],
 )

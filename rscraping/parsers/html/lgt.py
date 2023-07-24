@@ -155,7 +155,10 @@ class LGTHtmlParser(HtmlParser):
 
     def get_participants(self, results_selector: Selector) -> List[Selector]:
         def is_valid(row: Selector) -> bool:
-            return len(row.xpath("//*/td").getall()) > 1 and row.xpath("//*/td[2]/text()").get("") != "LIBRE"
+            if len(row.xpath("//*/td").getall()) <= 1:
+                return False
+            maybe_name = row.xpath("//*/td[2]/text()").get("")
+            return bool(maybe_name) and maybe_name != "LIBRE"
 
         return [
             Selector(p)

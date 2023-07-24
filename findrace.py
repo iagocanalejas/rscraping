@@ -4,19 +4,13 @@ import argparse
 import logging
 import os
 import sys
-from typing import Optional
+from rscraping import find_race
 
-from rscraping.data.models import Datasource, Race
-from rscraping.clients import Client
+from rscraping.data.models import Datasource
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 logger.addHandler(logging.StreamHandler(sys.stdout))
-
-
-def find_race(race_id: str, datasource: Datasource, is_female: bool) -> Optional[Race]:
-    client = Client(source=datasource, is_female=is_female)  # type: ignore
-    return client.get_race_by_id(race_id, is_female=is_female)
 
 
 def _parse_arguments():

@@ -1,6 +1,6 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import List, Optional, Type
+from typing import List, Optional
 
 from rscraping.data.models import Datasource, Lineup, Race
 
@@ -20,7 +20,7 @@ class Client(ABC):
         if source:
             cls._registry[source] = cls
 
-    def __new__(cls, source: Datasource, is_female: bool = False, **kwargs) -> Type["Client"]:  # pyright: ignore
+    def __new__(cls, source: Datasource, is_female: bool = False, **kwargs) -> "Client":  # pyright: ignore
         subclass = cls._registry[source]
         final_obj = object.__new__(subclass)
         final_obj._is_female = is_female

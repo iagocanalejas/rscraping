@@ -150,7 +150,7 @@ class ARCHtmlParser(HtmlParser):
 
     def get_date(self, selector: Selector) -> date:
         value = whitespaces_clean(selector.xpath('//*[@id="main"]/div[2]/div[2]/div[1]/div[1]/ul/li[1]/text()').get(""))
-        value = value.replace("AGO", "AUG")  # want to avoid changing the local
+        value = value.upper().replace("AGO", "AUG")  # want to avoid changing the local
         return datetime.strptime(value, "%d %b %Y").date()
 
     def get_day(self, selector: Selector) -> int:

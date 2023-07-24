@@ -4,20 +4,14 @@ import argparse
 import logging
 import os
 import sys
-from typing import List
+from rscraping import find_lineup
 
-from rscraping.data.models import Datasource, Lineup
-from rscraping.clients import Client
+from rscraping.data.models import Datasource
 from rscraping.data.functions import save_csv
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 logger.addHandler(logging.StreamHandler(sys.stdout))
-
-
-def find_lineup(race_id: str, datasource: Datasource, is_female: bool) -> List[Lineup]:
-    client = Client(source=datasource, is_female=is_female)  # type: ignore
-    return client.get_lineup_by_race_id(race_id)
 
 
 def _parse_arguments():
