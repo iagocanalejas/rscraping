@@ -1,32 +1,38 @@
 import json
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum, auto
 from typing import List, Optional
 
 
-class Datasource(Enum):
-    ACT = "act"
-    LGT = "lgt"
-    ARC = "arc"
+class Datasource(StrEnum):
+    ACT = auto()
+    LGT = auto()
+    ARC = auto()
+    TRAINERAS = auto()
+    INFOREMO = auto()
 
     @classmethod
-    def values(cls) -> List[str]:
-        return [k for k in cls.__dict__.keys() if not k.startswith("_")]
+    def has_value(cls, value: str) -> bool:
+        return value is not None and value.lower() in [d for d in cls]
+
+    @classmethod
+    def is_OCR(cls, value: str) -> bool:
+        return value is not None and value.lower() in [cls.INFOREMO]
+
+    @classmethod
+    def _missing_(cls, value: str) -> Optional["Datasource"]:
+        value = value.lower()
+        for member in cls:
+            if member.value == value:
+                return member
+        return None
 
     def __str__(self) -> str:
         return self.value
 
     def __repr__(self) -> str:
         return self.__str__()
-
-
-class OCR(Enum):
-    INFOREMO = "inforemo"
-
-    @classmethod
-    def values(cls) -> List[str]:
-        return [k for k in cls.__dict__.keys() if not k.startswith("_")]
 
 
 @dataclass

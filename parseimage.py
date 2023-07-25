@@ -8,7 +8,7 @@ import sys
 from typing import List
 from rscraping.parsers.ocr import ImageOCR
 from rscraping.data.functions import expand_path, save_csv
-from rscraping.data.models import OCR, Datasource, Race
+from rscraping.data.models import Datasource, Race
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -41,10 +41,10 @@ if __name__ == "__main__":
     logger.info(f"{os.path.basename(__file__)}:: args -> {args.__dict__}")
 
     _DEBUG = args.debug
-    if args.datasource.upper() not in OCR.values():
+    if not Datasource.is_OCR(args.datasource):
         raise ValueError(f"invalid datasource={args.datasource}")
 
     main(
         paths=expand_path(os.path.abspath(args.path), valid_files=[".JPG", ".JPEG", ".PNG"]),
-        datasource=Datasource[args.datasource.upper()],
+        datasource=Datasource(args.datasource),
     )

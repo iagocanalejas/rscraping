@@ -9,7 +9,7 @@ from typing import Any, List, Tuple, Optional, Generator
 from matplotlib import pyplot as plt
 from numpy.typing import NDArray
 from pandas import DataFrame
-from rscraping.data.models import OCR, Race
+from rscraping.data.models import Datasource, Race
 from rscraping.data.normalization.clubs import normalize_club_name
 from rscraping.data.normalization.races import normalize_race_name
 
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class ImageOCR(ABC):
-    DATASOURCE: OCR
+    DATASOURCE: Datasource
     _registry = {}
 
     img: NDArray  # grayscale loaded image

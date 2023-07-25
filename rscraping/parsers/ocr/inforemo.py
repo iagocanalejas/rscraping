@@ -11,7 +11,7 @@ from typing import List, Optional, Tuple, Generator, Any
 from pandas import DataFrame
 from pytesseract import pytesseract
 from pyutils.strings import whitespaces_clean, remove_symbols
-from rscraping.data.models import Participant, Race, OCR
+from rscraping.data.models import Datasource, Participant, Race
 from rscraping.data.normalization.times import normalize_lap_time
 from rscraping.data.constants import (
     RACE_TRAINERA,
@@ -25,8 +25,8 @@ from rscraping.data.constants import (
 logger = logging.getLogger(__name__)
 
 
-class ImageOCRInforemo(ImageOCR, source=OCR.INFOREMO):
-    DATASOURCE = OCR.INFOREMO
+class ImageOCRInforemo(ImageOCR, source=Datasource.INFOREMO):
+    DATASOURCE = Datasource.INFOREMO
 
     _GENDERS = {
         GENDER_MALE: ["MASCULINO", "ABSOLUTO", "VETERANO"],

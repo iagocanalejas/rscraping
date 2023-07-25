@@ -23,12 +23,12 @@ def _parse_arguments():
 
 
 def main(race_id: str, datasource: str, is_female: bool):
-    if datasource.upper() not in Datasource.values():
+    if not Datasource.has_value(datasource):
         raise ValueError(f"invalid datasource={datasource}")
 
     lineups = find_lineup(
         race_id=race_id,
-        datasource=Datasource[datasource.upper()],
+        datasource=Datasource(datasource),
         is_female=is_female,
     )
     if not lineups:

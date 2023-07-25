@@ -65,12 +65,12 @@ if __name__ == "__main__":
     logger.info(f"{os.path.basename(__file__)}:: args -> {args.__dict__}")
 
     _DEBUG = args.debug
-    if args.datasource.upper() not in Datasource.values():
+    if not Datasource.has_value(args.datasource):
         raise ValueError(f"invalid datasource={args.datasource}")
-    if args.datasource.lower() == Datasource.ARC:
+    if args.datasource.lower() == Datasource.ARC.value:
         raise NotImplementedError(f"no valid implementation for datasource={Datasource.ARC}")
 
     main(
         paths=expand_path(os.path.abspath(args.path), valid_files=[".PDF"]),
-        datasource=Datasource[args.datasource.upper()],
+        datasource=Datasource(args.datasource),
     )
