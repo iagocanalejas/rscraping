@@ -41,7 +41,7 @@ class ARCHtmlParser(HtmlParser):
 
         race = Race(
             name=name,
-            trophy_name=normalize_race_name(name, is_female),
+            normalized_name=normalize_race_name(name, is_female),
             date=self.get_date(selector).strftime("%d/%m/%Y"),
             type=self.get_type(participants),
             edition=self.get_edition(name),
@@ -52,6 +52,7 @@ class ARCHtmlParser(HtmlParser):
             organizer=None,
             race_id=race_id,
             url=None,
+            gender=gender,
             datasource=self.DATASOURCE.value,
             cancelled=self.is_cancelled(selector),
             race_laps=self.get_race_laps(selector),

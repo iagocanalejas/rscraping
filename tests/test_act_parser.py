@@ -2,6 +2,7 @@ import os
 import unittest
 
 from parsel import Selector
+from rscraping.data.constants import GENDER_MALE
 from rscraping.data.models import Participant, Race
 
 from rscraping.parsers.html.act import ACTHtmlParser
@@ -44,10 +45,11 @@ class TestACTParser(unittest.TestCase):
         league="EUSKO LABEL LIGA",
         town="ZIERBENA BIZKAIA",
         organizer=None,
-        trophy_name="BANDERA PETRONOR",
+        normalized_name="BANDERA PETRONOR",
         race_id="1234",
         url=None,
         datasource="act",
+        gender=GENDER_MALE,
         participants=[],
         race_laps=7,
         race_lanes=4,

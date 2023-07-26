@@ -2,6 +2,7 @@ import os
 import unittest
 
 from parsel import Selector
+from rscraping.data.constants import GENDER_MALE
 from rscraping.data.models import Participant, Race, Lineup
 
 from rscraping.parsers.html.arc import ARCHtmlParser
@@ -56,9 +57,10 @@ class TestARCParser(unittest.TestCase):
         league="TEMPORADA 2009",
         town="COLINDRES",
         organizer=None,
-        trophy_name="BANDERA RIA DEL ASON",
+        normalized_name="BANDERA RIA DEL ASON",
         race_id="1234",
         url=None,
+        gender=GENDER_MALE,
         datasource="arc",
         participants=[],
         race_laps=4,

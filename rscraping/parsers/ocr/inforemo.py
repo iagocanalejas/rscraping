@@ -52,12 +52,12 @@ class ImageOCRInforemo(ImageOCR, source=Datasource.INFOREMO):
         if self.allow_plot:
             logger.info(df)
 
-        trophy_name = self.normalized_name(name)
+        normalized_name = self.normalized_name(name)
         race_lanes = self.get_race_lanes(df)
         race_laps = self.get_race_laps(df)
         race = Race(
             name=name,
-            trophy_name=trophy_name,
+            normalized_name=normalized_name,
             date=t_date,
             edition=self.get_edition(),
             day=self.get_day(),
@@ -68,6 +68,7 @@ class ImageOCRInforemo(ImageOCR, source=Datasource.INFOREMO):
             organizer=self.get_organizer(),
             race_id=os.path.basename(path),
             url=None,
+            gender=None,
             datasource=self.DATASOURCE.value,
             race_laps=race_laps,
             race_lanes=race_lanes,

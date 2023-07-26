@@ -52,7 +52,7 @@ class LGTHtmlParser(HtmlParser):
 
         race = Race(
             name=name,
-            trophy_name=normalize_race_name(name, is_female),
+            normalized_name=normalize_race_name(name, is_female),
             date=t_date.strftime("%d/%m/%Y"),
             type=self.get_type(participants),
             edition=edition,
@@ -64,6 +64,7 @@ class LGTHtmlParser(HtmlParser):
             race_id=race_id,
             url=None,
             datasource=self.DATASOURCE.value,
+            gender=gender,
             cancelled=self.is_cancelled(participants),
             race_laps=self.get_race_laps(results_selector),
             race_lanes=self.get_race_lanes(participants),

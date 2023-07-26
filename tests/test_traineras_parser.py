@@ -2,6 +2,7 @@ import os
 import unittest
 
 from parsel import Selector
+from rscraping.data.constants import GENDER_MALE
 from rscraping.data.models import Participant, Race
 
 from rscraping.parsers.html.traineras import MultiDayRaceException, TrainerasHtmlParser
@@ -62,9 +63,10 @@ class TestTrainerasParser(unittest.TestCase):
         league=None,
         town="A CORUÑA",
         organizer=None,
-        trophy_name="BANDERA CIUDAD DE LA CORUÑA",
+        normalized_name="BANDERA CIUDAD DE LA CORUÑA",
         race_id="1234",
         url=None,
+        gender=GENDER_MALE,
         datasource="traineras",
         participants=[],
         race_laps=4,
@@ -81,9 +83,10 @@ class TestTrainerasParser(unittest.TestCase):
         league=None,
         town="A CORUÑA",
         organizer=None,
-        trophy_name="BANDERA CIUDAD DE LA CORUÑA",
+        normalized_name="BANDERA CIUDAD DE LA CORUÑA",
         race_id="1234",
         url=None,
+        gender=GENDER_MALE,
         datasource="traineras",
         participants=[],
         race_laps=4,

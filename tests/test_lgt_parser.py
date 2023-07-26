@@ -2,6 +2,7 @@ import os
 import unittest
 
 from parsel import Selector
+from rscraping.data.constants import GENDER_MALE
 from rscraping.data.models import Participant, Race
 
 from rscraping.parsers.html.lgt import LGTHtmlParser
@@ -41,10 +42,11 @@ class TestLGTParser(unittest.TestCase):
         league="LIGA A",
         town="",
         organizer=None,
-        trophy_name="BANDEIRA VIRXE DO CARME",
+        normalized_name="BANDEIRA VIRXE DO CARME",
         race_id="1234",
         url=None,
         datasource="arc",
+        gender=GENDER_MALE,
         participants=[],
         race_laps=4,
         race_lanes=4,

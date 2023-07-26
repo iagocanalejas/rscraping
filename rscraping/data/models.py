@@ -65,12 +65,13 @@ class Race:
     organizer: Optional[str]
 
     # normalized fields
-    trophy_name: str
+    normalized_name: str
 
     # datasource data
     race_id: str
     url: Optional[str]
     datasource: str
+    gender: Optional[str]
 
     participants: List["Participant"]
 

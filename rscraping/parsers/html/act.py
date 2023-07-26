@@ -47,7 +47,7 @@ class ACTHtmlParser(HtmlParser):
 
         race = Race(
             name=name,
-            trophy_name=normalize_race_name(name, is_female),
+            normalized_name=normalize_race_name(name, is_female),
             date=t_date.strftime("%d/%m/%Y"),
             type=self.get_type(participants),
             edition=edition,
@@ -58,6 +58,7 @@ class ACTHtmlParser(HtmlParser):
             organizer=self.get_organizer(selector),
             race_id=race_id,
             url=None,
+            gender=gender,
             datasource=self.DATASOURCE.value,
             cancelled=self.is_cancelled(selector),
             race_laps=self.get_race_laps(selector),

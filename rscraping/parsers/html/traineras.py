@@ -59,7 +59,7 @@ class TrainerasHtmlParser(HtmlParser):
 
         race = Race(
             name=name,
-            trophy_name=normalize_race_name(name, False),
+            normalized_name=normalize_race_name(name, False),
             date=t_date.strftime("%d/%m/%Y"),
             type=ttype,
             edition=1,  # not present
@@ -70,6 +70,7 @@ class TrainerasHtmlParser(HtmlParser):
             organizer=None,
             race_id=race_id,
             url=None,
+            gender=gender,
             datasource=self.DATASOURCE.value,
             cancelled=self.is_cancelled(),
             race_laps=self.get_race_laps(selector, day),
