@@ -1,3 +1,4 @@
+from datetime import date
 import logging
 import requests
 
@@ -14,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 class TrainerasClient(Client, source=Datasource.TRAINERAS):
     DATASOURCE = Datasource.TRAINERAS
+    MALE_START = FEMALE_START = 1960
 
     @staticmethod
     def get_race_details_url(race_id: str, **_) -> str:
@@ -39,6 +41,11 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
         return race
 
     def get_race_ids_by_year(self, year: int, **_) -> List[str]:
+        since = self.MALE_START
+        today = date.today().year
+        if year < since or year > today:
+            raise ValueError(f"invalid 'year', available values are [{since}, {today}]")
+
         ids: List[str] = []
         parser: TrainerasHtmlParser = TrainerasHtmlParser()
 

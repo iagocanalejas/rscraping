@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 class LGTClient(Client, source=Datasource.LGT):
     DATASOURCE = Datasource.LGT
+    MALE_START = FEMALE_START = 2020
     _excluded_ids = [
         1,
         2,
@@ -119,7 +120,7 @@ class LGTClient(Client, source=Datasource.LGT):
         Returns a list of unchecked IDs, note that this list can contain invalid values as this method does not check
         each one of them.
         """
-        since = 2020
+        since = self.MALE_START
         today = date.today().year
         if year < since or year > today:
             raise ValueError(f"invalid 'year', available values are [{since}, {today}]")

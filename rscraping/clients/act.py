@@ -18,6 +18,8 @@ logger = logging.getLogger(__name__)
 
 class ACTClient(Client, source=Datasource.ACT):
     DATASOURCE = Datasource.ACT
+    MALE_START = 2003
+    FEMALE_START = 2009
 
     @staticmethod
     def get_race_details_url(race_id: str, is_female: bool, **_) -> str:
@@ -46,7 +48,7 @@ class ACTClient(Client, source=Datasource.ACT):
         return race
 
     def get_race_ids_by_year(self, year: int, **_) -> List[str]:
-        since = 2009 if self._is_female else 2003
+        since = self.FEMALE_START if self._is_female else self.MALE_START
         today = date.today().year
         if year < since or year > today:
             raise ValueError(f"invalid 'year', available values are [{since}, {today}]")

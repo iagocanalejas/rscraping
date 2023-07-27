@@ -21,6 +21,8 @@ class ARCClient(Client, source=Datasource.ARC):
     """
 
     DATASOURCE = Datasource.ARC
+    MALE_START = 2006
+    FEMALE_START = 2018
 
     @staticmethod
     def get_race_details_url(race_id: str, is_female: bool, **_) -> str:
@@ -51,7 +53,7 @@ class ARCClient(Client, source=Datasource.ARC):
         return race
 
     def get_race_ids_by_year(self, year: int, **_) -> List[str]:
-        since = 2018 if self._is_female else 2006
+        since = self.FEMALE_START if self._is_female else self.MALE_START
         today = date.today().year
         if year < since or year > today:
             raise ValueError(f"invalid 'year', available values are [{since}, {today}]")

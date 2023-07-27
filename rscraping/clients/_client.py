@@ -13,6 +13,8 @@ class Client(ABC):
     _is_female = False
 
     DATASOURCE: Datasource
+    FEMALE_START: int
+    MALE_START: int
 
     def __init_subclass__(cls, **kwargs):
         source = kwargs.pop("source", None)

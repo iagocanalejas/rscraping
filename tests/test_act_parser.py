@@ -11,7 +11,7 @@ from rscraping.parsers.html.act import ACTHtmlParser
 class TestACTParser(unittest.TestCase):
     def setUp(self):
         self.parser = ACTHtmlParser()
-        self.fixtures = os.path.join(os.getcwd(), "fixtures")
+        self.fixtures = os.path.join(os.getcwd(), "fixtures", "html")
 
     def test_parse_race(self):
         with open(os.path.join(self.fixtures, "act_details.html"), "r") as file:

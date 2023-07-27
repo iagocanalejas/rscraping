@@ -11,7 +11,7 @@ from rscraping.parsers.html.traineras import MultiDayRaceException, TrainerasHtm
 class TestTrainerasParser(unittest.TestCase):
     def setUp(self):
         self.parser = TrainerasHtmlParser()
-        self.fixtures = os.path.join(os.getcwd(), "fixtures")
+        self.fixtures = os.path.join(os.getcwd(), "fixtures", "html")
 
     def test_multi_day_race_exception(self):
         with open(os.path.join(self.fixtures, "traineras_details.html"), "r") as file:
