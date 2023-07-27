@@ -78,6 +78,7 @@ class ACTHtmlParser(HtmlParser):
                     distance=self.get_distance(is_female),
                     participant=normalize_club_name(self.get_club_name(row)),
                     race=race,
+                    disqualified=self.is_disqualified(row),
                 )
             )
 
@@ -156,6 +157,12 @@ class ACTHtmlParser(HtmlParser):
     def get_laps(self, participant: Selector) -> List[str]:
         laps = participant.xpath("//*/td/text()").getall()[2:-1]
         return [t.strftime("%M:%S.%f") for t in [normalize_lap_time(e) for e in laps if e] if t is not None]
+
+    def is_disqualified(self, participant: Selector) -> bool:
+        # race_id=1647864823
+        # try to find the "Descal" text in the final crono
+        laps = participant.xpath("//*/td/text()").getall()[2:-1]
+        return whitespaces_clean(laps[-1]) == "Descal"
 
     def get_series(self, selector: Selector, participant: Selector) -> int:
         series = 1

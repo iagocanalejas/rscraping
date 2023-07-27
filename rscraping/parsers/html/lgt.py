@@ -83,6 +83,7 @@ class LGTHtmlParser(HtmlParser):
                     distance=self.get_distance(),
                     participant=normalize_club_name(self.get_club_name(row)),
                     race=race,
+                    disqualified=self.is_disqualified(row),
                 )
             )
 
@@ -181,6 +182,12 @@ class LGTHtmlParser(HtmlParser):
     def get_laps(self, participant: Selector) -> List[str]:
         laps = participant.xpath("//*/td/text()").getall()[2:]
         return [t.strftime("%M:%S.%f") for t in [normalize_lap_time(e) for e in laps if e] if t is not None]
+
+    def is_disqualified(self, participant: Selector) -> bool:
+        # race_id=168
+        # try to find the "-" text in the final crono
+        laps = participant.xpath("//*/td/text()").getall()[2:]
+        return whitespaces_clean(laps[-1]) == "-"
 
     def get_series(self, results_selector: Selector, participant: Selector) -> int:
         series = 1

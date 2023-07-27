@@ -90,6 +90,7 @@ class TrainerasHtmlParser(HtmlParser):
                     distance=distance,
                     participant=normalize_club_name(self.get_club_name(row)),
                     race=race,
+                    disqualified=self.is_disqualified(row),
                 )
             )
 
@@ -161,6 +162,12 @@ class TrainerasHtmlParser(HtmlParser):
     def get_laps(self, participant: Selector) -> List[str]:
         laps = participant.xpath("//*/td/text()").getall()[2:-4]
         return [t.strftime("%M:%S.%f") for t in [normalize_lap_time(e) for e in laps if e] if t is not None]
+
+    def is_disqualified(self, participant: Selector) -> bool:
+        # race_id=5360
+        # try to find the "Desc." text in the final crono
+        laps = participant.xpath("//*/td/text()").getall()[2:-4]
+        return laps[-1] == "Desc."
 
     def get_series(self, participant: Selector) -> int:
         lane = participant.xpath("//*/td[4]/text()").get()

@@ -72,6 +72,7 @@ class ARCHtmlParser(HtmlParser):
                     distance=self.get_distance(is_female),
                     participant=normalize_club_name(self.get_club_name(row)),
                     race=race,
+                    disqualified=self.is_disqualified(selector, row),
                 )
             )
 
@@ -216,6 +217,21 @@ class ARCHtmlParser(HtmlParser):
     def get_laps(self, participant: Selector) -> List[str]:
         laps = participant.xpath("//*/td/text()").getall()
         return [t.strftime("%M:%S.%f") for t in [normalize_lap_time(e) for e in laps if e] if t is not None]
+
+    def is_disqualified(self, selector: Selector, participant: Selector) -> bool:
+        # race_id=472
+        # try to find a club with 0 points
+        club_name = self.get_club_name(participant).upper()
+        final_times_rows = selector.xpath('//*[@id="widget-resultados"]/div/div[1]/div[2]/div/table/tbody/tr')
+
+        for row in final_times_rows:
+            club_name_in_row = whitespaces_clean(row.xpath(".//td[1]/span/a/text()").get("")).upper()
+            final_time = row.xpath(".//td[3]/text()").get("")
+
+            if club_name_in_row == club_name:
+                return final_time == "0"
+
+        return False
 
     def get_series(self, selector: Selector, participant: Selector) -> int:
         series = 1
