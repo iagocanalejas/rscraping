@@ -1,6 +1,7 @@
 from datetime import date, datetime
 import logging
 import re
+
 from ._parser import HtmlParser
 from typing import List, Optional, Tuple
 from parsel import Selector
@@ -78,11 +79,12 @@ class ARCHtmlParser(HtmlParser):
 
         return race
 
-    def parse_race_ids(self, selector: Selector, for_old_web: bool = False, **_) -> List[str]:
-        if for_old_web:
-            urls = selector.xpath('//*[@id="contenido"]/div[*]/a/@href').getall()
-            return [url_parts[-1] for url_parts in (url.split("id=") for url in urls)]
-        urls = selector.xpath('//*[@id="main"]/div[3]/div[15]/table/tbody/tr[*]/td[2]/span/a/@href').getall()
+    def parse_race_ids(self, selector: Selector, **_) -> List[str]:
+        urls = (
+            selector.xpath('//*[@id="main"]/div[6]/table/tbody/tr[*]/td[2]/span/a/@href').getall()
+            if selector.xpath('//*[@id="proximas-regatas"]').get()
+            else selector.xpath('//*[@id="main"]/div[4]/table/tbody/tr[*]/td[2]/span/a/@href').getall()
+        )
         return [url_parts[-2] for url_parts in (url.split("/") for url in urls)]
 
     def parse_club_ids(self, selector: Selector) -> List[str]:

@@ -13,15 +13,8 @@ logger = logging.getLogger(__name__)
 
 
 class ARCClient(Client, source=Datasource.ARC):
-    """
-    The old ARC web is only supported for race_id retrieval.
-
-    Note that the IDs are not unique between the tho pages so we can have different races depending of the page we
-    are querying.
-    """
-
     DATASOURCE = Datasource.ARC
-    MALE_START = 2006
+    MALE_START = 2009
     FEMALE_START = 2018
 
     @staticmethod
@@ -31,10 +24,8 @@ class ARCClient(Client, source=Datasource.ARC):
 
     @staticmethod
     def get_races_url(year: int, is_female: bool, **_) -> str:
-        if (not is_female) and year < 2009:
-            return f"http://www.liga-arc.com/historico/resultados.php?temporada={year}"
         host = "ligaete" if is_female else "liga-arc"
-        return f"https://www.{host}.com/es/resultados/{year}"
+        return f"https://www.{host}.com/es/calendario/{year}"
 
     @staticmethod
     def get_lineup_url(race_id: str, club_id: str, is_female: bool, **_) -> str:
@@ -61,13 +52,9 @@ class ARCClient(Client, source=Datasource.ARC):
         url = self.get_races_url(year, self._is_female)
         return ARCHtmlParser().parse_race_ids(
             selector=Selector(requests.get(url=url, headers=HTTP_HEADERS).text),
-            for_old_web=(not self._is_female) and year < 2009,
         )
 
     def get_lineup_by_race_id(self, race_id: str, **_) -> List[Lineup]:
-        """
-        Only supports new ARC webpage.
-        """
         parser = ARCHtmlParser()
 
         # find participants in race

@@ -33,7 +33,7 @@ class TestARCParser(unittest.TestCase):
         with open(os.path.join(self.fixtures, "arc_races.html"), "r") as file:
             ids = self.parser.parse_race_ids(Selector(file.read()))
 
-        self.assertEqual(ids, ["486", "499", "485"])
+        self.assertEqual(ids, ["446", "474", "475"])
 
     def test_parse_club_ids(self):
         with open(os.path.join(self.fixtures, "arc_lineups.html"), "r") as file:

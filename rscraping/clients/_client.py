@@ -54,6 +54,9 @@ class Client(ABC):
 
     @abstractmethod
     def get_race_ids_by_year(self, year: int, **kwargs) -> List[str]:
+        """
+        Returns a list of ids sorted by date either parsing a page with a list of races or bruteforzing it.
+        """
         raise NotImplementedError
 
     @abstractmethod

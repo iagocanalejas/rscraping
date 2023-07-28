@@ -47,7 +47,13 @@ def normalize_race_name(name: str, is_female: bool) -> str:
 
 
 def remove_league_indicator(name: str) -> str:
-    return " ".join([w for w in name.split() if w not in ["B", "F"]])
+    words = name.split()
+    filtered_words = [w for w in words if w not in {"B", "F"}]
+
+    if name.endswith(" A"):
+        filtered_words = filtered_words[:-1]
+
+    return " ".join(filtered_words)
 
 
 def deacronym_race_name(name: str) -> str:
