@@ -32,7 +32,7 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
     def get_race_by_id(self, race_id: str, day: Optional[int] = None, **_) -> Optional[Race]:
         url = self.get_race_details_url(race_id)
         race = TrainerasHtmlParser().parse_race(
-            selector=Selector(requests.get(url=url, headers=HTTP_HEADERS).text),
+            selector=Selector(requests.get(url=url, headers=HTTP_HEADERS).content.decode("utf-8")),
             race_id=race_id,
             day=day,
         )

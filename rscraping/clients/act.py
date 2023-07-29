@@ -39,7 +39,7 @@ class ACTClient(Client, source=Datasource.ACT):
     def get_race_by_id(self, race_id: str, **_) -> Optional[Race]:
         url = self.get_race_details_url(race_id, self._is_female)
         race = ACTHtmlParser().parse_race(
-            selector=Selector(requests.get(url=url, headers=HTTP_HEADERS).text),
+            selector=Selector(requests.get(url=url, headers=HTTP_HEADERS).content.decode("utf-8")),
             race_id=race_id,
             is_female=self._is_female,
         )

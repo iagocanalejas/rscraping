@@ -102,7 +102,7 @@ class LGTClient(Client, source=Datasource.LGT):
         self._results_selector = self.get_results_selector(race_id)
 
         race = LGTHtmlParser().parse_race(
-            selector=Selector(requests.get(url=url, headers=HTTP_HEADERS).text),
+            selector=Selector(requests.get(url=url, headers=HTTP_HEADERS).content.decode("utf-8")),
             results_selector=self.get_results_selector(race_id),
             race_id=race_id,
         )

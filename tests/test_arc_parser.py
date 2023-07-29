@@ -50,11 +50,11 @@ class TestARCParser(unittest.TestCase):
     _RACE = Race(
         name="BANDERA RIA DEL ASON",
         date="22/08/2009",
-        edition=1,
+        edition=17,
         day=1,
         modality="TRAINERA",
         type="TIME_TRIAL",
-        league="TEMPORADA 2009",
+        league="ASOCIACIÓN DE REMO DEL CANTÁBRICO 2",
         town="COLINDRES",
         organizer=None,
         normalized_name="BANDERA RIA DEL ASON",

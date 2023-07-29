@@ -31,6 +31,7 @@ class ARCHtmlParser(HtmlParser):
         logger.info(f"{self.DATASOURCE}: found race {name}")
 
         gender = GENDER_FEMALE if is_female else GENDER_MALE
+        edition = self.get_edition(name)
 
         name = self._normalize_race_name(name, is_female=is_female)
         if not name:
@@ -45,7 +46,7 @@ class ARCHtmlParser(HtmlParser):
             normalized_name=normalize_race_name(name, is_female),
             date=self.get_date(selector).strftime("%d/%m/%Y"),
             type=self.get_type(participants),
-            edition=self.get_edition(name),
+            edition=edition,
             day=self.get_day(selector),
             modality=RACE_TRAINERA,
             league=self.get_league(selector, is_female),
@@ -171,10 +172,10 @@ class ARCHtmlParser(HtmlParser):
     def get_league(self, selector: Selector, is_female: bool) -> Optional[str]:
         if is_female:
             return "EMAKUMEZKO TRAINERUEN ELKARTEA"
-        text = whitespaces_clean(selector.xpath('//*[@id="main"]/h1/span/text()').get("")).upper()
+        text = whitespaces_clean(selector.xpath('//*[@id="main"]/h1/span/span/text()').get("")).upper()
         if is_play_off(text):
             return "ASOCIACIÓN DE REMO DEL CANTÁBRICO"
-        return re.sub(r"TEMPORADA \d+ GRUPO", "ASOCIACIÓN DE REMO DEL CANTÁBRICO", text)
+        return text.replace("GRUPO", "ASOCIACIÓN DE REMO DEL CANTÁBRICO")
 
     def get_town(self, selector: Selector) -> str:
         text = remove_parenthesis(selector.xpath('//*[@id="main"]/div[2]/div[2]/div[1]/div[1]/ul/li[4]/text()').get(""))
