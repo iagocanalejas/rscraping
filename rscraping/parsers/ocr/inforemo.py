@@ -66,6 +66,7 @@ class ImageOCRInforemo(ImageOCR, source=Datasource.INFOREMO):
             league=self.get_league(),
             town=town,
             organizer=self.get_organizer(),
+            sponsor=None,
             race_id=os.path.basename(path),
             url=None,
             gender=None,

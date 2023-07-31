@@ -29,12 +29,12 @@ class TestTrainerasParser(unittest.TestCase):
                 race_id="1234",
                 day=1,
             )
-            race2 = self.parser.parse_race(
+            race_2 = self.parser.parse_race(
                 selector,
                 race_id="1234",
                 day=2,
             )
-        if not race_1 or not race2:
+        if not race_1 or not race_2:
             raise ValueError(f"unable to parse race")
 
         participants = race_1.participants
@@ -63,6 +63,7 @@ class TestTrainerasParser(unittest.TestCase):
         league=None,
         town="A CORUÑA",
         organizer=None,
+        sponsor=None,
         normalized_name="BANDERA CIUDAD DE LA CORUÑA",
         race_id="1234",
         url=None,
@@ -83,6 +84,7 @@ class TestTrainerasParser(unittest.TestCase):
         league=None,
         town="A CORUÑA",
         organizer=None,
+        sponsor=None,
         normalized_name="BANDERA CIUDAD DE LA CORUÑA",
         race_id="1234",
         url=None,

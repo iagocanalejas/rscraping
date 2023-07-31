@@ -48,7 +48,7 @@ class TestARCParser(unittest.TestCase):
         self.assertEqual(lineup, self._LINEUP)
 
     _RACE = Race(
-        name="BANDERA RIA DEL ASON",
+        name="XVII BANDERA RIA DEL ASON",
         date="22/08/2009",
         edition=17,
         day=1,
@@ -57,6 +57,7 @@ class TestARCParser(unittest.TestCase):
         league="ASOCIACIÓN DE REMO DEL CANTÁBRICO 2",
         town="COLINDRES",
         organizer=None,
+        sponsor=None,
         normalized_name="BANDERA RIA DEL ASON",
         race_id="1234",
         url=None,

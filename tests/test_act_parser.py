@@ -36,7 +36,7 @@ class TestACTParser(unittest.TestCase):
         self.assertEqual(ids, ["1616789082", "1616789390", "1616789420"])
 
     _RACE = Race(
-        name="BANDERA PETRONOR",
+        name="XXXIX. BANDERA PETRONOR (17-07-2022)",
         date="17/07/2022",
         edition=39,
         day=1,
@@ -45,6 +45,7 @@ class TestACTParser(unittest.TestCase):
         league="EUSKO LABEL LIGA",
         town="ZIERBENA BIZKAIA",
         organizer=None,
+        sponsor=None,
         normalized_name="BANDERA PETRONOR",
         race_id="1234",
         url=None,

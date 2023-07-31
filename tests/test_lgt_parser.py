@@ -33,7 +33,7 @@ class TestLGTParser(unittest.TestCase):
         self.assertEqual(participants, self._PARTICIPANTS)
 
     _RACE = Race(
-        name="BANDEIRA VIRXE DO CARME",
+        name="IX BANDEIRA VIRXE DO CARME",
         date="25/07/2020",
         edition=9,
         day=1,
@@ -42,6 +42,7 @@ class TestLGTParser(unittest.TestCase):
         league="LIGA A",
         town="",
         organizer=None,
+        sponsor=None,
         normalized_name="BANDEIRA VIRXE DO CARME",
         race_id="1234",
         url=None,

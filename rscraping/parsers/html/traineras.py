@@ -14,7 +14,7 @@ from rscraping.data.constants import (
 from rscraping.data.models import Datasource, Participant, Race
 from rscraping.data.normalization.clubs import normalize_club_name
 from rscraping.data.normalization.times import normalize_lap_time
-from rscraping.data.normalization.races import normalize_race_name
+from rscraping.data.normalization.races import find_race_sponsor, normalize_race_name
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +58,7 @@ class TrainerasHtmlParser(HtmlParser):
         ttype = self.get_type(participants)
 
         race = Race(
-            name=name,
+            name=self.get_name(selector),
             normalized_name=normalize_race_name(name, False),
             date=t_date.strftime("%d/%m/%Y"),
             type=ttype,
@@ -68,6 +68,7 @@ class TrainerasHtmlParser(HtmlParser):
             league=None,  # not present
             town=self.get_town(selector),
             organizer=None,
+            sponsor=find_race_sponsor(self.get_name(selector)),
             race_id=race_id,
             url=None,
             gender=gender,

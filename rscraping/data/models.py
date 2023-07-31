@@ -63,6 +63,7 @@ class Race:
     league: Optional[str]
     town: Optional[str]
     organizer: Optional[str]
+    sponsor: Optional[str]
 
     # normalized fields
     normalized_name: str
