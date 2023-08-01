@@ -1,7 +1,6 @@
-from datetime import date, datetime
 import logging
 import re
-
+from datetime import date, datetime
 from ._parser import HtmlParser
 from typing import List, Optional, Tuple
 from parsel import Selector
@@ -15,7 +14,7 @@ from rscraping.data.constants import (
     RACE_TRAINERA,
 )
 from rscraping.data.functions import is_play_off
-from rscraping.data.models import Datasource, Lineup, Participant, Race
+from rscraping.data.models import Datasource, Lineup, Participant, Race, RaceName
 from rscraping.data.normalization.clubs import normalize_club_name
 from rscraping.data.normalization.times import normalize_lap_time
 from rscraping.data.normalization.races import find_race_sponsor, normalize_race_name
@@ -88,6 +87,19 @@ class ARCHtmlParser(HtmlParser):
             else selector.xpath('//*[@id="main"]/div[4]/table/tbody/tr[*]/td[2]/span/a/@href').getall()
         )
         return [url_parts[-2] for url_parts in (url.split("/") for url in urls)]
+
+    def parse_race_names(self, selector: Selector, is_female: bool, **_) -> List[RaceName]:
+        def normalize(name: str, is_female: bool) -> str:
+            return self._normalize_race_name(normalize_race_name(name, is_female), is_female)
+
+        hrefs = (
+            selector.xpath('//*[@id="main"]/div[6]/table/tbody/tr[*]/td[2]/span/a').getall()
+            if selector.xpath('//*[@id="proximas-regatas"]').get()
+            else selector.xpath('//*[@id="main"]/div[4]/table/tbody/tr[*]/td[2]/span/a').getall()
+        )
+        selectors = [Selector(h) for h in hrefs]
+        pairs = [(s.xpath("//*/@href").get("").split("/")[-2], s.xpath("//*/text()").get("")) for s in selectors]
+        return [RaceName(p[0], whitespaces_clean(p[1]).upper(), normalize(p[1], is_female)) for p in pairs]
 
     def parse_club_ids(self, selector: Selector) -> List[str]:
         urls = (

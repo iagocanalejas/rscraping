@@ -1,13 +1,9 @@
-import logging
 import re
-
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import List, Optional
 from parsel import Selector
 from pyutils.strings import find_roman, roman_to_int
-from rscraping.data.models import Datasource, Lineup, Race
-
-logger = logging.getLogger(__name__)
+from rscraping.data.models import Datasource, Lineup, Race, RaceName
 
 
 class HtmlParser(ABC):
@@ -25,7 +21,11 @@ class HtmlParser(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def parse_race_ids(self, selector: Selector, **kwargs) -> Optional[str]:
+    def parse_race_ids(self, selector: Selector, **kwargs) -> List[str]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def parse_race_names(self, selector: Selector, **kwargs) -> List[RaceName]:
         raise NotImplementedError
 
     @abstractmethod

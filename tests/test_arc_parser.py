@@ -3,7 +3,7 @@ import unittest
 
 from parsel import Selector
 from rscraping.data.constants import GENDER_MALE
-from rscraping.data.models import Participant, Race, Lineup
+from rscraping.data.models import Participant, Race, Lineup, RaceName
 
 from rscraping.parsers.html.arc import ARCHtmlParser
 
@@ -34,6 +34,12 @@ class TestARCParser(unittest.TestCase):
             ids = self.parser.parse_race_ids(Selector(file.read()))
 
         self.assertEqual(ids, ["446", "474", "475"])
+
+    def test_parse_race_names(self):
+        with open(os.path.join(self.fixtures, "arc_races.html"), "r") as file:
+            race_names = self.parser.parse_race_names(Selector(file.read()), is_female=False)
+
+        self.assertEqual(race_names, self._RACE_NAMES)
 
     def test_parse_club_ids(self):
         with open(os.path.join(self.fixtures, "arc_lineups.html"), "r") as file:
@@ -93,6 +99,15 @@ class TestARCParser(unittest.TestCase):
             race=_RACE,
             disqualified=False,
         ),
+    ]
+    _RACE_NAMES = [
+        RaceName(
+            race_id="446",
+            name="KEPA DEUN ARRANTZALEEN KOFRADIA XXII. IKURRIÑA",
+            normalized_name="KEPA DEUN ARRANTZALEEN KOFRADÍA IKURRIÑA",
+        ),
+        RaceName(race_id="474", name="PLAY OFF I", normalized_name="PLAY OFF"),
+        RaceName(race_id="475", name="PLAY OFF II", normalized_name="PLAY OFF"),
     ]
     _LINEUP = Lineup(
         race="XXIX BANDERA REAL ASTILLERO DE GUARNIZO",

@@ -3,7 +3,7 @@ import unittest
 
 from parsel import Selector
 from rscraping.data.constants import GENDER_MALE
-from rscraping.data.models import Participant, Race
+from rscraping.data.models import Participant, Race, RaceName
 
 from rscraping.parsers.html.act import ACTHtmlParser
 
@@ -34,6 +34,12 @@ class TestACTParser(unittest.TestCase):
             ids = self.parser.parse_race_ids(Selector(file.read()))
 
         self.assertEqual(ids, ["1616789082", "1616789390", "1616789420"])
+
+    def test_parse_race_names(self):
+        with open(os.path.join(self.fixtures, "act_races.html"), "r") as file:
+            race_names = self.parser.parse_race_names(Selector(file.read()), is_female=False)
+
+        self.assertEqual(race_names, self._RACE_NAMES)
 
     _RACE = Race(
         name="XXXIX. BANDERA PETRONOR (17-07-2022)",
@@ -92,5 +98,22 @@ class TestACTParser(unittest.TestCase):
             participant="HONDARRIBIA",
             race=_RACE,
             disqualified=False,
+        ),
+    ]
+    _RACE_NAMES = [
+        RaceName(
+            race_id="1616789082",
+            name="V BANDEIRA CIDADE DA CORUÑA (J1)",
+            normalized_name="BANDEIRA CIDADE DA CORUÑA",
+        ),
+        RaceName(
+            race_id="1616789390",
+            name="V. BANDEIRA CIDADE DA CORUÑA (J2)",
+            normalized_name="BANDEIRA CIDADE DA CORUÑA",
+        ),
+        RaceName(
+            race_id="1616789420",
+            name="XIII. BANDERA DONOSTIARRA - TURISMO CASTILLA-LA MANCHA",
+            normalized_name="BANDERA DONOSTIARRA",
         ),
     ]

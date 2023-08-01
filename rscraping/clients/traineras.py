@@ -1,21 +1,21 @@
-from datetime import date
-import logging
 import requests
-
 from ._client import Client
-from typing import List, Optional
+from typing import Any, Generator, List
 from parsel import Selector
 from rscraping.data.constants import HTTP_HEADERS
-from rscraping.data.models import Datasource, Lineup, Race
+from rscraping.data.models import Datasource, Lineup, RaceName
 from rscraping.parsers.html import TrainerasHtmlParser
 
 
-logger = logging.getLogger(__name__)
-
-
 class TrainerasClient(Client, source=Datasource.TRAINERAS):
+    _html_parser: TrainerasHtmlParser
+
     DATASOURCE = Datasource.TRAINERAS
     MALE_START = FEMALE_START = 1960
+
+    def __init__(self, **_) -> None:
+        super().__init__()
+        self._html_parser = TrainerasHtmlParser()
 
     @staticmethod
     def get_race_details_url(race_id: str, **_) -> str:
@@ -29,39 +29,33 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
     def get_lineup_url(**_) -> str:
         raise NotImplementedError
 
-    def get_race_by_id(self, race_id: str, day: Optional[int] = None, **_) -> Optional[Race]:
-        url = self.get_race_details_url(race_id)
-        race = TrainerasHtmlParser().parse_race(
-            selector=Selector(requests.get(url=url, headers=HTTP_HEADERS).content.decode("utf-8")),
-            race_id=race_id,
-            day=day,
-        )
-        if race:
-            race.url = url
-        return race
-
-    def get_race_ids_by_year(self, year: int, **_) -> List[str]:
-        since = self.MALE_START
-        today = date.today().year
-        if year < since or year > today:
-            raise ValueError(f"invalid 'year', available values are [{since}, {today}]")
-
-        ids: List[str] = []
-        parser: TrainerasHtmlParser = TrainerasHtmlParser()
-
-        page = 1
-        first_page = Selector(requests.get(url=self.get_races_url(year, page=page), headers=HTTP_HEADERS).text)
-        while page <= parser.get_number_of_pages(first_page):
-            selector = (
-                Selector(requests.get(url=self.get_races_url(year, page=page), headers=HTTP_HEADERS).text)
-                if page != 1
-                else first_page
+    def get_pages(self, year: int) -> Generator[Selector, Any, Any]:
+        def selector(year: int, page: int) -> Selector:
+            return Selector(
+                requests.get(url=self.get_races_url(year, page=page), headers=HTTP_HEADERS).content.decode("utf-8")
             )
 
-            ids.extend(parser.parse_race_ids(selector))
-
+        page = 1
+        first_page = selector(year, page)
+        while page <= self._html_parser.get_number_of_pages(first_page):
+            yield (selector(year, page) if page != 1 else first_page)
             page += 1
+
+    def get_race_ids_by_year(self, year: int, **_) -> List[str]:
+        self.validate_year_or_raise_exception(year)
+
+        ids: List[str] = []
+        for page in self.get_pages(year):
+            ids.extend(self._html_parser.parse_race_ids(page))
         return ids
 
-    def get_lineup_by_race_id(self, race_id: str, **_) -> List[Lineup]:
+    def get_race_names_by_year(self, year: int, **_) -> List[RaceName]:
+        self.validate_year_or_raise_exception(year)
+
+        race_names: List[RaceName] = []
+        for page in self.get_pages(year):
+            race_names.extend(self._html_parser.parse_race_names(page))
+        return race_names
+
+    def get_lineup_by_race_id(self, **_) -> List[Lineup]:
         raise NotImplementedError

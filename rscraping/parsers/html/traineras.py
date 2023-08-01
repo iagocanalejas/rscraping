@@ -11,7 +11,7 @@ from rscraping.data.constants import (
     RACE_TIME_TRIAL,
     RACE_TRAINERA,
 )
-from rscraping.data.models import Datasource, Participant, Race
+from rscraping.data.models import Datasource, Participant, Race, RaceName
 from rscraping.data.normalization.clubs import normalize_club_name
 from rscraping.data.normalization.times import normalize_lap_time
 from rscraping.data.normalization.races import find_race_sponsor, normalize_race_name
@@ -32,7 +32,7 @@ class TrainerasHtmlParser(HtmlParser):
 
     DATASOURCE = Datasource.TRAINERAS
 
-    _FEMALE = ["SF", "VF", "JF"]
+    _FEMALE = ["SF", "VF", "JF", "F"]
 
     def parse_race(self, selector: Selector, race_id: str, day: Optional[int] = None, **_) -> Optional[Race]:
         if len(selector.xpath("/html/body/div[1]/main/div[1]/div/div/div[2]/table[*]").getall()) > 1 and not day:
@@ -100,6 +100,12 @@ class TrainerasHtmlParser(HtmlParser):
     def parse_race_ids(self, selector: Selector, **_) -> List[str]:
         ids = selector.xpath("/html/body/div[1]/div[2]/table/tbody/tr/td[1]/a/@href").getall()
         return [e.split("/")[-1] for e in ids]
+
+    def parse_race_names(self, selector: Selector, **_) -> List[RaceName]:
+        hrefs = selector.xpath("/html/body/div[1]/div[2]/table/tbody/tr/td[1]/a").getall()
+        selectors = [Selector(h) for h in hrefs]
+        pairs = [(s.xpath("//*/@href").get("").split("/")[-1], s.xpath("//*/text()").get("")) for s in selectors]
+        return [RaceName(p[0], whitespaces_clean(p[1]).upper(), normalize_race_name(p[1], False)) for p in pairs]
 
     def parse_lineup(self, **_):
         raise NotImplementedError

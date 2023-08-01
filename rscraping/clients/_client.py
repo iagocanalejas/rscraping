@@ -1,16 +1,18 @@
-import logging
 from abc import ABC, abstractmethod
+from datetime import date
 from typing import List, Optional
 
-from rscraping.data.models import Datasource, Lineup, Race
-
-
-logger = logging.getLogger(__name__)
+from parsel import Selector
+import requests
+from rscraping.data.constants import HTTP_HEADERS
+from rscraping.parsers.html import HtmlParser
+from rscraping.data.models import Datasource, Lineup, Race, RaceName
 
 
 class Client(ABC):
     _registry = {}
     _is_female = False
+    _html_parser: HtmlParser
 
     DATASOURCE: Datasource
     FEMALE_START: int
@@ -29,6 +31,41 @@ class Client(ABC):
 
         return final_obj
 
+    def validate_year_or_raise_exception(self, year: int):
+        since = self.FEMALE_START if self._is_female else self.MALE_START
+        today = date.today().year
+        if year < since or year > today:
+            raise ValueError(f"invalid 'year', available values are [{since}, {today}]")
+
+    def get_race_by_id(self, race_id: str, **kwargs) -> Optional[Race]:
+        url = self.get_race_details_url(race_id, is_female=self._is_female)
+        race = self._html_parser.parse_race(
+            selector=Selector(requests.get(url=url, headers=HTTP_HEADERS).content.decode("utf-8")),
+            race_id=race_id,
+            **kwargs,
+        )
+        if race:
+            race.url = url
+        return race
+
+    def get_race_ids_by_year(self, year: int, **kwargs) -> List[str]:
+        self.validate_year_or_raise_exception(year)
+
+        url = self.get_races_url(year, is_female=self._is_female)
+        return self._html_parser.parse_race_ids(
+            selector=Selector(requests.get(url=url, headers=HTTP_HEADERS).text),
+            **kwargs,
+        )
+
+    def get_race_names_by_year(self, year: int, **kwargs) -> List[RaceName]:
+        self.validate_year_or_raise_exception(year)
+
+        url = self.get_races_url(year, is_female=self._is_female)
+        return self._html_parser.parse_race_names(
+            selector=Selector(requests.get(url=url, headers=HTTP_HEADERS).content.decode("utf-8")),
+            **kwargs,
+        )
+
     ####################################################
     #                     ABSTRACT                     #
     ####################################################
@@ -46,17 +83,6 @@ class Client(ABC):
     @staticmethod
     @abstractmethod
     def get_lineup_url(race_id: str, **kwargs) -> str:
-        raise NotImplementedError
-
-    @abstractmethod
-    def get_race_by_id(self, race_id: str, **kwargs) -> Optional[Race]:
-        raise NotImplementedError
-
-    @abstractmethod
-    def get_race_ids_by_year(self, year: int, **kwargs) -> List[str]:
-        """
-        Returns a list of ids sorted by date either parsing a page with a list of races or bruteforzing it.
-        """
         raise NotImplementedError
 
     @abstractmethod

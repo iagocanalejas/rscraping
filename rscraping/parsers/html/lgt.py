@@ -1,7 +1,6 @@
-from datetime import date, datetime
 import logging
 import re
-
+from datetime import date, datetime
 from ._parser import HtmlParser
 from typing import List, Optional, Tuple
 from parsel import Selector
@@ -15,7 +14,7 @@ from rscraping.data.constants import (
     RACE_TRAINERA,
 )
 from rscraping.data.functions import is_play_off
-from rscraping.data.models import Datasource, Participant, Race
+from rscraping.data.models import Datasource, Participant, Race, RaceName
 from rscraping.data.normalization.clubs import normalize_club_name
 from rscraping.data.normalization.times import normalize_lap_time
 from rscraping.data.normalization.races import find_race_sponsor, normalize_race_name
@@ -89,6 +88,9 @@ class LGTHtmlParser(HtmlParser):
             )
 
         return race
+
+    def parse_race_names(self, **_) -> List[RaceName]:
+        raise NotImplementedError
 
     def parse_race_ids(self, **_):
         raise NotImplementedError

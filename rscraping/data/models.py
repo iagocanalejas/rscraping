@@ -1,8 +1,11 @@
+import collections
 import json
 
 from dataclasses import dataclass
 from enum import StrEnum, auto
 from typing import List, Optional
+
+RaceName = collections.namedtuple("RaceName", ["race_id", "name", "normalized_name"])
 
 
 class Datasource(StrEnum):

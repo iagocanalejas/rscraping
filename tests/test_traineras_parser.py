@@ -3,7 +3,7 @@ import unittest
 
 from parsel import Selector
 from rscraping.data.constants import GENDER_MALE
-from rscraping.data.models import Participant, Race
+from rscraping.data.models import Participant, Race, RaceName
 
 from rscraping.parsers.html.traineras import MultiDayRaceException, TrainerasHtmlParser
 
@@ -48,6 +48,12 @@ class TestTrainerasParser(unittest.TestCase):
             ids = self.parser.parse_race_ids(Selector(file.read()))
 
         self.assertEqual(ids, ["5455", "5456", "5457", "5458", "5535", "5536"])
+
+    def test_parse_race_names(self):
+        with open(os.path.join(self.fixtures, "traineras_results.html"), "r") as file:
+            race_names = self.parser.parse_race_names(Selector(file.read()))
+
+        self.assertEqual(race_names, self._RACE_NAMES)
 
     def test_get_number_of_pages(self):
         with open(os.path.join(self.fixtures, "traineras_results.html"), "r") as file:
@@ -120,4 +126,12 @@ class TestTrainerasParser(unittest.TestCase):
             race=_RACE_1,
             disqualified=False,
         ),
+    ]
+    _RACE_NAMES = [
+        RaceName(race_id="5455", name="MEMORIAL PEPE O RUSO", normalized_name="MEMORIAL PEPE O RUSO"),
+        RaceName(race_id="5456", name="MEMORIAL PEPE O RUSO", normalized_name="MEMORIAL PEPE O RUSO"),
+        RaceName(race_id="5457", name="MEMORIAL PEPE O RUSO", normalized_name="MEMORIAL PEPE O RUSO"),
+        RaceName(race_id="5458", name="MEMORIAL PEPE O RUSO", normalized_name="MEMORIAL PEPE O RUSO"),
+        RaceName(race_id="5535", name="MEMORIAL AURORA TRUEBA", normalized_name="MEMORIAL AURORA TRUEBA"),
+        RaceName(race_id="5536", name="MEMORIAL AURORA TRUEBA", normalized_name="MEMORIAL AURORA TRUEBA"),
     ]

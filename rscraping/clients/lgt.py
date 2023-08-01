@@ -1,24 +1,19 @@
-from datetime import date
-import logging
 import requests
-
-
+from datetime import date
+from pyutils.strings import whitespaces_clean
 from ._client import Client
 from io import BytesIO
 from pypdf import PdfReader
 from typing import Dict, List, Optional
 from parsel import Selector
 from rscraping.data.constants import HTTP_HEADERS
-from rscraping.data.models import Datasource, Lineup, Race
+from rscraping.data.models import Datasource, Lineup, Race, RaceName
 from rscraping.parsers.html import LGTHtmlParser
 from rscraping.parsers.pdf import LGTPdfParser
-
-logger = logging.getLogger(__name__)
+from rscraping.data.normalization.races import normalize_race_name
 
 
 class LGTClient(Client, source=Datasource.LGT):
-    DATASOURCE = Datasource.LGT
-    MALE_START = FEMALE_START = 2020
     _excluded_ids = [
         1,
         2,
@@ -74,6 +69,14 @@ class LGTClient(Client, source=Datasource.LGT):
         147,
         151,
     ]  # weird races
+    _html_parser: LGTHtmlParser
+
+    DATASOURCE = Datasource.LGT
+    MALE_START = FEMALE_START = 2020
+
+    def __init__(self, **_) -> None:
+        super().__init__()
+        self._html_parser = LGTHtmlParser()
 
     @staticmethod
     def get_race_details_url(race_id: str, **_) -> str:
@@ -93,22 +96,12 @@ class LGTClient(Client, source=Datasource.LGT):
         data = {"liga_id": 1, "regata_id": race_id}
         return Selector(requests.post(url=url, headers=HTTP_HEADERS, data=data).text)
 
-    def get_race_by_id(self, race_id: str, **_) -> Optional[Race]:
+    def get_race_by_id(self, race_id: str, **kwargs) -> Optional[Race]:
         if race_id in self._excluded_ids:
             return None
 
-        url = self.get_race_details_url(race_id)
-        self._selector = Selector(requests.get(url=url, headers=HTTP_HEADERS).text)
-        self._results_selector = self.get_results_selector(race_id)
-
-        race = LGTHtmlParser().parse_race(
-            selector=Selector(requests.get(url=url, headers=HTTP_HEADERS).content.decode("utf-8")),
-            results_selector=self.get_results_selector(race_id),
-            race_id=race_id,
-        )
-        if race:
-            race.url = url
-        return race
+        kwargs["results_selector"] = self.get_results_selector(race_id)
+        return super().get_race_by_id(race_id, **kwargs)
 
     def get_race_ids_by_year(self, year: int, **_) -> List[str]:
         """
@@ -120,11 +113,10 @@ class LGTClient(Client, source=Datasource.LGT):
         Returns a list of unchecked IDs, note that this list can contain invalid values as this method does not check
         each one of them.
         """
+        self.validate_year_or_raise_exception(year)
+
         since = self.MALE_START
         today = date.today().year
-        if year < since or year > today:
-            raise ValueError(f"invalid 'year', available values are [{since}, {today}]")
-
         parser = LGTHtmlParser()
 
         # asume 30 races per year for lower bound and 50 for the upper bound
@@ -156,6 +148,27 @@ class LGTClient(Client, source=Datasource.LGT):
         upper_race_id = right
 
         return [str(r) for r in range(lower_race_id, (upper_race_id + 1)) if r not in self._excluded_ids]
+
+    def get_race_names_by_year(self, year: int, **_) -> List[RaceName]:
+        def normalize(parser: LGTHtmlParser, name: str, is_female: bool) -> str:
+            return normalize_race_name(parser._normalize_race_name(name, is_female), is_female)
+
+        ids = self.get_race_ids_by_year(year)
+        race_names: List[RaceName] = []
+        parser = LGTHtmlParser()
+
+        for id in ids:
+            if id in self._excluded_ids:
+                pass
+
+            url = self.get_race_details_url(id)
+            selector = Selector(requests.get(url=url, headers=HTTP_HEADERS).content.decode("utf-8"))
+            if parser.is_valid_race(selector):
+                name = parser.get_name(selector)
+                is_female = any(e in name for e in ["FEMENINA", "FEMININA"])
+                race_names.append(RaceName(id, whitespaces_clean(name).upper(), normalize(parser, name, is_female)))
+
+        return race_names
 
     def get_lineup_by_race_id(self, race_id: str, **_) -> List[Lineup]:
         if race_id in self._excluded_ids:

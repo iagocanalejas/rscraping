@@ -8,6 +8,8 @@ def normalize_lap_time(value: str) -> Optional[time]:
         # try to fix ':18,62' | ':45' page errors
         value = "00" + value
     parts = re.findall(r"\d+", value)
+    if all(p == "00" for p in parts):
+        return None
     if len(parts) == 2:
         # try to fix '2102:48' | '25:2257' page errors
         if len(parts[0]) == 3:
