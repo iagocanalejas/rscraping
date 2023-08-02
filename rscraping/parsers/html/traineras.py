@@ -89,6 +89,7 @@ class TrainerasHtmlParser(HtmlParser):
                     series=self.get_series(selector) if ttype == RACE_CONVENTIONAL else 1,
                     laps=self.get_laps(row),
                     distance=distance,
+                    handicap=None,
                     participant=normalize_club_name(self.get_club_name(row)),
                     race=race,
                     disqualified=self.is_disqualified(row),

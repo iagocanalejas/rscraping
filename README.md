@@ -18,6 +18,14 @@ python findlineup <datasource> <race_id> <options>
     # --female=<bool>: Specifies if we need to search in the female pages.
 ```
 
+## Lemmatize
+
+Create a list of lemmas for the given phrase.
+
+```sh
+python lematize <phrase>
+```
+
 ## Build PDF
 
 Build all required files for a rower.

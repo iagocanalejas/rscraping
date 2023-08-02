@@ -12,6 +12,7 @@ class Datasource(StrEnum):
     ACT = auto()
     LGT = auto()
     ARC = auto()
+    ABE = auto()
     TRAINERAS = auto()
     INFOREMO = auto()
 
@@ -95,10 +96,11 @@ class Participant:
     gender: str
     category: str
     club_name: str
-    lane: int
-    series: int
+    lane: Optional[int]
+    series: Optional[int]
     laps: List[str]
     distance: Optional[int]
+    handicap: Optional[str]
 
     # normalized fields
     participant: str

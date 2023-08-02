@@ -77,6 +77,7 @@ class ACTHtmlParser(HtmlParser):
                     series=self.get_series(selector, row),
                     laps=self.get_laps(row),
                     distance=self.get_distance(is_female),
+                    handicap=None,
                     participant=normalize_club_name(self.get_club_name(row)),
                     race=race,
                     disqualified=self.is_disqualified(row),
