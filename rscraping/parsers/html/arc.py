@@ -2,7 +2,7 @@ import logging
 import re
 from datetime import date, datetime
 from ._parser import HtmlParser
-from typing import List, Optional, Tuple
+from typing import List, Optional
 from parsel import Selector
 from pyutils.strings import remove_parenthesis, whitespaces_clean, remove_roman
 from rscraping.data.constants import (
@@ -17,7 +17,7 @@ from rscraping.data.functions import is_play_off
 from rscraping.data.models import Datasource, Lineup, Participant, Race, RaceName
 from rscraping.data.normalization.clubs import normalize_club_name
 from rscraping.data.normalization.times import normalize_lap_time
-from rscraping.data.normalization.races import find_race_sponsor, normalize_race_name
+from rscraping.data.normalization.races import find_race_sponsor, normalize_name_parts, normalize_race_name
 
 logger = logging.getLogger(__name__)
 
@@ -27,25 +27,27 @@ class ARCHtmlParser(HtmlParser):
 
     def parse_race(self, selector: Selector, race_id: str, is_female: bool, **_) -> Optional[Race]:
         name = self.get_name(selector)
-        logger.info(f"{self.DATASOURCE}: found race {name}")
-
-        gender = GENDER_FEMALE if is_female else GENDER_MALE
-        edition = self.get_edition(name)
-
-        name = self._normalize_race_name(name, is_female=is_female)
         if not name:
             logger.error(f"{self.DATASOURCE}: no race found for {race_id=}")
             return None
-        logger.info(f"{self.DATASOURCE}: race normalized to {name=}")
+        logger.info(f"{self.DATASOURCE}: found race {name}")
+
+        gender = GENDER_FEMALE if is_female else GENDER_MALE
+
+        normalized_names = normalize_name_parts(normalize_race_name(name, is_female=is_female))
+        if len(normalized_names) == 0:
+            logger.error(f"{self.DATASOURCE}: unable to normalize {name=}")
+            return None
+        normalized_names = [(self._normalize_race_name(n), e) for (n, e) in normalized_names]
+        logger.info(f"{self.DATASOURCE}: race normalized to {normalized_names=}")
 
         participants = self.get_participants(selector)
 
         race = Race(
             name=self.get_name(selector),
-            normalized_name=normalize_race_name(name, is_female),
+            normalized_names=normalized_names,
             date=self.get_date(selector).strftime("%d/%m/%Y"),
             type=self.get_type(participants),
-            edition=edition,
             day=self.get_day(selector),
             modality=RACE_TRAINERA,
             league=self.get_league(selector, is_female),
@@ -91,7 +93,9 @@ class ARCHtmlParser(HtmlParser):
 
     def parse_race_names(self, selector: Selector, is_female: bool, **_) -> List[RaceName]:
         def normalize(name: str, is_female: bool) -> str:
-            return self._normalize_race_name(normalize_race_name(name, is_female), is_female)
+            name = normalize_race_name(name, is_female)
+            name = remove_roman(remove_parenthesis(name))
+            return self._normalize_race_name(name)
 
         hrefs = (
             selector.xpath('//*[@id="main"]/div[6]/table/tbody/tr[*]/td[2]/span/a').getall()
@@ -266,69 +270,7 @@ class ARCHtmlParser(HtmlParser):
     ####################################################
 
     @staticmethod
-    def _normalize_race_name(name: str, is_female: bool = False) -> str:
-        name = name.replace("AYTO", "AYUNTAMIENTO")
-        name = name.replace("IKURRINA", "IKURRIÑA")
-        name = name.replace(" AE ", "")
-        name = re.sub(r"EXCMO|ILTMO", "", name)
-        name = whitespaces_clean(name)
-
-        # remove edition
-        name = remove_roman(remove_parenthesis(whitespaces_clean(name)))
+    def _normalize_race_name(name: str) -> str:
         # remove day
         name = re.sub(r"\d+ª día|\(\d+ª? JORNADA\)", "", name)
-
-        if "-" in name:
-            part1, part2 = whitespaces_clean(name.split("-")[0]), whitespaces_clean(name.split("-")[1])
-
-            if any(e in part2 for e in ["OMENALDIA", "MEMORIAL"]):  # tributes
-                name = part1
-            if any(w in part1 for w in ["BANDERA", "BANDEIRA", "IKURRIÑA"]):
-                name = part1
-
-        name = normalize_race_name(name, is_female)
-
         return name
-
-    @staticmethod
-    def _hardcoded_name_edition_day(name: str, year: int, edition: int, day: int) -> Tuple[str, int, int]:
-        if "AMBILAMP" in name:
-            return "BANDERA AMBILAMP", edition, day
-        if "BANDERA DE CASTRO" in name or "BANDERA CIUDAD DE CASTRO" in name:
-            return "BANDERA DE CASTRO", edition, day
-        if "CORREO" in name and "IKURRIÑA" in name:
-            return "EL CORREO IKURRIÑA", (year - 1986), day
-        if "DONIBANE ZIBURUKO" in name:
-            return "DONIBANE ZIBURUKO ESTROPADAK", int(re.findall(r"\d+", name)[0]), 1
-        if "SAN VICENTE DE LA BARQUERA" in name:
-            return "BANDERA SAN VICENTE DE LA BARQUERA", edition, day
-
-        match = re.match(r"\d+ª? JORNADA|JORNADA \d+", name)
-        if match:
-            arc = 1 if "1" in name else "2"
-            return f"REGATA LIGA ARC {arc}", edition, int(re.findall(r"\d+", match.group(0))[0])
-
-        if is_play_off(name):
-            return "PLAY-OFF ARC", (year - 2005), day
-
-        return name, edition, day
-
-    # @staticmethod
-    # def _hardcoded_old_web_mappings(name: str, edition: int, day: int, year: int) -> Tuple[str, int, int]:
-    #     if "DONIBANE ZIBURUKO" in name:
-    #         return "DONIBANE ZIBURUKO ESTROPADAK", int(re.findall(r"\d+", name)[0]), 1
-    #     if "AMBILAMP" in name:
-    #         return "BANDERA AMBILAMP", edition, day
-    #     if "BANDERA DE CASTRO" in name:
-    #         return "BANDERA DE CASTRO", edition, day
-    #
-    #     if name == "PORTUGALETE 2 REGATA (ARC 2)":
-    #         return "REGATA PORTUGALETE (ARC 2)", 2, 1
-    #     if name == "IKURRIÑA ILTMO AYTO DE SANTURTZI":
-    #         return "IKURRIÑA DE SANTURTZI", edition, day
-    #
-    #     if is_play_off(name):
-    #         if any(e in name for e in ["ACT", "SAN MIGUEL"]):
-    #             return "PREVIO PLAY-OFF ACT (ARC - ALN)", (year - 2005), day
-    #         return "PLAY-OFF ARC", (year - 2005), day
-    #     return name, edition, day

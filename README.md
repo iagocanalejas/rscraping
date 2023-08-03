@@ -5,7 +5,7 @@
 Tries to find the race information searching in the leagues webpages.
 
 ```sh
-python findrace <datasource> <race_id> <options>
+python findrace.py <datasource> <race_id> <options>
     # --female=<bool>: Specifies if we need to search in the female pages.
 ```
 
@@ -14,7 +14,7 @@ python findrace <datasource> <race_id> <options>
 Tries to parse a line-up for a given race to retrieved all the participants.
 
 ```sh
-python findlineup <datasource> <race_id> <options>
+python findlineup.py <datasource> <race_id> <options>
     # --female=<bool>: Specifies if we need to search in the female pages.
 ```
 
@@ -23,7 +23,7 @@ python findlineup <datasource> <race_id> <options>
 Create a list of lemmas for the given phrase.
 
 ```sh
-python lematize <phrase>
+python lemmatize.py <phrase>
 ```
 
 ## Build PDF
@@ -31,7 +31,7 @@ python lematize <phrase>
 Build all required files for a rower.
 
 ```sh
-python fillforms <options>
+python fillforms.py <options>
     # -on: SignOn date to use in the documents (DD/MM/YYYY).
     # -t, --type: Specifies the list of files to be generate (['all']). ['national', 'image', 'fegar', 'xogade', 'all']
     # -p, --parent: Specifies if the rower requires parents data. (False)
@@ -48,7 +48,7 @@ python fillforms <options>
 Tries to parse a line-up image to retrieve all the participants and the line-ups.
 
 ```sh
-python parsepdf <path> <options>
+python parsepdf.py <path> <options>
     # --datasource=<source>: Specifies the format of the PDF.
     #     - lgt
     #     - act
@@ -66,7 +66,7 @@ python parsepdf <path> <options>
 Tries to parse an Inforemo image to retrieve the race data and participants.
 
 ```sh
-python parseimage <path> <options>
+python parseimage.py <path> <options>
     # --datasource=<source>: Specifies the format of the Image.
     #     - inforemo
     # --debug: Plot the image processing steps and dataframes transformations done.

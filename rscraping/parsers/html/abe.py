@@ -3,7 +3,7 @@ import re
 from ._parser import HtmlParser
 from typing import List, Optional
 from parsel import Selector
-from pyutils.strings import find_date, whitespaces_clean
+from pyutils.strings import find_date, remove_parenthesis, remove_roman, whitespaces_clean
 from rscraping.data.constants import (
     GENDER_MALE,
     PARTICIPANT_CATEGORY_ABSOLUT,
@@ -13,7 +13,7 @@ from rscraping.data.constants import (
 from rscraping.data.models import Datasource, Participant, Race, RaceName
 from rscraping.data.normalization.clubs import normalize_club_name
 from rscraping.data.normalization.times import normalize_lap_time
-from rscraping.data.normalization.races import find_race_sponsor, normalize_race_name
+from rscraping.data.normalization.races import find_race_sponsor, normalize_name_parts, normalize_race_name
 
 logger = logging.getLogger(__name__)
 
@@ -23,28 +23,29 @@ class ABEHtmlParser(HtmlParser):
 
     def parse_race(self, selector: Selector, race_id: str, **_) -> Optional[Race]:
         name = self.get_name(selector)
+        if not name:
+            logger.error(f"{self.DATASOURCE}: no race found for {race_id=}")
+            return None
         logger.info(f"{self.DATASOURCE}: found race {name}")
 
-        # parse name, edition, and date from the page title (<edition> <race_name> (<date>))
-        edition = self.get_edition(name)
         t_date = find_date(name)
 
         if not t_date:
             raise ValueError(f"{self.DATASOURCE}: no date found for {name=}")
 
-        if not name:
-            logger.error(f"{self.DATASOURCE}: no race found for {race_id=}")
+        normalized_names = normalize_name_parts(normalize_race_name(name, is_female=False))
+        if len(normalized_names) == 0:
+            logger.error(f"{self.DATASOURCE}: unable to normalize {name=}")
             return None
-        logger.info(f"{self.DATASOURCE}: race normalized to {name=}")
+        logger.info(f"{self.DATASOURCE}: race normalized to {normalized_names=}")
 
         participants = self.get_participants(selector)
 
         race = Race(
             name=self.get_name(selector),
-            normalized_name=normalize_race_name(name, False),
+            normalized_names=normalized_names,
             date=t_date.strftime("%d/%m/%Y"),
             type=RACE_CONVENTIONAL,
-            edition=edition,
             day=self.get_day(selector),
             modality=RACE_TRAINERA,
             league="ARRAUNLARI BETERANOEN ELKARTEA",
@@ -87,12 +88,17 @@ class ABEHtmlParser(HtmlParser):
         return [url_parts[-2] for url_parts in (url.split("/") for url in urls)]
 
     def parse_race_names(self, selector: Selector, **_) -> List[RaceName]:
+        def normalize(name: str, is_female: bool) -> str:
+            name = normalize_race_name(name, is_female)
+            name = remove_roman(remove_parenthesis(name))
+            return name
+
         hrefs = selector.xpath(
             '//*[@id="page"]/div/section[2]/div[2]/div[1]/div/div[2]/div/div/article[*]/div/h3/a'
         ).getall()
         selectors = [Selector(h) for h in hrefs]
         pairs = [(s.xpath("//*/@href").get("").split("/")[-2], s.xpath("//*/text()").get("")) for s in selectors]
-        return [RaceName(p[0], whitespaces_clean(p[1]).upper(), normalize_race_name(p[1], False)) for p in pairs]
+        return [RaceName(p[0], whitespaces_clean(p[1]).upper(), normalize(p[1], False)) for p in pairs]
 
     def parse_lineup(self, **_):
         raise NotImplementedError

@@ -17,7 +17,7 @@ from rscraping.data.functions import is_play_off
 from rscraping.data.models import Datasource, Participant, Race, RaceName
 from rscraping.data.normalization.clubs import normalize_club_name
 from rscraping.data.normalization.times import normalize_lap_time
-from rscraping.data.normalization.races import find_race_sponsor, normalize_race_name
+from rscraping.data.normalization.races import find_race_sponsor, normalize_name_parts, normalize_race_name
 
 logger = logging.getLogger(__name__)
 
@@ -33,28 +33,32 @@ class LGTHtmlParser(HtmlParser):
         **_,
     ) -> Optional[Race]:
         name = self.get_name(selector)
+        if not name or name.upper() == "EREWEWEWERW" or name.upper() == "REGATA" or "?" in name:  # wtf
+            logger.error(f"{self.DATASOURCE}: no race found for {race_id=}")
+            return None
         logger.info(f"{self.DATASOURCE}: found race {name}")
 
         t_date = self.get_date(selector)
         is_female = any(e in name for e in ["FEMENINA", "FEMININA"])
-        edition = self.get_edition(name)
         gender = GENDER_FEMALE if is_female else GENDER_MALE
 
-        name = self._normalize_race_name(name, is_female=is_female)
-        name, edition = self._hardcoded_playoff_edition(name, year=t_date.year, edition=edition)
-        if not name:
-            logger.error(f"{self.DATASOURCE}: no race found for {race_id=}")
+        normalized_names = normalize_name_parts(normalize_race_name(name, is_female=is_female))
+        if len(normalized_names) == 0:
+            logger.error(f"{self.DATASOURCE}: unable to normalize {name=}")
             return None
-        logger.info(f"{self.DATASOURCE}: race normalized to {name=}")
+        normalized_names = [
+            self._hardcoded_playoff_edition(self._normalize_race_name(n), year=t_date.year, edition=e)
+            for (n, e) in normalized_names
+        ]
+        logger.info(f"{self.DATASOURCE}: race normalized to {normalized_names=}")
 
         participants = self.get_participants(results_selector)
 
         race = Race(
             name=self.get_name(selector),
-            normalized_name=normalize_race_name(name, is_female),
+            normalized_names=normalized_names,
             date=t_date.strftime("%d/%m/%Y"),
             type=self.get_type(participants),
-            edition=edition,
             day=self.get_day(selector),
             modality=RACE_TRAINERA,
             league=self.get_league(selector),
@@ -208,16 +212,9 @@ class LGTHtmlParser(HtmlParser):
     ####################################################
 
     @staticmethod
-    def _normalize_race_name(name: str, is_female: bool = False) -> str:
-        # remove edition and parenthesis
-        name = remove_roman(remove_parenthesis(whitespaces_clean(name)))
-
+    def _normalize_race_name(name: str) -> str:
         # remove day
         name = re.sub(r"(XORNADA )\d+|\d+( XORNADA)", "", name)
-
-        # remove waste
-        if name == "EREWEWEWERW" or name == "REGATA" or "?" in name:  # wtf
-            return ""
 
         if "TERESA HERRERA" in name:  # lgt never saves the final
             return "TROFEO TERESA HERRERA (CLASIFICATORIA)"
@@ -225,7 +222,6 @@ class LGTHtmlParser(HtmlParser):
         if "PLAY" in name:
             return "PLAY-OFF LGT"
 
-        name = normalize_race_name(name, is_female)
         # remove gender
         for g in ["FEMENINA", "FEMININA"]:
             name = name.replace(g, "")
@@ -233,7 +229,7 @@ class LGTHtmlParser(HtmlParser):
         return whitespaces_clean(name)
 
     @staticmethod
-    def _hardcoded_playoff_edition(name: str, year: int, edition: int) -> Tuple[str, int]:
+    def _hardcoded_playoff_edition(name: str, year: int, edition: Optional[int]) -> Tuple[str, Optional[int]]:
         if is_play_off(name):
             return name, (year - 2011)
         return name, edition

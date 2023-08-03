@@ -18,6 +18,7 @@ _ENTITY_TITLES_SHORT = [
     "CDM",
     "CCD",
     "CRN",
+    "CRO",
     "FEM",
     "B",
     "AN",
@@ -95,11 +96,12 @@ _KNOWN_SPONSORS = [
     "RODAVIGO",
     "NORTEGAS",
     "SIMEI",
+    "NATURHOUSE",
 ]
 
 
 def normalize_club_name(name: str) -> str:
-    name = whitespaces_clean(remove_parenthesis(name.upper()))
+    name = whitespaces_clean(remove_parenthesis(name.upper().replace(".", "")))
     name = remove_club_title(name)
     name = remove_club_sponsor(name)
 
@@ -127,6 +129,6 @@ def remove_club_sponsor(name: str) -> str:
     for sponsor in _KNOWN_SPONSORS:
         name = name.replace(sponsor, "")
         name = name.replace(unidecode(sponsor), "")
-    if name.endswith(" - "):
+    if name.endswith(" - ") or name.startswith(" - "):
         name = name.replace(" - ", "")
     return whitespaces_clean(name)

@@ -35,7 +35,6 @@ class TestLGTParser(unittest.TestCase):
     _RACE = Race(
         name="IX BANDEIRA VIRXE DO CARME",
         date="25/07/2020",
-        edition=9,
         day=1,
         modality="TRAINERA",
         type="CONVENTIONAL",
@@ -43,7 +42,7 @@ class TestLGTParser(unittest.TestCase):
         town="",
         organizer=None,
         sponsor=None,
-        normalized_name="BANDEIRA VIRXE DO CARME",
+        normalized_names=[("BANDEIRA VIRXE DO CARME", 9)],
         race_id="1234",
         url=None,
         datasource="arc",

@@ -2,7 +2,7 @@ import logging
 from ._parser import HtmlParser
 from typing import List, Optional
 from parsel import Selector
-from pyutils.strings import find_date, whitespaces_clean
+from pyutils.strings import find_date, remove_parenthesis, whitespaces_clean
 from rscraping.data.constants import (
     GENDER_FEMALE,
     GENDER_MALE,
@@ -40,6 +40,9 @@ class TrainerasHtmlParser(HtmlParser):
         day = day if day else 1
 
         name = self.get_name(selector)
+        if not name:
+            logger.error(f"{self.DATASOURCE}: no race found for {race_id=}")
+            return None
         logger.info(f"{self.DATASOURCE}: found race {name}")
 
         t_date = find_date(selector.xpath("/html/body/div[1]/main/div/div/div/div[1]/h2/text()").get(""))
@@ -59,10 +62,9 @@ class TrainerasHtmlParser(HtmlParser):
 
         race = Race(
             name=self.get_name(selector),
-            normalized_name=normalize_race_name(name, False),
+            normalized_names=[(normalize_race_name(name, is_female=False), None)],
             date=t_date.strftime("%d/%m/%Y"),
             type=ttype,
-            edition=1,  # not present
             day=day,
             modality=RACE_TRAINERA,
             league=None,  # not present
@@ -103,10 +105,15 @@ class TrainerasHtmlParser(HtmlParser):
         return [e.split("/")[-1] for e in ids]
 
     def parse_race_names(self, selector: Selector, **_) -> List[RaceName]:
+        def normalize(name: str) -> str:
+            name = normalize_race_name(name, is_female=False)
+            name = remove_parenthesis(name)
+            return name
+
         hrefs = selector.xpath("/html/body/div[1]/div[2]/table/tbody/tr/td[1]/a").getall()
         selectors = [Selector(h) for h in hrefs]
         pairs = [(s.xpath("//*/@href").get("").split("/")[-1], s.xpath("//*/text()").get("")) for s in selectors]
-        return [RaceName(p[0], whitespaces_clean(p[1]).upper(), normalize_race_name(p[1], False)) for p in pairs]
+        return [RaceName(p[0], whitespaces_clean(p[1]).upper(), normalize(p[1])) for p in pairs]
 
     def parse_lineup(self, **_):
         raise NotImplementedError

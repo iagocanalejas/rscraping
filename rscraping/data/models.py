@@ -3,7 +3,7 @@ import json
 
 from dataclasses import dataclass
 from enum import StrEnum, auto
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 RaceName = collections.namedtuple("RaceName", ["race_id", "name", "normalized_name"])
 
@@ -60,7 +60,6 @@ class Lineup:
 class Race:
     name: str
     date: str
-    edition: int
     day: int
     modality: str
     type: str
@@ -70,7 +69,7 @@ class Race:
     sponsor: Optional[str]
 
     # normalized fields
-    normalized_name: str
+    normalized_names: List[Tuple[str, Optional[int]]]
 
     # datasource data
     race_id: str

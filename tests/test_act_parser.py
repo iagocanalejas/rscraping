@@ -2,7 +2,6 @@ import os
 import unittest
 
 from parsel import Selector
-from rscraping.data.constants import GENDER_MALE
 from rscraping.data.models import Participant, Race, RaceName
 
 from rscraping.parsers.html.act import ACTHtmlParser
@@ -42,9 +41,8 @@ class TestACTParser(unittest.TestCase):
         self.assertEqual(race_names, self._RACE_NAMES)
 
     _RACE = Race(
-        name="XXXIX. BANDERA PETRONOR (17-07-2022)",
-        date="17/07/2022",
-        edition=39,
+        name="ORIOKO XXXIII. ESTROPADA - ORIO KANPINA XI. BANDERA (16-07-2023)",
+        date="16/07/2023",
         day=1,
         modality="TRAINERA",
         type="CONVENTIONAL",
@@ -52,13 +50,13 @@ class TestACTParser(unittest.TestCase):
         town="ZIERBENA BIZKAIA",
         organizer=None,
         sponsor=None,
-        normalized_name="BANDERA PETRONOR",
+        normalized_names=[("ORIOKO ESTROPADAK", 33), ("ORIO KANPINA BANDERA", 11)],
         race_id="1234",
         url=None,
         datasource="act",
-        gender=GENDER_MALE,
+        gender="MALE",
         participants=[],
-        race_laps=7,
+        race_laps=4,
         race_lanes=4,
         cancelled=False,
     )
@@ -111,12 +109,12 @@ class TestACTParser(unittest.TestCase):
         ),
         RaceName(
             race_id="1616789390",
-            name="V. BANDEIRA CIDADE DA CORUÑA (J2)",
-            normalized_name="BANDEIRA CIDADE DA CORUÑA",
+            name="ORIOKO XXXIII. ESTROPADA - ORIO KANPINA XI. BANDERA",
+            normalized_name="ORIOKO ESTROPADA - ORIO KANPINA BANDERA",
         ),
         RaceName(
             race_id="1616789420",
             name="XIII. BANDERA DONOSTIARRA - TURISMO CASTILLA-LA MANCHA",
-            normalized_name="BANDERA DONOSTIARRA",
+            normalized_name="BANDERA DONOSTIARRA - TURISMO CASTILLA LA MANCHA",
         ),
     ]

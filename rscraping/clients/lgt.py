@@ -1,6 +1,6 @@
 import requests
 from datetime import date
-from pyutils.strings import whitespaces_clean
+from pyutils.strings import remove_parenthesis, remove_roman, whitespaces_clean
 from ._client import Client
 from io import BytesIO
 from pypdf import PdfReader
@@ -151,7 +151,9 @@ class LGTClient(Client, source=Datasource.LGT):
 
     def get_race_names_by_year(self, year: int, **_) -> List[RaceName]:
         def normalize(parser: LGTHtmlParser, name: str, is_female: bool) -> str:
-            return normalize_race_name(parser._normalize_race_name(name, is_female), is_female)
+            name = normalize_race_name(name, is_female)
+            name = remove_roman(remove_parenthesis(name))
+            return parser._normalize_race_name(name)
 
         ids = self.get_race_ids_by_year(year)
         race_names: List[RaceName] = []

@@ -43,7 +43,6 @@ class TestABEParser(unittest.TestCase):
     _RACE = Race(
         name="XIII BANDERA CRV PONTEJOS (3/6/2023)",
         date="03/06/2023",
-        edition=13,
         day=1,
         modality="TRAINERA",
         type="CONVENTIONAL",
@@ -51,7 +50,7 @@ class TestABEParser(unittest.TestCase):
         town=None,
         organizer=None,
         sponsor=None,
-        normalized_name="XIII BANDERA CRV PONTEJOS (3/6/2023)",
+        normalized_names=[("BANDERA CRV PONTEJOS", 13)],
         race_id="1234",
         url=None,
         datasource="abe",
@@ -106,16 +105,16 @@ class TestABEParser(unittest.TestCase):
         RaceName(
             race_id="getxo",
             name="XIX REGATA DE TRAINERAS DE VETERANOS DE GETXO (29/7/23)",
-            normalized_name="XIX REGATA DE TRAINERAS DE VETERANOS DE GETXO (29/7/23)",
+            normalized_name="REGATA DE TRAINERAS DE VETERANOS DE GETXO",
         ),
         RaceName(
             race_id="plentzia",
             name="V BANDERA KARMENGO AMA. PLENTZIA (17/7/22)",
-            normalized_name="V BANDERA KARMENGO AMA PLENTZIA (17/7/22)",
+            normalized_name="BANDERA KARMENGO AMA PLENTZIA",
         ),
         RaceName(
             race_id="fortuna",
             name="XII REGATA DE VETERANOS FORTUNA K. E. (8/5/2023)",
-            normalized_name="XII REGATA DE VETERANOS FORTUNA K E (8/5/2023)",
+            normalized_name="REGATA DE VETERANOS FORTUNA K E",
         ),
     ]
