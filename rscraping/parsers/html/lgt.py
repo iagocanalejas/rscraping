@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 class LGTHtmlParser(HtmlParser):
-    DATASOURCE = Datasource.ARC
+    DATASOURCE = Datasource.LGT
 
     def parse_race(
         self,
@@ -39,7 +39,8 @@ class LGTHtmlParser(HtmlParser):
         logger.info(f"{self.DATASOURCE}: found race {name}")
 
         t_date = self.get_date(selector)
-        is_female = any(e in name for e in ["FEMENINA", "FEMININA"])
+        league = self.get_league(selector)
+        is_female = any(e in name for e in ["FEMENINA", "FEMININA"]) or (league is not None and "F" in league.split())
         gender = GENDER_FEMALE if is_female else GENDER_MALE
 
         normalized_names = normalize_name_parts(normalize_race_name(name, is_female=is_female))
@@ -61,7 +62,7 @@ class LGTHtmlParser(HtmlParser):
             type=self.get_type(participants),
             day=self.get_day(selector),
             modality=RACE_TRAINERA,
-            league=self.get_league(selector),
+            league=league,
             town=self.get_town(selector),
             organizer=self.get_organizer(selector),
             sponsor=find_race_sponsor(self.get_name(selector)),
@@ -208,9 +209,9 @@ class LGTHtmlParser(HtmlParser):
 
     def get_series(self, results_selector: Selector, participant: Selector) -> int:
         series = 1
-        rows = [Selector(p) for p in results_selector.xpath('//*[@id="tabla-tempos"]/tbody/tr[2]').getall()[1:]]
+        rows = [Selector(p) for p in results_selector.xpath('//*[@id="tabla-tempos"]/tr[*]').getall()]
         for row in rows:
-            if row == participant:
+            if row.xpath("//*/td[2]/text()").get("") == self.get_club_name(participant):
                 return series
             if len(row.xpath("//*/td[*]").getall()) == 1:
                 series += 1

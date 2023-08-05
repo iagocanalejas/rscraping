@@ -42,6 +42,8 @@ _KNOWN_RACE_SPONSORS = [
     "ONURA HOMES",
     "YURRITA GROUP",
     "WOFCO",
+    "SALGADO",
+    "CEFYCAL",
 ]
 
 
