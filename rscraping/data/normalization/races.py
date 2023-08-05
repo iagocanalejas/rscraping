@@ -1,11 +1,10 @@
-import logging
 import re
 from typing import List, Optional, Tuple
 
 from pyutils.strings import find_roman, remove_parenthesis, remove_roman, roman_to_int, whitespaces_clean
-from unidecode import unidecode
 
-logger = logging.getLogger(__name__)
+from rscraping.data.functions import is_play_off
+
 
 _NORMALIZED_MALE_RACES = {
     "ZARAUZKO IKURRIÑA": ["ZARAUZKO ESTROPADAK", "ZARAUZKO IKURRIÑA"],
@@ -36,6 +35,7 @@ _MISSPELLINGS = [
     (" AE ", ""),
     ("EXCMO", ""),
     ("ILTMO", ""),
+    ("TRAIEIRAS", "TRAIÑEIRAS"),
 ]
 
 _KNOWN_RACE_SPONSORS = [
@@ -48,7 +48,7 @@ _KNOWN_RACE_SPONSORS = [
 def normalize_name_parts(normalized_name: str) -> List[Tuple[str, Optional[int]]]:
     parts: List[Tuple[str, Optional[int]]] = []
     normalized_name = remove_parenthesis(whitespaces_clean(normalized_name))
-    name_parts = normalized_name.split(" - ")
+    name_parts = normalized_name.split(" - ") if not is_play_off(normalized_name) else [normalized_name]
 
     for name in name_parts:
         edition = find_edition(name)
@@ -90,7 +90,6 @@ def remove_league_indicator(name: str) -> str:
 def remove_race_sponsor(name: str) -> str:
     for sponsor in _KNOWN_RACE_SPONSORS:
         name = name.replace(sponsor, "")
-        name = name.replace(unidecode(sponsor), "")
     if name.endswith(" - "):
         name = name.replace(" - ", "")
     return whitespaces_clean(name)

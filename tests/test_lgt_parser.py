@@ -3,7 +3,7 @@ import unittest
 
 from parsel import Selector
 from rscraping.data.constants import GENDER_MALE
-from rscraping.data.models import Participant, Race
+from rscraping.data.models import Participant, Race, RaceName
 
 from rscraping.parsers.html.lgt import LGTHtmlParser
 
@@ -31,6 +31,18 @@ class TestLGTParser(unittest.TestCase):
 
         self.assertEqual(race, self._RACE)
         self.assertEqual(participants, self._PARTICIPANTS)
+
+    def test_parse_race_ids(self):
+        with open(os.path.join(self.fixtures, "lgt_races.html"), "r") as file:
+            ids = self.parser.parse_race_ids(Selector(file.read()))
+
+        self.assertEqual(ids, ["152", "153", "154"])
+
+    def test_parse_race_names(self):
+        with open(os.path.join(self.fixtures, "lgt_races.html"), "r") as file:
+            race_names = self.parser.parse_race_names(Selector(file.read()), is_female=False)
+
+        self.assertEqual(race_names, self._RACE_NAMES)
 
     _RACE = Race(
         name="IX BANDEIRA VIRXE DO CARME",
@@ -92,4 +104,9 @@ class TestLGTParser(unittest.TestCase):
             race=_RACE,
             disqualified=False,
         ),
+    ]
+    _RACE_NAMES = [
+        RaceName(race_id="152", name="XXVIII BANDEIRA TRAIÑEIRAS CONCELLO DE BUEU"),
+        RaceName(race_id="153", name="I BANDEIRA CONCELLO AS PONTES B"),
+        RaceName(race_id="154", name="I BANDEIRA CONCELLO AS PONTES F"),
     ]

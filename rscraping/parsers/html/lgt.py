@@ -4,7 +4,7 @@ from datetime import date, datetime
 from ._parser import HtmlParser
 from typing import List, Optional, Tuple
 from parsel import Selector
-from pyutils.strings import remove_parenthesis, whitespaces_clean, remove_roman
+from pyutils.strings import whitespaces_clean
 from rscraping.data.constants import (
     GENDER_FEMALE,
     GENDER_MALE,
@@ -94,11 +94,20 @@ class LGTHtmlParser(HtmlParser):
 
         return race
 
-    def parse_race_names(self, **_) -> List[RaceName]:
-        raise NotImplementedError
+    def parse_race_ids(self, selector: Selector, **_):
+        urls = selector.xpath("//*/div/div/div[*]/div/a/@href").getall()
+        return [u.split("/")[-1].split("-")[0] for u in urls[0:]]
 
-    def parse_race_ids(self, **_):
-        raise NotImplementedError
+    def parse_race_names(self, selector: Selector, **_) -> List[RaceName]:
+        values = [Selector(u) for u in selector.xpath("//*/div/div/div[*]/div").getall()]
+        values = [
+            (
+                u.xpath("//*/a/@href").get("").split("/")[-1].split("-")[0],
+                u.xpath("//*/table/tr/td[2]/text()").get(""),
+            )
+            for u in values
+        ]
+        return [RaceName(p[0], whitespaces_clean(p[1]).upper()) for p in values]
 
     def parse_lineup(self, **_):
         raise NotImplementedError

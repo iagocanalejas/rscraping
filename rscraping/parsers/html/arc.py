@@ -4,7 +4,7 @@ from datetime import date, datetime
 from ._parser import HtmlParser
 from typing import List, Optional
 from parsel import Selector
-from pyutils.strings import remove_parenthesis, whitespaces_clean, remove_roman
+from pyutils.strings import remove_parenthesis, whitespaces_clean
 from rscraping.data.constants import (
     GENDER_FEMALE,
     GENDER_MALE,
@@ -91,12 +91,7 @@ class ARCHtmlParser(HtmlParser):
         )
         return [url_parts[-2] for url_parts in (url.split("/") for url in urls)]
 
-    def parse_race_names(self, selector: Selector, is_female: bool, **_) -> List[RaceName]:
-        def normalize(name: str, is_female: bool) -> str:
-            name = normalize_race_name(name, is_female)
-            name = remove_roman(remove_parenthesis(name))
-            return self._normalize_race_name(name)
-
+    def parse_race_names(self, selector: Selector, **_) -> List[RaceName]:
         hrefs = (
             selector.xpath('//*[@id="main"]/div[6]/table/tbody/tr[*]/td[2]/span/a').getall()
             if selector.xpath('//*[@id="proximas-regatas"]').get()
@@ -104,7 +99,7 @@ class ARCHtmlParser(HtmlParser):
         )
         selectors = [Selector(h) for h in hrefs]
         pairs = [(s.xpath("//*/@href").get("").split("/")[-2], s.xpath("//*/text()").get("")) for s in selectors]
-        return [RaceName(p[0], whitespaces_clean(p[1]).upper(), normalize(p[1], is_female)) for p in pairs]
+        return [RaceName(p[0], whitespaces_clean(p[1]).upper()) for p in pairs]
 
     def parse_club_ids(self, selector: Selector) -> List[str]:
         urls = (

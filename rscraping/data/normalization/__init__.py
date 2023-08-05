@@ -1,6 +1,7 @@
 from .clubs import normalize_club_name  # pyright: ignore
 from .races import (
     normalize_race_name,  # pyright: ignore
+    normalize_name_parts,  # pyright: ignore
     remove_league_indicator,  # pyright: ignore
     amend_race_name,  # pyright: ignore
     deacronym_race_name,  # pyright: ignore

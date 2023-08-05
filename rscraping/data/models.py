@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from enum import StrEnum, auto
 from typing import List, Optional, Tuple
 
-RaceName = collections.namedtuple("RaceName", ["race_id", "name", "normalized_name"])
+RaceName = collections.namedtuple("RaceName", ["race_id", "name"])
 
 
 class Datasource(StrEnum):

@@ -3,7 +3,7 @@ import re
 from ._parser import HtmlParser
 from typing import List, Optional, Tuple
 from parsel import Selector
-from pyutils.strings import find_date, remove_parenthesis, remove_roman, whitespaces_clean
+from pyutils.strings import find_date, whitespaces_clean
 from rscraping.data.constants import (
     GENDER_FEMALE,
     GENDER_MALE,
@@ -93,16 +93,11 @@ class ACTHtmlParser(HtmlParser):
         urls = selector.xpath('//*[@id="col-a"]/div/section/div[5]/table/tbody/tr[*]/td[*]/a/@href').getall()
         return [url_parts[-1] for url_parts in (url.split("r=") for url in urls)]
 
-    def parse_race_names(self, selector: Selector, is_female: bool, **_) -> List[RaceName]:
-        def normalize(name: str, is_female: bool) -> str:
-            name = normalize_race_name(name, is_female)
-            name = remove_roman(remove_parenthesis(name))
-            return self._normalize_race_name(name)
-
+    def parse_race_names(self, selector: Selector, **_) -> List[RaceName]:
         hrefs = selector.xpath('//*[@id="col-a"]/div/section/div[5]/table/tbody/tr[*]/td[*]/a').getall()
         selectors = [Selector(h) for h in hrefs]
         pairs = [(s.xpath("//*/@href").get("").split("r=")[-1], s.xpath("//*/text()").get("")) for s in selectors]
-        return [RaceName(p[0], whitespaces_clean(p[1]).upper(), normalize(p[1], is_female)) for p in pairs]
+        return [RaceName(p[0], whitespaces_clean(p[1]).upper()) for p in pairs]
 
     def parse_lineup(self, **_):
         raise NotImplementedError

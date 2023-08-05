@@ -11,6 +11,5 @@ pytesseract==0.3.10
 requests==2.31.0
 reportlab~=4.0.4
 simplemma==0.9.1
-Unidecode==1.3.6
 
 pyutils @ git+https://github.com/iagocanalejas/pyutils.git@master

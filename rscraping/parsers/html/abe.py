@@ -3,7 +3,7 @@ import re
 from ._parser import HtmlParser
 from typing import List, Optional
 from parsel import Selector
-from pyutils.strings import find_date, remove_parenthesis, remove_roman, whitespaces_clean
+from pyutils.strings import find_date, whitespaces_clean
 from rscraping.data.constants import (
     GENDER_MALE,
     PARTICIPANT_CATEGORY_ABSOLUT,
@@ -88,17 +88,12 @@ class ABEHtmlParser(HtmlParser):
         return [url_parts[-2] for url_parts in (url.split("/") for url in urls)]
 
     def parse_race_names(self, selector: Selector, **_) -> List[RaceName]:
-        def normalize(name: str, is_female: bool) -> str:
-            name = normalize_race_name(name, is_female)
-            name = remove_roman(remove_parenthesis(name))
-            return name
-
         hrefs = selector.xpath(
             '//*[@id="page"]/div/section[2]/div[2]/div[1]/div/div[2]/div/div/article[*]/div/h3/a'
         ).getall()
         selectors = [Selector(h) for h in hrefs]
         pairs = [(s.xpath("//*/@href").get("").split("/")[-2], s.xpath("//*/text()").get("")) for s in selectors]
-        return [RaceName(p[0], whitespaces_clean(p[1]).upper(), normalize(p[1], False)) for p in pairs]
+        return [RaceName(p[0], whitespaces_clean(p[1]).upper()) for p in pairs]
 
     def parse_lineup(self, **_):
         raise NotImplementedError

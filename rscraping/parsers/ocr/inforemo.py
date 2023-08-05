@@ -57,15 +57,14 @@ class ImageOCRInforemo(ImageOCR, source=Datasource.INFOREMO):
         race_laps = self.get_race_laps(df)
         race = Race(
             name=name,
-            normalized_name=normalized_name,
+            normalized_names=[(normalized_name, 1)],
             date=t_date,
-            edition=self.get_edition(),
-            day=self.get_day(),
+            day=1,
             type="",  # TODO: type in image
             modality=self.get_modality(),
-            league=self.get_league(),
+            league=None,
             town=town,
-            organizer=self.get_organizer(),
+            organizer=None,
             sponsor=None,
             race_id=os.path.basename(path),
             url=None,
@@ -86,6 +85,7 @@ class ImageOCRInforemo(ImageOCR, source=Datasource.INFOREMO):
                     series=self.get_series(row),
                     laps=self.get_laps(row),
                     distance=self.get_distance(),
+                    handicap=None,
                     participant=self.normalized_club_name(club_name),
                     race=race,
                 )
@@ -262,7 +262,7 @@ class ImageOCRInforemo(ImageOCR, source=Datasource.INFOREMO):
         return [t.isoformat() for t in [normalize_lap_time(self.clean_lap(t)) for t in data.iloc[idx:]] if t]
 
     def get_race_lanes(self, df: DataFrame) -> int:
-        lanes = max(int(row[4]) for _, row in df.iterrows())
+        lanes = max(int(row.iloc[4]) for (_, row) in df.iterrows())
         try:
             lanes = int(lanes)
             return lanes if lanes < 7 else 1
@@ -278,20 +278,3 @@ class ImageOCRInforemo(ImageOCR, source=Datasource.INFOREMO):
         new_name = new_name.replace("'", '"')  # normalize quotes
 
         return new_name
-
-    ####################################################
-    #                 DEFAULT VALUES                   #
-    ####################################################
-
-    @staticmethod
-    def get_edition() -> int:
-        return 1
-
-    def get_league(self) -> Optional[str]:
-        return None
-
-    def get_day(self) -> int:
-        return 1
-
-    def get_organizer(self) -> Optional[str]:
-        return None

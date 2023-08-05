@@ -12,7 +12,6 @@ setup(
         "pypdf",
         "requests",
         "simplemma",
-        "Unidecode",
     ],
     dependency_links=["https://github.com/iagocanalejas/pyutils.git@master#egg=pyutils"],
 )

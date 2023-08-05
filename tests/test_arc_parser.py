@@ -105,10 +105,9 @@ class TestARCParser(unittest.TestCase):
         RaceName(
             race_id="446",
             name="KEPA DEUN ARRANTZALEEN KOFRADIA XXII. IKURRIÑA",
-            normalized_name="KEPA DEUN ARRANTZALEEN KOFRADÍA IKURRIÑA",
         ),
-        RaceName(race_id="474", name="PLAY OFF I", normalized_name="PLAY OFF"),
-        RaceName(race_id="475", name="PLAY OFF II", normalized_name="PLAY OFF"),
+        RaceName(race_id="474", name="PLAY OFF I"),
+        RaceName(race_id="475", name="PLAY OFF II"),
     ]
     _LINEUP = Lineup(
         race="XXIX BANDERA REAL ASTILLERO DE GUARNIZO",

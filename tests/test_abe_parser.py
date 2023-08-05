@@ -105,16 +105,13 @@ class TestABEParser(unittest.TestCase):
         RaceName(
             race_id="getxo",
             name="XIX REGATA DE TRAINERAS DE VETERANOS DE GETXO (29/7/23)",
-            normalized_name="REGATA DE TRAINERAS DE VETERANOS DE GETXO",
         ),
         RaceName(
             race_id="plentzia",
             name="V BANDERA KARMENGO AMA. PLENTZIA (17/7/22)",
-            normalized_name="BANDERA KARMENGO AMA PLENTZIA",
         ),
         RaceName(
             race_id="fortuna",
             name="XII REGATA DE VETERANOS FORTUNA K. E. (8/5/2023)",
-            normalized_name="REGATA DE VETERANOS FORTUNA K E",
         ),
     ]

@@ -1,7 +1,6 @@
 import logging
 
 from pyutils.strings import whitespaces_clean, remove_parenthesis
-from unidecode import unidecode
 
 logger = logging.getLogger(__name__)
 
@@ -121,14 +120,12 @@ def remove_club_title(name: str) -> str:
             # edge case, need to avoid removing 'ARRAUN LAGUNAK' from 'DONOSTIA ARRAUN LAGUNAK'
             continue
         name = name.replace(title, "")
-        name = name.replace(unidecode(title), "")
     return whitespaces_clean(name)
 
 
 def remove_club_sponsor(name: str) -> str:
     for sponsor in _KNOWN_SPONSORS:
         name = name.replace(sponsor, "")
-        name = name.replace(unidecode(sponsor), "")
     if name.endswith(" - ") or name.startswith(" - "):
         name = name.replace(" - ", "")
     return whitespaces_clean(name)

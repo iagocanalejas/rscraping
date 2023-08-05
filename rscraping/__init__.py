@@ -4,7 +4,7 @@ from pyutils.strings import normalize_synonyms, remove_conjunctions, remove_symb
 from rscraping.clients import Client
 from rscraping.data.constants import SYNONYMS
 from rscraping.data.models import Datasource, Lineup, Race
-from simplemma import text_lemmatizer
+from simplemma.simplemma import text_lemmatizer
 
 
 def find_lineup(race_id: str, datasource: Datasource, is_female: bool) -> List[Lineup]:

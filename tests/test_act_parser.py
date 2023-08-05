@@ -105,16 +105,13 @@ class TestACTParser(unittest.TestCase):
         RaceName(
             race_id="1616789082",
             name="V BANDEIRA CIDADE DA CORUÑA (J1)",
-            normalized_name="BANDEIRA CIDADE DA CORUÑA",
         ),
         RaceName(
             race_id="1616789390",
             name="ORIOKO XXXIII. ESTROPADA - ORIO KANPINA XI. BANDERA",
-            normalized_name="ORIOKO ESTROPADA - ORIO KANPINA BANDERA",
         ),
         RaceName(
             race_id="1616789420",
             name="XIII. BANDERA DONOSTIARRA - TURISMO CASTILLA-LA MANCHA",
-            normalized_name="BANDERA DONOSTIARRA - TURISMO CASTILLA LA MANCHA",
         ),
     ]

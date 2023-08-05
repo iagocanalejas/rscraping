@@ -1,6 +1,6 @@
 import requests
 from datetime import date
-from pyutils.strings import remove_parenthesis, remove_roman, whitespaces_clean
+from pyutils.strings import whitespaces_clean
 from ._client import Client
 from io import BytesIO
 from pypdf import PdfReader
@@ -10,7 +10,6 @@ from rscraping.data.constants import HTTP_HEADERS
 from rscraping.data.models import Datasource, Lineup, Race, RaceName
 from rscraping.parsers.html import LGTHtmlParser
 from rscraping.parsers.pdf import LGTPdfParser
-from rscraping.data.normalization.races import normalize_race_name
 
 
 class LGTClient(Client, source=Datasource.LGT):
@@ -94,7 +93,13 @@ class LGTClient(Client, source=Datasource.LGT):
     def get_results_selector(race_id: str) -> Selector:
         url = "https://www.ligalgt.com/ajax/principal/ver_resultados.php"
         data = {"liga_id": 1, "regata_id": race_id}
-        return Selector(requests.post(url=url, headers=HTTP_HEADERS, data=data).text)
+        return Selector(requests.post(url=url, headers=HTTP_HEADERS, data=data).content.decode("utf-8"))
+
+    @staticmethod
+    def get_calendar_selector() -> Selector:
+        url = "https://www.ligalgt.com/ajax/principal/regatas.php"
+        data = {"lng": "es"}
+        return Selector(requests.post(url=url, headers=HTTP_HEADERS, data=data).content.decode("utf-8"))
 
     def get_race_by_id(self, race_id: str, **kwargs) -> Optional[Race]:
         if race_id in self._excluded_ids:
@@ -108,16 +113,21 @@ class LGTClient(Client, source=Datasource.LGT):
         As this datasource doesn't give us an easy way of retrieving the races for a given year we need to bruteforce
         it, this method will do a binary search for the 'upper' and 'lower' bounds of a season.
 
+        For the current year tryies to find the IDs in the calendar page.
+
         We also need to ignore a hole ton of useless IDs (_excluded_ids) that are not used or have invalid information.
 
         Returns a list of unchecked IDs, note that this list can contain invalid values as this method does not check
         each one of them.
         """
-        self.validate_year_or_raise_exception(year)
-
-        since = self.MALE_START
         today = date.today().year
-        parser = LGTHtmlParser()
+        if today == year:
+            race_ids = self._html_parser.parse_race_ids(selector=self.get_calendar_selector())
+            if race_ids:
+                return race_ids
+
+        self.validate_year_or_raise_exception(year)
+        since = self.MALE_START
 
         # asume 30 races per year for lower bound and 50 for the upper bound
         left, right = (year - since) * 20, (today - since + 1) * 50
@@ -126,7 +136,7 @@ class LGTClient(Client, source=Datasource.LGT):
             while mid in self._excluded_ids and mid > (left + 1):
                 mid -= 1
 
-            race_year = self._get_race_year(parser, str(mid))
+            race_year = self._get_race_year(str(mid))
             if not race_year or race_year < year:
                 left = mid + 1
             else:
@@ -140,7 +150,7 @@ class LGTClient(Client, source=Datasource.LGT):
             while mid in self._excluded_ids and mid < (right - 1):
                 mid += 1
 
-            race_year = self._get_race_year(parser, str(mid))
+            race_year = self._get_race_year(str(mid))
             if not race_year or race_year > year:
                 right = mid - 1
             else:
@@ -150,14 +160,14 @@ class LGTClient(Client, source=Datasource.LGT):
         return [str(r) for r in range(lower_race_id, (upper_race_id + 1)) if r not in self._excluded_ids]
 
     def get_race_names_by_year(self, year: int, **_) -> List[RaceName]:
-        def normalize(parser: LGTHtmlParser, name: str, is_female: bool) -> str:
-            name = normalize_race_name(name, is_female)
-            name = remove_roman(remove_parenthesis(name))
-            return parser._normalize_race_name(name)
+        today = date.today().year
+        if today == year:
+            race_names = self._html_parser.parse_race_names(selector=self.get_calendar_selector())
+            if race_names:
+                return race_names
 
         ids = self.get_race_ids_by_year(year)
         race_names: List[RaceName] = []
-        parser = LGTHtmlParser()
 
         for id in ids:
             if id in self._excluded_ids:
@@ -165,10 +175,9 @@ class LGTClient(Client, source=Datasource.LGT):
 
             url = self.get_race_details_url(id)
             selector = Selector(requests.get(url=url, headers=HTTP_HEADERS).content.decode("utf-8"))
-            if parser.is_valid_race(selector):
-                name = parser.get_name(selector)
-                is_female = any(e in name for e in ["FEMENINA", "FEMININA"])
-                race_names.append(RaceName(id, whitespaces_clean(name).upper(), normalize(parser, name, is_female)))
+            if self._html_parser.is_valid_race(selector):
+                name = self._html_parser.get_name(selector)
+                race_names.append(RaceName(id, whitespaces_clean(name).upper()))
 
         return race_names
 
@@ -196,17 +205,17 @@ class LGTClient(Client, source=Datasource.LGT):
 
     _RACE_YEARS: Dict[str, Optional[int]] = {}
 
-    def _get_race_year(self, parser: LGTHtmlParser, race_id: str) -> Optional[int]:
+    def _get_race_year(self, race_id: str) -> Optional[int]:
         if race_id in self._RACE_YEARS:
             return self._RACE_YEARS[race_id]
 
         url = self.get_race_details_url(race_id)
 
         selector = Selector(requests.get(url=url, headers=HTTP_HEADERS).text)
-        if not parser.is_valid_race(selector):
+        if not self._html_parser.is_valid_race(selector):
             self._RACE_YEARS[race_id] = None
             return None
-        race_year = parser.get_date(selector).year
+        race_year = self._html_parser.get_date(selector).year
 
         self._RACE_YEARS[race_id] = race_year
         return race_year
