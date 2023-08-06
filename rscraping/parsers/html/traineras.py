@@ -62,7 +62,7 @@ class TrainerasHtmlParser(HtmlParser):
 
         race = Race(
             name=self.get_name(selector),
-            normalized_names=[(normalize_race_name(name, is_female=False), None)],
+            normalized_names=[(normalize_race_name(name), None)],
             date=t_date.strftime("%d/%m/%Y"),
             type=ttype,
             day=day,
@@ -180,5 +180,5 @@ class TrainerasHtmlParser(HtmlParser):
         return laps[-1] == "Desc."
 
     def get_series(self, participant: Selector) -> int:
-        lane = participant.xpath("//*/td[4]/text()").get()
-        return int(lane) if lane else 0
+        series = participant.xpath("//*/td[4]/text()").get()
+        return int(series) if series else 0

@@ -76,7 +76,7 @@ class ImageOCR(ABC):
     ####################################################
 
     def normalized_name(self, name: str, **_) -> str:
-        return normalize_race_name(name, False)
+        return normalize_race_name(name)
 
     def normalized_club_name(self, name: str, **_) -> str:
         return normalize_club_name(name)

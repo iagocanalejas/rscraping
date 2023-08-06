@@ -21,7 +21,7 @@ class TestRaceNameNormalization(unittest.TestCase):
         ]
 
         for idx, race_name in enumerate(self.NAMES):
-            self.assertEqual(normalize_race_name(race_name, is_female=False), results[idx])
+            self.assertEqual(normalize_race_name(race_name), results[idx])
 
     def test_normalize_name_parts(self):
         results = [
@@ -31,6 +31,6 @@ class TestRaceNameNormalization(unittest.TestCase):
             [("GETXOKO ESTROPADEN IKURRIÑA", 45), ("JOSE ANTONIO AGIRRE LEHENDAKARIAREN OMENALDIA", 19)],
         ]
 
-        races = [normalize_race_name(n, is_female=False) for n in self.NAMES]
+        races = [normalize_race_name(n) for n in self.NAMES]
         for idx, race_name in enumerate(races):
             self.assertEqual(normalize_name_parts(race_name), results[idx])

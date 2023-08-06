@@ -6,23 +6,6 @@ from pyutils.strings import find_roman, remove_parenthesis, remove_roman, roman_
 from rscraping.data.functions import is_play_off
 
 
-_NORMALIZED_MALE_RACES = {
-    "ZARAUZKO IKURRIÑA": ["ZARAUZKO ESTROPADAK", "ZARAUZKO IKURRIÑA"],
-    "HONDARRIBIKO IKURRIÑA": ["HONDARRIBIKO IKURRIÑA", "HONDARRIBIKO BANDERA"],
-    "GRAN PREMIO EL CORTE INGLÉS": ["EL CORTE"],
-    "BANDERA MARINA DE CUDEYO": ["MARINA CUDEYO", "MARINA DE CUDEYO"],
-    "GRAN PREMIO FANDICOSTA": ["GRAN PREMIO FANDICOSTA", "GP FANDICOSTA"],
-    "BANDEIRA CIDADE DE FERROL": ["MIGUEL DERUNGS"],
-    "BANDEIRA OUTÓN Y FERNÁNDEZ": ["OUTÓN Y FERNÁNDEZ", "OUTÓN FERNÁNDEZ", "OUTON FERNÁNDEZ"],
-    "DONIBANE ZIBURUKO ESTROPADAK": ["DONIBANE ZIBURUKONESTROPADA"],
-    "BANDERA DE BILBAO": ["BILBOKO BANDERA"],
-}
-
-_NORMALIZED_FEMALE_RACES = {
-    "GRAN PREMIO FANDICOSTA FEMININO": ["GRAN PREMIO FANDICOSTA", "GP FANDICOSTA"],
-    "BANDEIRA FEMININA CIDADE DE FERROL": ["MIGUEL DERUNGS"],
-}
-
 _MISSPELLINGS = [
     ("IKURIÑA", "IKURRIÑA"),
     ("IKURINA", "IKURRIÑA"),
@@ -44,6 +27,7 @@ _KNOWN_RACE_SPONSORS = [
     "WOFCO",
     "SALGADO",
     "CEFYCAL",
+    "CONCELLO DE BOIRO",
 ]
 
 
@@ -60,7 +44,7 @@ def normalize_name_parts(normalized_name: str) -> List[Tuple[str, Optional[int]]
     return parts
 
 
-def normalize_race_name(name: str, is_female: bool) -> str:
+def normalize_race_name(name: str) -> str:
     name = whitespaces_clean(name).upper()
     name = re.sub(r"[\'\".:ª]", " ", name)
 
@@ -68,13 +52,6 @@ def normalize_race_name(name: str, is_female: bool) -> str:
     name = deacronym_race_name(name)
     name = remove_league_indicator(name)
     name = remove_race_sponsor(name)
-
-    normalizations = _NORMALIZED_FEMALE_RACES if is_female else _NORMALIZED_MALE_RACES
-    # specific race normalizations
-    for k, v in normalizations.items():
-        if name in v or any(part in name for part in v):
-            name = k
-            break
 
     return whitespaces_clean(name)
 

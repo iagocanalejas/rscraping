@@ -34,7 +34,7 @@ class ARCHtmlParser(HtmlParser):
 
         gender = GENDER_FEMALE if is_female else GENDER_MALE
 
-        normalized_names = normalize_name_parts(normalize_race_name(name, is_female=is_female))
+        normalized_names = normalize_name_parts(normalize_race_name(name))
         if len(normalized_names) == 0:
             logger.error(f"{self.DATASOURCE}: unable to normalize {name=}")
             return None

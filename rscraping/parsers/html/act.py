@@ -37,7 +37,7 @@ class ACTHtmlParser(HtmlParser):
 
         gender = GENDER_FEMALE if is_female else GENDER_MALE
 
-        normalized_names = normalize_name_parts(normalize_race_name(name, is_female=is_female))
+        normalized_names = normalize_name_parts(normalize_race_name(name))
         if len(normalized_names) == 0:
             logger.error(f"{self.DATASOURCE}: unable to normalize {name=}")
             return None
@@ -177,9 +177,10 @@ class ACTHtmlParser(HtmlParser):
 
     def get_series(self, selector: Selector, participant: Selector) -> int:
         series = 1
+        searching_name = participant.xpath("//*/td[2]/text()").get("")
         for table in selector.xpath('//*[@id="col-a"]/div/section/div[*]/div[2]/div/table/tbody').getall():
-            for p in Selector(table).xpath("//*/tr[*]").getall():
-                if p == participant:
+            for p in Selector(table).xpath("//*/tr/td[2]/text()").getall():
+                if p == searching_name:
                     return series
             series += 1
         return 0

@@ -43,7 +43,7 @@ class LGTHtmlParser(HtmlParser):
         is_female = any(e in name for e in ["FEMENINA", "FEMININA"]) or (league is not None and "F" in league.split())
         gender = GENDER_FEMALE if is_female else GENDER_MALE
 
-        normalized_names = normalize_name_parts(normalize_race_name(name, is_female=is_female))
+        normalized_names = normalize_name_parts(normalize_race_name(name))
         if len(normalized_names) == 0:
             logger.error(f"{self.DATASOURCE}: unable to normalize {name=}")
             return None
@@ -209,11 +209,13 @@ class LGTHtmlParser(HtmlParser):
 
     def get_series(self, results_selector: Selector, participant: Selector) -> int:
         series = 1
+        searching_name = participant.xpath("//*/td[2]/text()").get("")
         rows = [Selector(p) for p in results_selector.xpath('//*[@id="tabla-tempos"]/tr[*]').getall()]
         for row in rows:
-            if row.xpath("//*/td[2]/text()").get("") == self.get_club_name(participant):
+            row_name = row.xpath("//*/td[2]/text()").get()
+            if row_name is not None and row_name == searching_name:
                 return series
-            if len(row.xpath("//*/td[*]").getall()) == 1:
+            if len(row.xpath("//*/td").getall()) == 1:
                 series += 1
         return 0
 
