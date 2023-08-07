@@ -1,6 +1,5 @@
 import collections
 import json
-
 from dataclasses import dataclass
 from enum import StrEnum, auto
 from typing import List, Optional, Tuple

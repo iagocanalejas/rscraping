@@ -2,11 +2,12 @@ from abc import ABC, abstractmethod
 from datetime import date
 from typing import List, Optional
 
-from parsel import Selector
 import requests
+from parsel import Selector
+
 from rscraping.data.constants import HTTP_HEADERS
-from rscraping.parsers.html import HtmlParser
 from rscraping.data.models import Datasource, Lineup, Race, RaceName
+from rscraping.parsers.html import HtmlParser
 
 
 class Client(ABC):

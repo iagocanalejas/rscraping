@@ -1,15 +1,18 @@
-import requests
 from datetime import date
-from pyutils.strings import whitespaces_clean
-from ._client import Client
 from io import BytesIO
-from pypdf import PdfReader
 from typing import Dict, List, Optional
+
+import requests
 from parsel import Selector
+from pypdf import PdfReader
+from pyutils.strings import whitespaces_clean
+
 from rscraping.data.constants import HTTP_HEADERS
 from rscraping.data.models import Datasource, Lineup, Race, RaceName
 from rscraping.parsers.html import LGTHtmlParser
 from rscraping.parsers.pdf import LGTPdfParser
+
+from ._client import Client
 
 
 class LGTClient(Client, source=Datasource.LGT):

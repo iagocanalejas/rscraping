@@ -1,7 +1,9 @@
-from ._client import Client
 from typing import List
+
 from rscraping.data.models import Datasource, Lineup
 from rscraping.parsers.html import ABEHtmlParser
+
+from ._client import Client
 
 
 class ABEClient(Client, source=Datasource.ABE):

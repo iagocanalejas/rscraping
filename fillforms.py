@@ -4,8 +4,8 @@ import argparse
 import logging
 import os
 import sys
-
 from datetime import datetime
+
 from rscraping.builder import (
     PdfItem,
     fill_fegar_form,

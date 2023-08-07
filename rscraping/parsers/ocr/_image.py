@@ -1,14 +1,15 @@
 import locale
 import logging
-import cv2
-import numpy as np
-
 from abc import ABC, abstractmethod
 from datetime import date
-from typing import Any, List, Tuple, Optional, Generator
+from typing import Any, Generator, List, Optional, Tuple
+
+import cv2
+import numpy as np
 from matplotlib import pyplot as plt
 from numpy.typing import NDArray
 from pandas import DataFrame
+
 from rscraping.data.models import Datasource, Race
 from rscraping.data.normalization.clubs import normalize_club_name
 from rscraping.data.normalization.races import normalize_race_name

@@ -1,0 +1,25 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: requirements-txt-fixer
+      - id: end-of-file-fixer
+      - id: name-tests-test
+      - id: check-added-large-files
+      - id: check-yaml
+      - id: check-toml
+      - id: mixed-line-ending
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.10.1
+    hooks:
+      - id: pyupgrade
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.0.282
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+        types_or: [python, pyi]

@@ -1,6 +1,6 @@
 import logging
 
-from pyutils.strings import whitespaces_clean, remove_parenthesis
+from pyutils.strings import remove_parenthesis, whitespaces_clean
 
 logger = logging.getLogger(__name__)
 

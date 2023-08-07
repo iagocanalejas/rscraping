@@ -5,10 +5,10 @@ from pyutils.strings import find_roman, remove_parenthesis, remove_roman, roman_
 
 from rscraping.data.functions import is_play_off
 
-
 _MISSPELLINGS = [
     ("IKURIÑA", "IKURRIÑA"),
     ("IKURINA", "IKURRIÑA"),
+    ("IÑURRIÑA", "IKURRIÑA"),
     ("KOFRADIA", "KOFRADÍA"),
     ("RECICLAMOS LA LUZ", ""),
     ("PIRATA COM", "PIRATA.COM"),
@@ -38,7 +38,7 @@ def normalize_name_parts(normalized_name: str) -> List[Tuple[str, Optional[int]]
 
     for name in name_parts:
         edition = find_edition(name)
-        clean_name = remove_roman(name)
+        clean_name = whitespaces_clean(remove_roman(name))
         parts.append((clean_name, edition))
 
     return parts
@@ -63,7 +63,7 @@ def remove_league_indicator(name: str) -> str:
     if name.endswith(" A"):
         filtered_words = filtered_words[:-1]
 
-    return " ".join(filtered_words)
+    return whitespaces_clean(" ".join(filtered_words))
 
 
 def remove_race_sponsor(name: str) -> str:
@@ -71,6 +71,13 @@ def remove_race_sponsor(name: str) -> str:
         name = name.replace(sponsor, "")
     if name.endswith(" - "):
         name = name.replace(" - ", "")
+    return whitespaces_clean(name)
+
+
+def remove_day_indicator(name: str) -> str:
+    name = re.sub(r"\(?(\dJ|J\d)\)?", "", name)  # found in some ACT races
+    name = re.sub(r"\d+ª día|\(\d+ª? JORNADA\)", "", name)  # found in some ARC races
+    name = re.sub(r"(XORNADA )\d+|\d+( XORNADA)", "", name)  # found in some LGT races
     return whitespaces_clean(name)
 
 
@@ -83,7 +90,7 @@ def find_race_sponsor(name: str) -> Optional[str]:
 
 def find_edition(name: str) -> Optional[int]:
     name = re.sub(r"[\'\".:]", " ", name)
-    roman_options = list(filter(None, [find_roman(w) for w in name.split()]))
+    roman_options = [e for e in [find_roman(w) for w in name.split()] if e is not None]
     return roman_to_int(roman_options[0]) if roman_options else None
 
 

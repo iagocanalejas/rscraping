@@ -1,6 +1,5 @@
-[tool.ruff]
 select = [
-    "E", # pycodestyle 
+    "E", # pycodestyle
     "F", # Pyflakes
     "I001" # isort
 ]
@@ -33,6 +32,7 @@ exclude = [
     "dist",
     "node_modules",
     "venv",
+    "__init__.py",
 ]
 
 # Same as Black.
@@ -46,9 +46,9 @@ target-version = "py311"
 
 src = ["rscraping", "tests"]
 
-[tool.ruff.mccabe]
+[mccabe]
 # Unlike Flake8, default to a complexity level of 10.
 max-complexity = 10
 
-[tool.ruff.isort]
+[isort]
 known-first-party = ["rscraping"]

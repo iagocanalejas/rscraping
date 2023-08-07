@@ -2,9 +2,9 @@ import os
 import unittest
 
 from parsel import Selector
+
 from rscraping.data.constants import GENDER_MALE
 from rscraping.data.models import Participant, Race, RaceName
-
 from rscraping.parsers.html.lgt import LGTHtmlParser
 
 
@@ -15,8 +15,8 @@ class TestLGTParser(unittest.TestCase):
 
     def test_parse_race(self):
         with (
-            open(os.path.join(self.fixtures, "lgt_details.html"), "r") as file,
-            open(os.path.join(self.fixtures, "lgt_results.html"), "r") as results,
+            open(os.path.join(self.fixtures, "lgt_details.html")) as file,
+            open(os.path.join(self.fixtures, "lgt_results.html")) as results,
         ):
             race = self.parser.parse_race(
                 Selector(file.read()),
@@ -24,7 +24,7 @@ class TestLGTParser(unittest.TestCase):
                 race_id="1234",
             )
         if not race:
-            raise ValueError(f"unable to parse race")
+            raise ValueError("unable to parse race")
 
         participants = race.participants
         race.participants = []
@@ -33,13 +33,13 @@ class TestLGTParser(unittest.TestCase):
         self.assertEqual(participants, self._PARTICIPANTS)
 
     def test_parse_race_ids(self):
-        with open(os.path.join(self.fixtures, "lgt_races.html"), "r") as file:
+        with open(os.path.join(self.fixtures, "lgt_races.html")) as file:
             ids = self.parser.parse_race_ids(Selector(file.read()))
 
         self.assertEqual(ids, ["152", "153", "154"])
 
     def test_parse_race_names(self):
-        with open(os.path.join(self.fixtures, "lgt_races.html"), "r") as file:
+        with open(os.path.join(self.fixtures, "lgt_races.html")) as file:
             race_names = self.parser.parse_race_names(Selector(file.read()), is_female=False)
 
         self.assertEqual(race_names, self._RACE_NAMES)

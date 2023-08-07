@@ -1,10 +1,11 @@
 import logging
 import re
 from datetime import date, datetime
-from ._parser import HtmlParser
 from typing import List, Optional, Tuple
+
 from parsel import Selector
 from pyutils.strings import whitespaces_clean
+
 from rscraping.data.constants import (
     GENDER_FEMALE,
     GENDER_MALE,
@@ -16,8 +17,15 @@ from rscraping.data.constants import (
 from rscraping.data.functions import is_play_off
 from rscraping.data.models import Datasource, Participant, Race, RaceName
 from rscraping.data.normalization.clubs import normalize_club_name
+from rscraping.data.normalization.races import (
+    find_race_sponsor,
+    normalize_name_parts,
+    normalize_race_name,
+    remove_day_indicator,
+)
 from rscraping.data.normalization.times import normalize_lap_time
-from rscraping.data.normalization.races import find_race_sponsor, normalize_name_parts, normalize_race_name
+
+from ._parser import HtmlParser
 
 logger = logging.getLogger(__name__)
 
@@ -225,8 +233,7 @@ class LGTHtmlParser(HtmlParser):
 
     @staticmethod
     def _normalize_race_name(name: str) -> str:
-        # remove day
-        name = re.sub(r"(XORNADA )\d+|\d+( XORNADA)", "", name)
+        name = remove_day_indicator(name)
 
         if "TERESA HERRERA" in name:  # lgt never saves the final
             return "TROFEO TERESA HERRERA (CLASIFICATORIA)"

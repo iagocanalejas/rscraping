@@ -2,9 +2,9 @@ import os
 import unittest
 
 from parsel import Selector
+
 from rscraping.data.constants import GENDER_MALE
 from rscraping.data.models import Participant, Race, RaceName
-
 from rscraping.parsers.html.traineras import MultiDayRaceException, TrainerasHtmlParser
 
 
@@ -14,7 +14,7 @@ class TestTrainerasParser(unittest.TestCase):
         self.fixtures = os.path.join(os.getcwd(), "fixtures", "html")
 
     def test_multi_day_race_exception(self):
-        with open(os.path.join(self.fixtures, "traineras_details.html"), "r") as file:
+        with open(os.path.join(self.fixtures, "traineras_details.html")) as file:
             with self.assertRaises(MultiDayRaceException):
                 self.parser.parse_race(
                     Selector(file.read()),
@@ -22,7 +22,7 @@ class TestTrainerasParser(unittest.TestCase):
                 )
 
     def test_parse_race(self):
-        with open(os.path.join(self.fixtures, "traineras_details.html"), "r") as file:
+        with open(os.path.join(self.fixtures, "traineras_details.html")) as file:
             selector = Selector(file.read())
             race_1 = self.parser.parse_race(
                 selector,
@@ -35,7 +35,7 @@ class TestTrainerasParser(unittest.TestCase):
                 day=2,
             )
         if not race_1 or not race_2:
-            raise ValueError(f"unable to parse race")
+            raise ValueError("unable to parse race")
 
         participants = race_1.participants
         race_1.participants = []
@@ -44,19 +44,19 @@ class TestTrainerasParser(unittest.TestCase):
         self.assertEqual(participants, self._PARTICIPANTS)
 
     def test_parse_race_ids(self):
-        with open(os.path.join(self.fixtures, "traineras_results.html"), "r") as file:
+        with open(os.path.join(self.fixtures, "traineras_results.html")) as file:
             ids = self.parser.parse_race_ids(Selector(file.read()))
 
         self.assertEqual(ids, ["5455", "5456", "5457", "5458", "5535", "5536"])
 
     def test_parse_race_names(self):
-        with open(os.path.join(self.fixtures, "traineras_results.html"), "r") as file:
+        with open(os.path.join(self.fixtures, "traineras_results.html")) as file:
             race_names = self.parser.parse_race_names(Selector(file.read()))
 
         self.assertEqual(race_names, self._RACE_NAMES)
 
     def test_get_number_of_pages(self):
-        with open(os.path.join(self.fixtures, "traineras_results.html"), "r") as file:
+        with open(os.path.join(self.fixtures, "traineras_results.html")) as file:
             self.assertEqual(self.parser.get_number_of_pages(Selector(file.read())), 1)
 
     _RACE_1 = Race(

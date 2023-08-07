@@ -4,11 +4,11 @@ import argparse
 import logging
 import os
 import sys
-
 from typing import List
-from rscraping.parsers.ocr import ImageOCR
+
 from rscraping.data.functions import expand_path, save_csv
 from rscraping.data.models import Datasource, Race
+from rscraping.parsers.ocr import ImageOCR
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)

@@ -2,8 +2,8 @@ import os
 import unittest
 
 from parsel import Selector
-from rscraping.data.models import Participant, Race, RaceName
 
+from rscraping.data.models import Participant, Race, RaceName
 from rscraping.parsers.html.act import ACTHtmlParser
 
 
@@ -13,14 +13,14 @@ class TestACTParser(unittest.TestCase):
         self.fixtures = os.path.join(os.getcwd(), "fixtures", "html")
 
     def test_parse_race(self):
-        with open(os.path.join(self.fixtures, "act_details.html"), "r") as file:
+        with open(os.path.join(self.fixtures, "act_details.html")) as file:
             race = self.parser.parse_race(
                 Selector(file.read()),
                 race_id="1234",
                 is_female=False,
             )
         if not race:
-            raise ValueError(f"unable to parse race")
+            raise ValueError("unable to parse race")
 
         participants = race.participants
         race.participants = []
@@ -29,13 +29,13 @@ class TestACTParser(unittest.TestCase):
         self.assertEqual(participants, self._PARTICIPANTS)
 
     def test_parse_race_ids(self):
-        with open(os.path.join(self.fixtures, "act_races.html"), "r") as file:
+        with open(os.path.join(self.fixtures, "act_races.html")) as file:
             ids = self.parser.parse_race_ids(Selector(file.read()))
 
         self.assertEqual(ids, ["1616789082", "1616789390", "1616789420"])
 
     def test_parse_race_names(self):
-        with open(os.path.join(self.fixtures, "act_races.html"), "r") as file:
+        with open(os.path.join(self.fixtures, "act_races.html")) as file:
             race_names = self.parser.parse_race_names(Selector(file.read()), is_female=False)
 
         self.assertEqual(race_names, self._RACE_NAMES)

@@ -1,12 +1,15 @@
-import requests
-from ._client import Client
 from io import BytesIO
-from pypdf import PdfReader
 from typing import List
+
+import requests
+from pypdf import PdfReader
+
 from rscraping.data.constants import HTTP_HEADERS
 from rscraping.data.models import Datasource, Lineup
-from rscraping.parsers.pdf import ACTPdfParser
 from rscraping.parsers.html import ACTHtmlParser
+from rscraping.parsers.pdf import ACTPdfParser
+
+from ._client import Client
 
 
 class ACTClient(Client, source=Datasource.ACT):

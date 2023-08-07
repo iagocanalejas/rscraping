@@ -1,10 +1,11 @@
+#!/usr/bin/env python3
+
 import argparse
 import logging
 import os
 import sys
 
 from rscraping import lemmatize
-
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)

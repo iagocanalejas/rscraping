@@ -1,13 +1,14 @@
 import logging
 
-from ._item import PdfItem, Field
 from fillpdf import fillpdfs
+
+from ._item import Field, PdfItem
 
 FILE = "templates/national.pdf"
 
 
 def fill_national_form(data: PdfItem, with_parent: bool):
-    logging.info(f"national:: starting national form")
+    logging.info("national:: starting national form")
 
     values = {
         Field.FORM_FULL_NAME: f"{data.name} {data.surname}",

@@ -1,11 +1,13 @@
 import logging
 import re
+from typing import List, Tuple
 
-from ._parser import PdfParser
-from typing import Tuple, List
 from pypdf import PageObject
 from pyutils.strings import whitespaces_clean
+
 from rscraping.data.models import Datasource, Lineup
+
+from ._parser import PdfParser
 
 logger = logging.getLogger(__name__)
 

@@ -1,26 +1,28 @@
 import logging
 import os
 import re
+from datetime import date, datetime
+from typing import Any, Generator, List, Optional, Tuple
+
 import cv2
 import inquirer
 import numpy as np
-
-from ._image import ImageOCR
-from datetime import date, datetime
-from typing import List, Optional, Tuple, Generator, Any
 from pandas import DataFrame
 from pytesseract import pytesseract
-from pyutils.strings import whitespaces_clean, remove_symbols
+from pyutils.strings import remove_symbols, whitespaces_clean
+
+from rscraping.data.constants import (
+    GENDER_FEMALE,
+    GENDER_MALE,
+    GENDER_MIX,
+    PARTICIPANT_CATEGORY_ABSOLUT,
+    PARTICIPANT_CATEGORY_VETERAN,
+    RACE_TRAINERA,
+)
 from rscraping.data.models import Datasource, Participant, Race
 from rscraping.data.normalization.times import normalize_lap_time
-from rscraping.data.constants import (
-    RACE_TRAINERA,
-    GENDER_MALE,
-    GENDER_FEMALE,
-    GENDER_MIX,
-    PARTICIPANT_CATEGORY_VETERAN,
-    PARTICIPANT_CATEGORY_ABSOLUT,
-)
+
+from ._image import ImageOCR
 
 logger = logging.getLogger(__name__)
 
@@ -273,7 +275,7 @@ class ImageOCRInforemo(ImageOCR, source=Datasource.INFOREMO):
         return len(df.columns) - 4
 
     def normalized_club_name(self, name: str) -> str:
-        new_name = super(ImageOCRInforemo, self).normalized_club_name(name)
+        new_name = super().normalized_club_name(name)
         new_name = remove_symbols(new_name, ignore_quotes=True)
         new_name = new_name.replace("'", '"')  # normalize quotes
 

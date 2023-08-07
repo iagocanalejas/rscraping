@@ -1,9 +1,10 @@
 import logging
 import os
+from typing import Optional
+
+from fillpdf import fillpdfs
 
 from ._item import Field, PdfItem
-from typing import Optional
-from fillpdf import fillpdfs
 
 FILE = "templates/fegar.pdf"
 NIF_SIZE = (245, 150)
@@ -13,7 +14,7 @@ IMAGE_SIZE = (90, 110)
 def fill_fegar_form(
     data: PdfItem, with_parent: bool, images_folder: Optional[str] = None, remove_temp_files: bool = True
 ):
-    logging.info(f"fegar:: starting fegar form")
+    logging.info("fegar:: starting fegar form")
 
     values = {
         Field.FORM_NAME: data.name,
@@ -79,7 +80,7 @@ def add_images(data: PdfItem, images_folder: str, file_name: str, remove_temp_fi
                 front_file = os.path.join(images_folder, file)
 
     if any(x is None for x in [image_file, front_file, back_file]):
-        raise ValueError(f"Image not found")
+        raise ValueError("Image not found")
 
     logging.info(f"fegar:: adding {image_file=}")
     fillpdfs.place_image(
@@ -118,7 +119,7 @@ def add_images(data: PdfItem, images_folder: str, file_name: str, remove_temp_fi
     )
 
     if remove_temp_files:
-        logging.info(f"fegar:: removing temporal files")
+        logging.info("fegar:: removing temporal files")
         os.remove(f"{file_name}.pdf")
         os.remove(f"{file_name}_with_image.pdf")
         os.remove(f"{file_name}_with_front.pdf")

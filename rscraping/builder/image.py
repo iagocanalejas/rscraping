@@ -1,14 +1,15 @@
 import logging
 
-from ._item import Field, PdfItem
 from fillpdf import fillpdfs
+
+from ._item import Field, PdfItem
 
 FILE = "templates/image.pdf"
 MINOR_FILE = "templates/image_minor.pdf"
 
 
 def fill_image_form(data: PdfItem, with_parent: bool):
-    logging.info(f"image:: starting image form")
+    logging.info("image:: starting image form")
 
     values = {
         Field.FORM_FULL_NAME: f"{data.name} {data.surname}",

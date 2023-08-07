@@ -1,14 +1,14 @@
 import logging
 
-from ._item import Field, PdfItem
 from fillpdf import fillpdfs
 
+from ._item import Field, PdfItem
 
 FILE = "templates/xogade.pdf"
 
 
 def fill_xogade_form(data: PdfItem):
-    logging.info(f"xogade:: starting xogade form")
+    logging.info("xogade:: starting xogade form")
 
     values = {
         Field.FORM_FULL_NAME: f"{data.name} {data.surname}",

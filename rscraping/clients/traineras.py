@@ -1,10 +1,13 @@
-import requests
-from ._client import Client
 from typing import Any, Generator, List
+
+import requests
 from parsel import Selector
+
 from rscraping.data.constants import HTTP_HEADERS
 from rscraping.data.models import Datasource, Lineup, RaceName
 from rscraping.parsers.html import TrainerasHtmlParser
+
+from ._client import Client
 
 
 class TrainerasClient(Client, source=Datasource.TRAINERAS):

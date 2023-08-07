@@ -1,10 +1,11 @@
 import logging
 import re
 from datetime import date, datetime
-from ._parser import HtmlParser
 from typing import List, Optional
+
 from parsel import Selector
 from pyutils.strings import remove_parenthesis, whitespaces_clean
+
 from rscraping.data.constants import (
     GENDER_FEMALE,
     GENDER_MALE,
@@ -16,8 +17,15 @@ from rscraping.data.constants import (
 from rscraping.data.functions import is_play_off
 from rscraping.data.models import Datasource, Lineup, Participant, Race, RaceName
 from rscraping.data.normalization.clubs import normalize_club_name
+from rscraping.data.normalization.races import (
+    find_race_sponsor,
+    normalize_name_parts,
+    normalize_race_name,
+    remove_day_indicator,
+)
 from rscraping.data.normalization.times import normalize_lap_time
-from rscraping.data.normalization.races import find_race_sponsor, normalize_name_parts, normalize_race_name
+
+from ._parser import HtmlParser
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +46,7 @@ class ARCHtmlParser(HtmlParser):
         if len(normalized_names) == 0:
             logger.error(f"{self.DATASOURCE}: unable to normalize {name=}")
             return None
-        normalized_names = [(self._normalize_race_name(n), e) for (n, e) in normalized_names]
+        normalized_names = [(remove_day_indicator(n), e) for (n, e) in normalized_names]
         logger.info(f"{self.DATASOURCE}: race normalized to {normalized_names=}")
 
         participants = self.get_participants(selector)
@@ -259,13 +267,3 @@ class ARCHtmlParser(HtmlParser):
                     return series
             series += 1
         return 0
-
-    ####################################################
-    #                  NORMALIZATION                   #
-    ####################################################
-
-    @staticmethod
-    def _normalize_race_name(name: str) -> str:
-        # remove day
-        name = re.sub(r"\d+ª día|\(\d+ª? JORNADA\)", "", name)
-        return name

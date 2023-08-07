@@ -1,10 +1,13 @@
-import requests
-from ._client import Client
 from typing import List
+
+import requests
 from parsel import Selector
+
 from rscraping.data.constants import HTTP_HEADERS
 from rscraping.data.models import Datasource, Lineup
 from rscraping.parsers.html import ARCHtmlParser
+
+from ._client import Client
 
 
 class ARCClient(Client, source=Datasource.ARC):

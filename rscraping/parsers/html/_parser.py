@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
+
 from parsel import Selector
+
 from rscraping.data.models import Datasource, Lineup, Race, RaceName
 
 

@@ -4,10 +4,10 @@ import argparse
 import logging
 import os
 import sys
-from rscraping import find_lineup
 
-from rscraping.data.models import Datasource
+from rscraping import find_lineup
 from rscraping.data.functions import save_csv
+from rscraping.data.models import Datasource
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -34,7 +34,7 @@ def main(race_id: str, datasource: str, is_female: bool):
     if not lineups:
         raise ValueError(f"not found lineup for race_id={args.race_id}")
 
-    print(",\n".join(l.to_json() for l in lineups))
+    print(",\n".join(lineup.to_json() for lineup in lineups))
     save_csv(lineups, file_name=datasource.upper())
 
 

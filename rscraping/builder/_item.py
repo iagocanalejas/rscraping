@@ -1,8 +1,8 @@
-import inquirer
-
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
+
+import inquirer
 from pyutils.validators import is_valid_dni, is_valid_email
 
 

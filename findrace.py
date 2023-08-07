@@ -4,8 +4,8 @@ import argparse
 import logging
 import os
 import sys
-from rscraping import find_race
 
+from rscraping import find_race
 from rscraping.data.models import Datasource
 
 logger = logging.getLogger()

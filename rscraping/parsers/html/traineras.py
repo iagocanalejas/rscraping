@@ -1,8 +1,9 @@
 import logging
-from ._parser import HtmlParser
 from typing import List, Optional
+
 from parsel import Selector
 from pyutils.strings import find_date, whitespaces_clean
+
 from rscraping.data.constants import (
     GENDER_FEMALE,
     GENDER_MALE,
@@ -13,8 +14,10 @@ from rscraping.data.constants import (
 )
 from rscraping.data.models import Datasource, Participant, Race, RaceName
 from rscraping.data.normalization.clubs import normalize_club_name
-from rscraping.data.normalization.times import normalize_lap_time
 from rscraping.data.normalization.races import find_race_sponsor, normalize_race_name
+from rscraping.data.normalization.times import normalize_lap_time
+
+from ._parser import HtmlParser
 
 logger = logging.getLogger(__name__)
 

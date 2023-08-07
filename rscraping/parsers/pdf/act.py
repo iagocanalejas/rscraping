@@ -1,8 +1,11 @@
-from ._parser import PdfParser
-from typing import Optional, Tuple, List
+from typing import List, Optional, Tuple
+
 from pypdf import PageObject
 from pyutils.strings import whitespaces_clean
+
 from rscraping.data.models import Datasource, Lineup
+
+from ._parser import PdfParser
 
 
 class ACTPdfParser(PdfParser):
