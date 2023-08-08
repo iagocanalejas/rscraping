@@ -78,7 +78,7 @@ class TrainerasHtmlParser(HtmlParser):
             url=None,
             gender=gender,
             datasource=self.DATASOURCE.value,
-            cancelled=self.is_cancelled(),
+            cancelled=self.is_cancelled(participants),
             race_laps=self.get_race_laps(selector, day),
             race_lanes=self.get_race_lanes(participants),
             participants=[],
@@ -151,9 +151,10 @@ class TrainerasHtmlParser(HtmlParser):
         cia = selector.xpath(f"/html/body/div[1]/main/div[1]/div/div/div[2]/table[{day}]/tr[1]/th/text()").getall()
         return len(cia) - 6
 
-    def is_cancelled(self) -> bool:
-        # TODO: find a cancelled race
-        return False
+    def is_cancelled(self, participants: List[Selector]) -> bool:
+        # race_id=4061|211
+        laps = [self.get_laps(p) for p in participants]
+        return len([lap for lap in laps if len(lap) == 0]) >= len(participants) // 2
 
     def get_participants(self, selector: Selector, day: int) -> List[Selector]:
         rows = selector.xpath(f"/html/body/div[1]/main/div[1]/div/div/div[2]/table[{day}]/tr").getall()
