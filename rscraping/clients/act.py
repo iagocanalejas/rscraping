@@ -14,6 +14,7 @@ from ._client import Client
 
 class ACTClient(Client, source=Datasource.ACT):
     _html_parser: ACTHtmlParser
+    _pdf_parser: ACTPdfParser
 
     DATASOURCE = Datasource.ACT
     MALE_START = 2003
@@ -22,6 +23,7 @@ class ACTClient(Client, source=Datasource.ACT):
     def __init__(self, **_) -> None:
         super().__init__()
         self._html_parser = ACTHtmlParser()
+        self._pdf_parser = ACTPdfParser()
 
     @staticmethod
     def get_race_details_url(race_id: str, is_female: bool, **_) -> str:
@@ -43,11 +45,10 @@ class ACTClient(Client, source=Datasource.ACT):
         raw_pdf = requests.get(url=url, headers=HTTP_HEADERS).content
 
         parsed_items: List[Lineup] = []
-        parser = ACTPdfParser()
 
         with BytesIO(raw_pdf) as pdf:
             for page in PdfReader(pdf).pages:
-                items = parser.parse_lineup(page=page)
+                items = self._pdf_parser.parse_lineup(page=page)
                 if items:
                     parsed_items.append(items)
 

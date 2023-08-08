@@ -6,6 +6,8 @@ from pyutils.strings import whitespaces_clean
 
 from rscraping.data.constants import SYNONYMS
 from rscraping.data.models import Datasource, Lineup
+from rscraping.data.normalization.clubs import normalize_club_name
+from rscraping.data.normalization.races import normalize_race_name
 
 from ._parser import PdfParser
 
@@ -23,7 +25,7 @@ class ACTPdfParser(PdfParser):
 
         split = text.index("Entrenador")
         race, club = self._parse_name(text[:split])
-        coach, delegate, substitutes, rowers = self._clean_rowers(text[split:])
+        coach, delegate, substitutes, rowers = self._parse_rowers(text[split:])
         return Lineup(
             race=race,
             club=club,
@@ -41,34 +43,48 @@ class ACTPdfParser(PdfParser):
         useful_part = [p for p in parts if "Club:" in p][0]
         race = useful_part.split("- Puntuable")[0].split("/")[1]
         club = useful_part.split("Club:")[1]
-        return whitespaces_clean(race).upper(), whitespaces_clean(club).upper()
+        return normalize_race_name(race), normalize_club_name(club)
 
     # TODO: find a way to retrieve 'coxswain', 'bow', 'starboard' and 'larboard'
-    def _clean_rowers(self, rowers: List[str]) -> Tuple[str, str, List[str], List[str]]:
+    def _parse_rowers(self, rowers: List[str]) -> Tuple[str, str, List[str], List[str]]:
         rowers = [r for r in rowers if not any(t for t in self._TRASH if t in r.upper())]
+
+        coach, delegate = self._get_coach_and_delegate(rowers)
+
+        indexes = self._get_substitutes_tokens_indexes(rowers)
+        substitutes = self._build_names_between_indexes(rowers, indexes)
+
+        rowers = rowers[indexes[-1] - 1 :]  # remove substitutes
+        indexes = [idx for idx, rower in enumerate(rowers) if rower.upper() in self._CONDITION]
+        valid_rowers = self._build_names_between_indexes(rowers, indexes)
+
+        return coach, delegate, substitutes, valid_rowers
+
+    def _build_names_between_indexes(self, rowers: List[str], indexes: List[int]) -> List[str]:
+        items = []
+        for i in range(0, len(indexes) - 1):
+            name_parts = rowers[indexes[i] + 1 : indexes[i + 1]]
+            name_parts = [n for n in name_parts if n.upper() not in self._CONDITION]
+            items.append(whitespaces_clean(" ".join(name_parts)))
+        return items
+
+    def _get_substitutes_tokens_indexes(self, rowers: List[str]) -> List[int]:
+        def is_substitute_index(rower: str) -> bool:
+            return rower.upper() in SYNONYMS["ROWER"] or rower.upper() in SYNONYMS["COXWAIN"]
+
+        # ['Remero', 'EKAITZ ', 'BADIOLA', 'Canterano', 'Remero', 'UNAX ', 'BEDIALAUNETA', 'Canterano', ...]
+        # find all substitutes (marked as 'Remero' | 'Patrón')
+        indexes = [idx for idx, rower in enumerate(rowers) if is_substitute_index(rower)]
+
+        # add next _CONDITION after the last found substitute to build the name ('Canterano')
+        tail = rowers[indexes[-1] :]
+        next_idx = next(i + 1 for i, x in enumerate(tail) if x.upper() in self._CONDITION)
+        indexes.append(indexes[-1] + next_idx)
+
+        return indexes
+
+    def _get_coach_and_delegate(self, rowers: List[str]) -> Tuple[str, str]:
+        # rowers are always sorted like ['Entrenador', 'IÑAKI', 'ERRASTI', 'Delegado', 'HASIER', 'Suplentes', ...]
         coach = whitespaces_clean(" ".join(rowers[rowers.index("Entrenador") + 1 : rowers.index("Delegado")]))
         delegate = whitespaces_clean(" ".join(rowers[rowers.index("Delegado") + 1 : rowers.index("Suplentes")]))
-        substitutes = []
-
-        # find all substitutes (marked as 'Remero' | 'Patrón')
-        indexes = [
-            i
-            for i, rower in enumerate(rowers)
-            if rower.upper() in SYNONYMS["ROWER"] or rower.upper() in SYNONYMS["COXWAIN"]
-        ]
-        # add next _CONDITION after the last found substitute to build the name
-        indexes.append(
-            next(indexes[-1] + i + 1 for i, x in enumerate(rowers[indexes[-1] :]) if x.upper() in self._CONDITION)
-        )
-        for i in range(1, len(indexes)):
-            # discard range marks from the name building
-            name_parts = rowers[indexes[i - 1] + 1 : indexes[i] - 1]
-            substitutes.append(whitespaces_clean(" ".join(name_parts)))
-
-        valid_rowers = []
-        rowers = rowers[indexes[-1] - 1 :]  # remove substitutes
-        indexes = [i for i, rower in enumerate(rowers) if rower.upper() in self._CONDITION]
-        for i in range(1, len(indexes)):
-            parts = rowers[indexes[i - 1] + 1 : indexes[i]]
-            valid_rowers.append(whitespaces_clean(" ".join(parts)))
-        return coach, delegate, substitutes, valid_rowers
+        return coach, delegate

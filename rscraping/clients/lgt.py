@@ -72,6 +72,7 @@ class LGTClient(Client, source=Datasource.LGT):
         151,
     ]  # weird races
     _html_parser: LGTHtmlParser
+    _pdf_parser: LGTPdfParser
 
     DATASOURCE = Datasource.LGT
     MALE_START = FEMALE_START = 2020
@@ -79,6 +80,7 @@ class LGTClient(Client, source=Datasource.LGT):
     def __init__(self, **_) -> None:
         super().__init__()
         self._html_parser = LGTHtmlParser()
+        self._pdf_parser = LGTPdfParser()
 
     @staticmethod
     def get_race_details_url(race_id: str, **_) -> str:
@@ -192,11 +194,10 @@ class LGTClient(Client, source=Datasource.LGT):
         raw_pdf = requests.get(url=url, headers=HTTP_HEADERS).content
 
         parsed_items: List[Lineup] = []
-        parser = LGTPdfParser()
 
         with BytesIO(raw_pdf) as pdf:
             for page in PdfReader(pdf).pages:
-                items = parser.parse_lineup(page=page)
+                items = self._pdf_parser.parse_lineup(page=page)
                 if items:
                     parsed_items.append(items)
 

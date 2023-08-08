@@ -37,18 +37,16 @@ class ARCClient(Client, source=Datasource.ARC):
         return f"http://www.{host}.com/es/regata/{race_id}/unknown/equipo/{club_id}/unknown"
 
     def get_lineup_by_race_id(self, race_id: str, **_) -> List[Lineup]:
-        parser = ARCHtmlParser()
-
         # find participants in race
         url = f"http://www.{'ligaete' if self._is_female else 'liga-arc'}.com/es/regata/{race_id}/unknown/equipos"
-        club_ids = parser.parse_club_ids(selector=Selector(requests.get(url=url, headers=HTTP_HEADERS).text))
+        club_ids = self._html_parser.parse_club_ids(selector=Selector(requests.get(url=url, headers=HTTP_HEADERS).text))
 
         # get lineups
         lineups = []
         for club_id in club_ids:
             url = self.get_lineup_url(race_id, club_id, self._is_female)
             lineups.append(
-                parser.parse_lineup(
+                self._html_parser.parse_lineup(
                     selector=Selector(requests.get(url=url, headers=HTTP_HEADERS).content.decode("utf-8"))
                 )
             )

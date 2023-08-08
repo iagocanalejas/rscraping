@@ -8,12 +8,14 @@ from parsel import Selector
 from rscraping.data.constants import HTTP_HEADERS
 from rscraping.data.models import Datasource, Lineup, Race, RaceName
 from rscraping.parsers.html import HtmlParser
+from rscraping.parsers.pdf import PdfParser
 
 
 class Client(ABC):
     _registry = {}
     _is_female = False
     _html_parser: HtmlParser
+    _pdf_parser: PdfParser
 
     DATASOURCE: Datasource
     FEMALE_START: int

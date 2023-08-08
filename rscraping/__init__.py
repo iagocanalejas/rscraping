@@ -25,7 +25,7 @@ def find_race(
         try:
             lineups = find_lineup(race_id, datasource, is_female=is_female)
             for participant in race.participants:
-                lineup = [lin for lin in lineups if lin.club == participant.club_name]
+                lineup = [lin for lin in lineups if lin.club == participant.participant]
                 participant.lineup = lineup[0] if len(lineup) == 1 else None
         except NotImplementedError:
             pass

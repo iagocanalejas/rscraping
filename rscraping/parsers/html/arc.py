@@ -156,8 +156,8 @@ class ARCHtmlParser(HtmlParser):
         ]
 
         return Lineup(
-            race=whitespaces_clean(race.upper()),
-            club=whitespaces_clean(club.upper()),
+            race=normalize_race_name(race),
+            club=normalize_club_name(club),
             coach=whitespaces_clean(coach.upper()),
             delegate=whitespaces_clean(delegate.upper()),
             coxswain=whitespaces_clean(coxswain.upper()),

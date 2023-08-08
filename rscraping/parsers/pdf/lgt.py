@@ -4,10 +4,11 @@ from typing import List, Tuple
 
 from pypdf import PageObject
 from pyutils.lists import flatten
-from pyutils.strings import whitespaces_clean
 
 from rscraping.data.constants import SYNONYMS
 from rscraping.data.models import Datasource, Lineup
+from rscraping.data.normalization.clubs import normalize_club_name
+from rscraping.data.normalization.races import normalize_race_name
 
 from ._parser import PdfParser
 
@@ -31,7 +32,7 @@ class LGTPdfParser(PdfParser):
 
     def parse_lineup(self, page: PageObject) -> Lineup:
         text = page.extract_text().split("\n")
-        (race, club), rowers = self._parse_name(text[0]), self._clean_rowers(text[1:])
+        (race, club), rowers = self._parse_name(text[0]), self._parse_rowers(text[1:])
         return Lineup(
             race=race,
             club=club,
@@ -47,28 +48,36 @@ class LGTPdfParser(PdfParser):
     @staticmethod
     def _parse_name(name: str) -> Tuple[str, str]:
         parts = name.split("-")
-        return whitespaces_clean(parts[0]).upper(), whitespaces_clean(" ".join(parts[1:])).upper()
+        return normalize_race_name(parts[0]), normalize_club_name(" ".join(parts[1:]))
 
-    def _clean_rowers(self, rowers: List[str]) -> List[Tuple[str, str]]:
+    def _parse_rowers(self, rowers: List[str]) -> List[Tuple[str, str]]:
+        new_rowers = self._clean_rowers_list(rowers)
+
+        # converts a list of ['DELEGADO', 'EMILIO JOSE', 'DIESTE REGADES', 'ADESTRADOR', 'MANUEL RAUL', 'PAZOS'] in
+        # a list of tupples like [('DELEGADO', 'EMILIO JOSE DIESTE REGADES'), ('ADESTRADOR', 'MANUEL RAUL PAZOS')]
+        valid_rowers = []
+        indexes = [i for i, rower in enumerate(new_rowers) if any(e in rower for e in self._TOKEN)]
+        for i in range(0, len(indexes) - 1):
+            parts = new_rowers[indexes[i] : indexes[i + 1]]
+            valid_rowers.append((parts[0], " ".join(parts[1:])))
+        return sorted(valid_rowers, key=lambda x: x[0])
+
+    def _clean_rowers_list(self, rowers: List[str]) -> List[str]:
         new_rowers = []
         for raw_name in rowers:
             if "Licenza" in raw_name:
                 raw_name = re.sub(r"Licenza: (FRS|FRD|FRJ|FRT|FRV)?\d+", "", raw_name, flags=re.IGNORECASE)
 
             if raw_name and raw_name.upper() not in self._CONDITION:
-                match = next((t for t in self._TOKEN if t in raw_name and not raw_name.startswith(t)), None)
-                if not match:
-                    new_rowers.append(raw_name.upper())
-                    continue
+                new_rowers.extend(self._split_token_from_name(raw_name))
+        return new_rowers
 
-                # split 'VÁZQUEZ PENASUPLENTE 2' into ['VÁZQUEZ PENA', 'SUPLENTE 2']
-                parts = raw_name.split(match)
-                rower, extra = parts[0], match + parts[1]
-                new_rowers.extend([rower.upper(), extra.upper()])
+    def _split_token_from_name(self, name: str) -> List[str]:
+        # finds the 'SUPLENTE' in 'VÁZQUEZ PENASUPLENTE 2'
+        match = next((t for t in self._TOKEN if t in name and not name.startswith(t)), None)
+        if not match:
+            return [name]
 
-        valid_rowers = []
-        indexes = [i for i, rower in enumerate(new_rowers) if any(e in rower for e in self._TOKEN)]
-        for i in range(1, len(indexes)):
-            parts = new_rowers[indexes[i - 1] : indexes[i]]
-            valid_rowers.append((parts[0], " ".join(parts[1:])))
-        return sorted(valid_rowers, key=lambda x: x[0])
+        # splits 'VÁZQUEZ PENASUPLENTE 2' in ['VÁZQUEZ PENA', 'SUPLENTE 2']
+        parts = name.split(match)
+        return [parts[0], match + parts[1]]
