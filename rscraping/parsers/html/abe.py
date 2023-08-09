@@ -7,7 +7,7 @@ from pyutils.strings import find_date, whitespaces_clean
 
 from rscraping.data.constants import (
     GENDER_MALE,
-    PARTICIPANT_CATEGORY_ABSOLUT,
+    PARTICIPANT_CATEGORY_VETERAN,
     RACE_CONVENTIONAL,
     RACE_TRAINERA,
 )
@@ -69,7 +69,7 @@ class ABEHtmlParser(HtmlParser):
             race.participants.append(
                 Participant(
                     gender=GENDER_MALE,
-                    category=PARTICIPANT_CATEGORY_ABSOLUT,
+                    category=PARTICIPANT_CATEGORY_VETERAN,
                     club_name=self.get_club_name(row),
                     lane=None,
                     series=None,
@@ -128,7 +128,7 @@ class ABEHtmlParser(HtmlParser):
         return [lap.strftime("%M:%S.%f")] if lap is not None else []
 
     def get_handicap(self, participant: Selector) -> Optional[str]:
-        if len(participant.xpath("//*/td[*]/text()").getall()) <= 4:
+        if len(participant.xpath("//*/td/text()").getall()) <= 4:
             return None
         lap = normalize_lap_time(participant.xpath("//*/td[4]/text()").get(""))
         return lap.strftime("%M:%S.%f") if lap else None
