@@ -1,6 +1,7 @@
+import sys
 from typing import List, Optional, Tuple
 
-from pypdf import PageObject
+from fitz import Page
 from pyutils.lists import flatten
 from pyutils.strings import whitespaces_clean
 
@@ -18,34 +19,39 @@ class ACTPdfParser(PdfParser):
     _TRASH = ["FIRMA Y SELLO", "PROPIOS:", "CANTERANOS:", "NO PROPIOS:", "CAPITÁN", "CAPITANA"]
     _CONDITION = list(flatten([SYNONYMS["HOMEGROWN"], SYNONYMS["OWN"], SYNONYMS["NOT_OWN"]]))
 
-    def parse_lineup(self, page: PageObject) -> Optional[Lineup]:
-        text = [e for e in page.extract_text().split("\n") if e]
+    def parse_lineup(self, page: Page) -> Optional[Lineup]:
+        text = [e for e in page.get_text().split("\n") if e]
         if len(text) == 0:
             return None
 
         split = text.index("Entrenador")
         race, club = self._parse_name(text[:split])
         coach, delegate, substitutes, rowers = self._parse_rowers(text[split:])
+
+        coxswain, bow = self._get_coxswain_and_bow(page, rowers)
+        rowers = [r for r in rowers if r != coxswain and r != bow]
+        starboard, lardboard = self._get_starboard_and_lardboard(page, rowers)
+
         return Lineup(
             race=race,
             club=club,
             coach=coach,
             delegate=delegate,
-            coxswain=None,
-            starboard=rowers,
-            larboard=rowers,
+            coxswain=coxswain,
+            starboard=starboard,
+            larboard=lardboard,
             substitute=substitutes,
-            bow=None,
+            bow=bow,
         )
 
     @staticmethod
     def _parse_name(parts: List[str]) -> Tuple[str, str]:
-        useful_part = [p for p in parts if "Club:" in p][0]
-        race = useful_part.split("- Puntuable")[0].split("/")[1]
-        club = useful_part.split("Club:")[1]
+        race_part = next(e for e in parts if "Puntuable" in e)
+        club_index = next(idx for idx, value in enumerate(parts) if "Puntos" in value) + 2
+        race = race_part.split("- Puntuable")[0].split("/")[1]
+        club = parts[club_index]
         return normalize_race_name(race), normalize_club_name(club)
 
-    # TODO: find a way to retrieve 'coxswain', 'bow', 'starboard' and 'larboard'
     def _parse_rowers(self, rowers: List[str]) -> Tuple[str, str, List[str], List[str]]:
         rowers = [r for r in rowers if not any(t for t in self._TRASH if t in r.upper())]
 
@@ -88,3 +94,47 @@ class ACTPdfParser(PdfParser):
         coach = whitespaces_clean(" ".join(rowers[rowers.index("Entrenador") + 1 : rowers.index("Delegado")]))
         delegate = whitespaces_clean(" ".join(rowers[rowers.index("Delegado") + 1 : rowers.index("Suplentes")]))
         return coach, delegate
+
+    def _get_coxswain_and_bow(self, page: Page, rowers: List[str]) -> Tuple[str, str]:
+        """
+        Find the coxswain and bow rowers based on their vertical positions on the page.
+
+        Given a Page object and a list of rower names, this method identifies the coxswain (highest vertical position)
+        and the bow rower (lowest vertical position) from the provided rower names using their respective positions.
+
+        Parameters:
+            page (Page): The Page object representing the page containing the rower instances.
+            rowers (List[str]): The list of rower names to search for on the page.
+
+        Returns:
+            Tuple[str, str]: A tuple containing the name of the coxswain and the name of the bow rower.
+
+        Raises:
+            NotImplementedError: If a rower name appears multiple times on the page.
+
+        Note:
+            This method searches for instances of rower names on the provided page and identifies the coxswain as the
+            rower with the highest vertical position (lowest on the page) and the bow rower as the rower with the
+            lowest vertical position (highest on the page).
+        """
+        bow = coxswain = None
+        lower = 0
+        upper = sys.maxsize
+        for rower in rowers:
+            instances = page.search_for(rower)
+            if len(instances) != 1:
+                raise NotImplementedError(f"{rower=} appears multiple times in the page")
+            _, top, _, _ = instances[0]
+            if top < upper:
+                upper = top
+                bow = rower
+            if top > lower:
+                lower = top
+                coxswain = rower
+        return coxswain, bow
+
+    def _get_starboard_and_lardboard(self, page: Page, rowers: List[str]) -> Tuple[List[str], List[str]]:
+        # sorts the list of rowers from left to right, the first half is lardboard, the other half are starboard
+        rowers.sort(key=lambda x: page.search_for(x)[0][0])
+        mid = len(rowers) // 2
+        return rowers[mid:], rowers[:mid]

@@ -1,7 +1,7 @@
 import logging
 from abc import ABC, abstractmethod
 
-from pypdf import PageObject
+from fitz import Page
 
 from rscraping.data.models import Datasource, Lineup
 
@@ -12,5 +12,5 @@ class PdfParser(ABC):
     DATASOURCE: Datasource
 
     @abstractmethod
-    def parse_lineup(self, page: PageObject) -> Lineup:
+    def parse_lineup(self, page: Page) -> Lineup:
         raise NotImplementedError

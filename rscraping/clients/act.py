@@ -1,8 +1,7 @@
-from io import BytesIO
 from typing import List
 
+import fitz
 import requests
-from pypdf import PdfReader
 
 from rscraping.data.constants import HTTP_HEADERS
 from rscraping.data.models import Datasource, Lineup
@@ -46,9 +45,9 @@ class ACTClient(Client, source=Datasource.ACT):
 
         parsed_items: List[Lineup] = []
 
-        with BytesIO(raw_pdf) as pdf:
-            for page in PdfReader(pdf).pages:
-                items = self._pdf_parser.parse_lineup(page=page)
+        with fitz.open('pdf', raw_pdf) as pdf:
+            for page_num in range(pdf.page_count):
+                items = self._pdf_parser.parse_lineup(page=pdf[page_num])
                 if items:
                     parsed_items.append(items)
 

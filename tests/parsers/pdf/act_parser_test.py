@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from pypdf import PdfReader
+import fitz
 
 from rscraping.data.models import Lineup
 from rscraping.parsers.pdf.act import ACTPdfParser
@@ -13,9 +13,10 @@ class TestACTParser(unittest.TestCase):
         self.fixtures = os.path.join(os.getcwd(), "fixtures", "pdf")
 
     def test_parse_race(self):
-        with open(os.path.join(self.fixtures, "act_lineup.pdf"), "rb") as file:
-            page = PdfReader(file).pages[0]
-            lineup = self.parser.parse_lineup(page)
+        with fitz.open(os.path.join(self.fixtures, "act_lineup.pdf")) as pdf:
+            for page_num in range(pdf.page_count):
+                page = pdf[page_num]
+                lineup = self.parser.parse_lineup(page)
 
         self.assertEqual(lineup, self._LINEUP)
 
@@ -24,39 +25,16 @@ class TestACTParser(unittest.TestCase):
         club="ONDARROA",
         coach="IÑAKI ERRASTI",
         delegate="HASIER ETXABURU",
-        coxswain=None,
+        coxswain="IÑIGO LARRINAGA",
         starboard=[
             "JOSEBA ARISTI",
-            "JULEN AROSTEGI",
             "JON ARRIOLA",
             "JON CARRILLO",
-            "BEÑAT EIZAGIRRE",
-            "JOSU ELU",
             "IGOR GURUCHARRI",
-            "IKER INCHAURTIETA",
-            "ASIER IRUETA",
             "ANDER LARRAÑAGA",
-            "IÑIGO LARRINAGA",
-            "ANDONI LOPEZ",
-            "IVAN LOPEZ",
             "IKER MURGIONDO",
         ],
-        larboard=[
-            "JOSEBA ARISTI",
-            "JULEN AROSTEGI",
-            "JON ARRIOLA",
-            "JON CARRILLO",
-            "BEÑAT EIZAGIRRE",
-            "JOSU ELU",
-            "IGOR GURUCHARRI",
-            "IKER INCHAURTIETA",
-            "ASIER IRUETA",
-            "ANDER LARRAÑAGA",
-            "IÑIGO LARRINAGA",
-            "ANDONI LOPEZ",
-            "IVAN LOPEZ",
-            "IKER MURGIONDO",
-        ],
+        larboard=["IKER INCHAURTIETA", "BEÑAT EIZAGIRRE", "ANDONI LOPEZ", "ASIER IRUETA", "IVAN LOPEZ", "JOSU ELU"],
         substitute=[
             "EKAITZ BADIOLA",
             "UNAX BEDIALAUNETA",
@@ -65,5 +43,5 @@ class TestACTParser(unittest.TestCase):
             "XANET GIMENO",
             "MARKEL KALZAKORTA",
         ],
-        bow=None,
+        bow="JULEN AROSTEGI",
     )

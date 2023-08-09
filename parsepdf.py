@@ -6,7 +6,7 @@ import os
 import sys
 from typing import List
 
-from pypdf import PdfReader
+from fitz import fitz
 
 from rscraping.data.functions import expand_path, save_csv
 from rscraping.data.models import Datasource, Lineup
@@ -24,10 +24,9 @@ def main(paths: List[str], datasource: Datasource):
     parsed_items: List[Lineup] = []
 
     for file in paths:
-        with open(file, "rb") as pdf:
-            reader = PdfReader(pdf)
-            for page in reader.pages:
-                items = parser.parse_lineup(page=page)
+        with fitz.open(file) as pdf:
+            for page_num in range(pdf.page_count):
+                items = parser.parse_lineup(page=pdf[page_num])
                 if items:
                     parsed_items.append(items)
 

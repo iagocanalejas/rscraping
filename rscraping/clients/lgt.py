@@ -1,10 +1,9 @@
 from datetime import date
-from io import BytesIO
 from typing import Dict, List, Optional
 
 import requests
+from fitz import fitz
 from parsel import Selector
-from pypdf import PdfReader
 from pyutils.strings import whitespaces_clean
 
 from rscraping.data.constants import HTTP_HEADERS
@@ -195,9 +194,9 @@ class LGTClient(Client, source=Datasource.LGT):
 
         parsed_items: List[Lineup] = []
 
-        with BytesIO(raw_pdf) as pdf:
-            for page in PdfReader(pdf).pages:
-                items = self._pdf_parser.parse_lineup(page=page)
+        with fitz.open("pdf", raw_pdf) as pdf:
+            for page_num in range(pdf.page_count):
+                items = self._pdf_parser.parse_lineup(page=pdf[page_num])
                 if items:
                     parsed_items.append(items)
 

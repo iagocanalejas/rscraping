@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from pypdf import PdfReader
+from fitz import fitz
 
 from rscraping.data.models import Lineup
 from rscraping.parsers.pdf.lgt import LGTPdfParser
@@ -13,9 +13,10 @@ class TestLGTParser(unittest.TestCase):
         self.fixtures = os.path.join(os.getcwd(), "fixtures", "pdf")
 
     def test_parse_race(self):
-        with open(os.path.join(self.fixtures, "lgt_lineup.pdf"), "rb") as file:
-            page = PdfReader(file).pages[0]
-            lineup = self.parser.parse_lineup(page)
+        with fitz.open(os.path.join(self.fixtures, "lgt_lineup.pdf")) as pdf:
+            for page_num in range(pdf.page_count):
+                page = pdf[page_num]
+                lineup = self.parser.parse_lineup(page)
 
         self.assertEqual(lineup, self._LINEUP)
 

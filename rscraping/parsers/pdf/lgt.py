@@ -2,7 +2,7 @@ import logging
 import re
 from typing import List, Tuple
 
-from pypdf import PageObject
+from fitz import Page
 from pyutils.lists import flatten
 
 from rscraping.data.constants import SYNONYMS
@@ -30,8 +30,8 @@ class LGTPdfParser(PdfParser):
         )
     )
 
-    def parse_lineup(self, page: PageObject) -> Lineup:
-        text = page.extract_text().split("\n")
+    def parse_lineup(self, page: Page) -> Lineup:
+        text = [e for e in page.get_text().split("\n") if e]
         (race, club), rowers = self._parse_name(text[0]), self._parse_rowers(text[1:])
         return Lineup(
             race=race,
