@@ -2,7 +2,6 @@ import re
 from typing import List, Optional, Tuple
 
 from pyutils.strings import find_roman, remove_parenthesis, remove_roman, roman_to_int, whitespaces_clean
-
 from rscraping.data.functions import is_play_off
 
 _MISSPELLINGS = [

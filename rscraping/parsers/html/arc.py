@@ -4,8 +4,8 @@ from datetime import date, datetime
 from typing import List, Optional
 
 from parsel import Selector
-from pyutils.strings import remove_parenthesis, whitespaces_clean
 
+from pyutils.strings import remove_parenthesis, whitespaces_clean
 from rscraping.data.constants import (
     GENDER_FEMALE,
     GENDER_MALE,

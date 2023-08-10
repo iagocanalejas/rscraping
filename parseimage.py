@@ -6,45 +6,43 @@ import os
 import sys
 from typing import List
 
-from rscraping.data.functions import expand_path, save_csv
+from rscraping import parse_race_image
+from rscraping.data.functions import expand_path
 from rscraping.data.models import Datasource, Race
-from rscraping.parsers.ocr import ImageOCR
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 logger.addHandler(logging.StreamHandler(sys.stdout))
 
-_DEBUG = False
-
-
-def main(paths: List[str], datasource: Datasource):
-    parsed_items: List[Race] = []
-    scrapper: ImageOCR = ImageOCR(source=datasource, allow_plot=_DEBUG)  # type: ignore
-    scrapper.set_language("es_ES.utf8")
-
-    for file in paths:
-        parsed_items.extend(scrapper.digest(path=file))
-
-    save_csv(parsed_items, file_name=scrapper.DATASOURCE.value)
-
 
 def _parse_arguments():
     parser = argparse.ArgumentParser()
+    parser.add_argument("datasource", type=str, help="Datasource from where to retrieve.")
     parser.add_argument("path", help="Path to be handled")
-    parser.add_argument("--datasource", type=str)
     parser.add_argument("--debug", action="store_true", default=False)
     return parser.parse_args()
+
+
+def main(paths: List[str], datasource: str, allow_plot: bool = False):
+    if not Datasource.is_OCR(datasource):
+        raise ValueError(f"invalid datasource={datasource}")
+
+    parsed_items: List[Race] = []
+    for path in paths:
+        parsed_items.extend(parse_race_image(path, datasource=Datasource(datasource), allow_plot=allow_plot))
+
+    for race in parsed_items:
+        print(race.to_json())
+
+    # save_csv(parsed_items, file_name=scrapper.DATASOURCE.value)
 
 
 if __name__ == "__main__":
     args = _parse_arguments()
     logger.info(f"{os.path.basename(__file__)}:: args -> {args.__dict__}")
 
-    _DEBUG = args.debug
-    if not Datasource.is_OCR(args.datasource):
-        raise ValueError(f"invalid datasource={args.datasource}")
-
     main(
         paths=expand_path(os.path.abspath(args.path), valid_files=[".JPG", ".JPEG", ".PNG"]),
-        datasource=Datasource(args.datasource),
+        datasource=args.datasource,
+        allow_plot=args.debug,
     )

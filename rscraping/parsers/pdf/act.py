@@ -2,9 +2,9 @@ import sys
 from typing import List, Optional, Tuple
 
 from fitz import Page
+
 from pyutils.lists import flatten
 from pyutils.strings import whitespaces_clean
-
 from rscraping.data.constants import SYNONYMS
 from rscraping.data.models import Datasource, Lineup
 from rscraping.data.normalization.clubs import normalize_club_name

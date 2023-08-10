@@ -4,8 +4,8 @@ from typing import Dict, List, Optional
 import requests
 from fitz import fitz
 from parsel import Selector
-from pyutils.strings import whitespaces_clean
 
+from pyutils.strings import whitespaces_clean
 from rscraping.data.constants import HTTP_HEADERS
 from rscraping.data.models import Datasource, Lineup, Race, RaceName
 from rscraping.parsers.html import LGTHtmlParser

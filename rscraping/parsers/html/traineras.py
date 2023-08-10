@@ -2,8 +2,8 @@ import logging
 from typing import List, Optional
 
 from parsel import Selector
-from pyutils.strings import find_date, whitespaces_clean
 
+from pyutils.strings import find_date, whitespaces_clean
 from rscraping.data.constants import (
     GENDER_FEMALE,
     GENDER_MALE,

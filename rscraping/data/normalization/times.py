@@ -26,3 +26,27 @@ def normalize_lap_time(value: str) -> Optional[time]:
     if len(parts) == 3:
         return datetime.strptime(f"{parts[0]}:{parts[1]},{parts[2]}", "%M:%S,%f").time()
     return None
+
+
+MONTHS = {
+    "ENERO": ["XANEIRO"],
+    "FEBRERO": ["FEBREIRO"],
+    "MARZO": [],
+    "ABRIL": [],
+    "MAYO": ["MAIO"],
+    "JUNIO": ["XUÑO"],
+    "JULIO": ["XULLO"],
+    "AGOSTO": [],
+    "SEPTIEMBRE": ["SEPTEMBRO"],
+    "OCTUBRE": ["OUTUBRO"],
+    "NOVIEMBRE": ["NOVEMBRO"],
+    "DICIEMBRE": ["DECEMMBRO"],
+}
+
+
+def normalize_spanish_months(phrase: str) -> str:
+    phrase = phrase.upper()
+    for key, values in MONTHS.items():
+        for value in [v for v in values if v in phrase]:
+            phrase = phrase.replace(value, key)
+    return phrase

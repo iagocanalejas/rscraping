@@ -3,7 +3,6 @@ import os
 from typing import List
 
 from pyutils.strings import remove_symbols
-
 from rscraping.data.models import Lineup, Race
 
 
