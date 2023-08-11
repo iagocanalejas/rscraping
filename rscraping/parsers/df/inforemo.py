@@ -1,7 +1,7 @@
-import locale
 import logging
+import re
 from datetime import date, datetime
-from typing import Any, Generator, List, Optional, Tuple
+from typing import Any, Generator, List, Optional
 
 import inquirer
 from pandas import DataFrame, Series
@@ -14,6 +14,7 @@ from rscraping.data.constants import (
     PARTICIPANT_CATEGORY_ABSOLUT,
     PARTICIPANT_CATEGORY_VETERAN,
     RACE_CONVENTIONAL,
+    RACE_TIME_TRIAL,
     RACE_TRAINERA,
 )
 from rscraping.data.models import Datasource, Participant, Race
@@ -21,12 +22,12 @@ from rscraping.data.normalization.clubs import normalize_club_name
 from rscraping.data.normalization.races import normalize_name_parts, normalize_race_name
 from rscraping.data.normalization.times import normalize_lap_time, normalize_spanish_months
 
-from ._parser import OcrParser
+from ._parser import DataFrameParser
 
 logger = logging.getLogger(__name__)
 
 
-class InforemoOcrParser(OcrParser, source=Datasource.INFOREMO):
+class InforemoDataFrameParser(DataFrameParser, source=Datasource.INFOREMO):
     DATASOURCE = Datasource.INFOREMO
 
     _GENDERS = {
@@ -40,13 +41,11 @@ class InforemoOcrParser(OcrParser, source=Datasource.INFOREMO):
         file_name: str,
         header: str,
         tabular: DataFrame,
-        language: str = "es_ES.utf8",
         manual_input: bool = False,
         **_,
     ) -> Generator[Race, Any, Any]:
-        locale.setlocale(locale.LC_TIME, language)
-
-        name, t_date = self._parse_header_data(header, manual_input=manual_input)
+        name = self._try_find_race_name(header, manual_input=manual_input)
+        t_date = self._try_find_race_date(header, manual_input=manual_input)
         if not name:
             raise ValueError(f"{self.DATASOURCE}: no name found")
         if not t_date:
@@ -54,11 +53,10 @@ class InforemoOcrParser(OcrParser, source=Datasource.INFOREMO):
 
         df = self._clean_dataframe(tabular)
 
-        race_lanes = self.get_race_lanes(df)
         race_laps = self.get_race_laps(df)
 
         identifiers = df[2].unique()
-        for identifier in identifiers:
+        for identifier in [i for i in identifiers if i]:
             participants: DataFrame = df[df[2] == identifier]
 
             genders = [self.get_gender(p) for (_, p) in participants.iterrows()]
@@ -68,12 +66,13 @@ class InforemoOcrParser(OcrParser, source=Datasource.INFOREMO):
                 else None
             )
 
-            # TODO: try to find hardcoded values
+            race_lanes = self.get_race_lanes(participants)
+
             race = Race(
                 name=name,
                 normalized_names=normalize_name_parts(name),
                 date=t_date.strftime("%d/%m/%Y"),
-                type=RACE_CONVENTIONAL,
+                type=RACE_CONVENTIONAL if race_lanes > 1 else RACE_TIME_TRIAL,
                 day=1,
                 modality=RACE_TRAINERA,
                 league=None,
@@ -90,46 +89,67 @@ class InforemoOcrParser(OcrParser, source=Datasource.INFOREMO):
                 participants=[],
             )
 
-            for _, participant in participants.iterrows():
-                race.participants.append(
-                    Participant(
-                        gender=self.get_gender(participant),
-                        category=self.get_category(participant),
-                        club_name=self.get_club_name(participant),
-                        lane=self.get_lane(participant),
-                        series=self.get_series(participant),
-                        laps=self.get_laps(participant),
-                        distance=5556,
-                        handicap=None,
-                        participant=normalize_club_name(self.get_club_name(participant)),
-                        race=race,
-                        disqualified=False,
-                    )
-                )
+            race.participants = self._get_race_participants(participants, race)
 
             yield race
 
-    def _parse_header_data(self, data: str, manual_input: bool) -> Tuple[Optional[str], Optional[date]]:
-        name = t_date = None
+
+    def _get_race_participants(self, participants: DataFrame, race: Race) -> List[Participant]:
+        items: List[Participant] = []
+        for _, participant in participants.iterrows():
+            club_name = self.get_club_name(participant)
+            items.append(
+                Participant(
+                    gender=self.get_gender(participant, club_name),
+                    category=self.get_category(participant),
+                    club_name=club_name,
+                    lane=self.get_lane(participant),
+                    series=self.get_series(participant),
+                    laps=self.get_laps(participant),
+                    distance=5556,
+                    handicap=None,
+                    participant=normalize_club_name(self.get_club_name(participant)),
+                    race=race,
+                    disqualified=False,
+                )
+            )
+        return items
+
+    def _try_find_race_name(self, data: str, manual_input: bool) -> Optional[str]:
+        name = None
         for part in data.split("\n"):
-            if not name and part and not any(w in part for w in ["@", "inforemo"]):
-                name = normalize_race_name(part)
+            if not part or any(w in part for w in ["@", "inforemo"]):
+                continue
+            # check if any 4 letter convination of "inforemobancofijo" is present in the part and discard it
+            if any("inforemobancofijo"[i : i + 4] in part for i in range(len("inforemobancofijo") - 3)):
                 continue
 
-            if not t_date:
-                phrase = remove_symbols(normalize_spanish_months(part))
-                t_date = find_date(phrase)
-
-            if name and t_date:
-                break
+            match = re.match(r"^[\wñÑ\- ]+$", remove_symbols(part))
+            if match and len(match.group(0)) > 5 and (not name or len(part) > len(name)):
+                name = normalize_race_name(part)
 
         if not name and manual_input:
-            name = inquirer.text(message=f"no name found \n {data} \n set manual name for the race:")
+            name = inquirer.text(message=f"no name found \n {data} \n set manual name for race:")
+
+        return name
+
+    def _try_find_race_date(self, data: str, manual_input: bool) -> Optional[date]:
+        t_date = None
+        for part in data.split("\n"):
+            if not part or any(w in part for w in ["@", "inforemo"]):
+                continue
+
+            phrase = remove_symbols(normalize_spanish_months(part))
+            t_date = find_date(phrase, language="es_ES.utf8")
+
+            if t_date:
+                break
+
         if not t_date and manual_input:
-            t_date = inquirer.text(message=f"no date found \n {data} \n set manual date for race {name} (DD-MM-YYYY):")
+            t_date = inquirer.text(message=f"no date found \n {data} \n set manual date for race (DD-MM-YYYY):")
             t_date = datetime.strptime("%d-%m-%Y", t_date).date() if t_date else None
 
-        return (name, t_date)
+        return t_date
 
     ####################################################
     #                      GETTERS                     #
@@ -163,7 +183,10 @@ class InforemoOcrParser(OcrParser, source=Datasource.INFOREMO):
         idx = 3 if ":" in data[4] else 4
         return [t.isoformat() for t in [normalize_lap_time(self.clean_lap(t)) for t in data.iloc[idx:]] if t]
 
-    def get_gender(self, data: Series) -> str:
+    def get_gender(self, data: Series, club_name: Optional[str] = None) -> str:
+        if club_name and "MIXTO" in club_name.upper():
+            return GENDER_MIX
+
         gender = str(data[2])
         for k, v in self._GENDERS.items():
             if gender in v or any(part in gender for part in v):
@@ -177,9 +200,7 @@ class InforemoOcrParser(OcrParser, source=Datasource.INFOREMO):
         return PARTICIPANT_CATEGORY_ABSOLUT
 
     def get_race_lanes(self, df: DataFrame) -> int:
-        rows = [str(row[4]) for (_, row) in df.iterrows()]
-        lanes = max(int(row) for row in rows if row.isdigit())
-        return lanes if lanes < 7 else 1
+        return max(self.get_lane(p) for (_, p) in df.iterrows())
 
     def get_race_laps(self, df: DataFrame) -> int:
         return len(df.columns) - 4
@@ -197,10 +218,13 @@ class InforemoOcrParser(OcrParser, source=Datasource.INFOREMO):
                 content = whitespaces_clean(col)
                 if content and len(content) > 5:
                     col_with_content += 1
-            if col_with_content < 2:  # check we at least have (maybe) name and final time
+            if col_with_content < 3:  # check we at least have (maybe) name, final time and category
                 remove.append(index)
 
         df.drop(remove, inplace=True)
         df.drop([0, len(df.columns) - 1], axis=1, inplace=True)
+
+        df = df.applymap(lambda w: w[1:] if w.startswith("I") else w)  # some vertical lines are confused with I
+        df[2] = df[2].apply(lambda w: whitespaces_clean("".join([c for c in w if c.isalpha()])))
 
         return df

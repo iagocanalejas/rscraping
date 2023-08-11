@@ -8,7 +8,7 @@ from rscraping.data.models import Datasource, Lineup, Race
 from simplemma.simplemma import text_lemmatizer
 
 from rscraping.ocr import ImageProcessor
-from rscraping.parsers.ocr import OcrParser
+from rscraping.parsers.df import DataFrameParser
 
 
 def find_race(
@@ -18,8 +18,31 @@ def find_race(
     day: Optional[int] = None,
     with_lineup: bool = False,
 ) -> Optional[Race]:
+    """
+    Find a race based on the provided parameters.
+
+    Parameters:
+    - race_id (str): The ID of the race to find.
+    - datasource (Datasource): The data source to use for retrieving race information.
+    - is_female (bool): Whether the race is for females (True) or not (False).
+    - day (Optional[int]): The day of the race (optional).
+    - with_lineup (bool): Whether to include lineup information for participants (default: False).
+
+    Returns:
+    - Optional[Race]: The found Race object if the race is found, otherwise None.
+
+    This function retrieves race information using the provided data source and parameters.
+    It creates a client using the provided data source and is_female flag, and then retrieves
+    the race by its ID and day if specified. If with_lineup is True, it attempts to find lineup
+    information for each participant in the race and attaches it to the participant object.
+
+    Note that lineup retrieval may raise NotImplementedError, in which case it will be caught and
+    the function will proceed without adding lineup information.
+    """
+
     client = Client(source=datasource, is_female=is_female)  # type: ignore
     race = client.get_race_by_id(race_id, is_female=is_female, day=day)
+
     if race is not None and with_lineup:
         try:
             lineups = find_lineup(race_id, datasource, is_female=is_female)
@@ -28,19 +51,43 @@ def find_race(
                 participant.lineup = lineup[0] if len(lineup) == 1 else None
         except NotImplementedError:
             pass
+
     return race
 
 
 def parse_race_image(
     path: str,
     datasource: Datasource,
+    header_size: int = 3,
     allow_plot: bool = False,
 ) -> Generator[Race, Any, Any]:
-    processor = ImageProcessor(source=datasource, allow_plot=allow_plot)  # pyright: ignore
-    parser = OcrParser(source=datasource, allow_plot=allow_plot)  # pyright: ignore
+    """
+    Parse race information from an image file using provided data source and parameters.
 
-    header_data = processor.retrieve_header_data(path=path)
-    df = processor.retrieve_tabular_dataframe(path=path)
+    Parameters:
+    - path (str): The path to the image file to be processed.
+    - datasource (Datasource): The data source to use for retrieving additional data.
+    - header_size (int): The ammount of the image that represents the header (default: 3) -> 1/3.
+    - allow_plot (bool): Whether to allow plotting for debugging during processing (default: False).
+
+    Yields:
+    - Generator[Race, Any, Any]: A generator that yields Race objects as they are parsed.
+
+    This function processes race information from an image file. It uses an ImageProcessor and a
+    DataFrameParser for retrieving header data and tabular data from the image, respectively.
+    The header data is retrieved based on the specified header size, and the tabular data is
+    extracted using the DataFrameParser.
+
+    The function yields Race objects as they are parsed from the data. The file name, header data,
+    and tabular data are used as input for the parsing process.
+    """
+
+    processor = ImageProcessor(source=datasource, allow_plot=allow_plot)  # pyright: ignore
+    parser = DataFrameParser(source=datasource, allow_plot=allow_plot)  # pyright: ignore
+
+    header_data = processor.retrieve_header_data(path=path, header_size=header_size)
+    df = processor.retrieve_tabular_dataframe(path=path, header_size=header_size)
+
     return parser.parse_races_from(
         file_name=os.path.splitext(os.path.basename(path))[0], header=header_data, tabular=df
     )

@@ -34,11 +34,13 @@ class ImageProcessor(ABC):
     #                 ABSTRACT METHODS                 #
     ####################################################
     @abstractmethod
-    def retrieve_header_data(self, path: str, language: str = "es_ES.utf8", **kwargs) -> str:
+    def retrieve_header_data(self, path: str, header_size: int = 3, **kwargs) -> str:
         raise NotImplementedError
 
     @abstractmethod
-    def retrieve_tabular_dataframe(self, path: str, language: str = "es_ES.utf8", **kwargs) -> DataFrame:
+    def retrieve_tabular_dataframe(
+        self, path: str, header_size: int = 3, **kwargs
+    ) -> DataFrame:
         raise NotImplementedError
 
     ####################################################

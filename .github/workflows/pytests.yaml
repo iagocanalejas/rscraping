@@ -10,6 +10,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Set locale (required for inforemo parsing)
+        run: |
+          sudo locale-gen es_ES.utf8 # Replace with your desired locale
+          sudo update-locale
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:

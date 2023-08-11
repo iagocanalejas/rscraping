@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from fitz import fitz
+import fitz
 
 from rscraping.data.models import Lineup
 from rscraping.parsers.pdf.lgt import LGTPdfParser

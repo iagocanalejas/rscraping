@@ -9,7 +9,7 @@ from rscraping.data.models import Datasource, Race
 logger = logging.getLogger(__name__)
 
 
-class OcrParser(ABC):
+class DataFrameParser(ABC):
     DATASOURCE: Datasource
     _registry = {}
 
@@ -18,7 +18,7 @@ class OcrParser(ABC):
         super().__init_subclass__(**kwargs)
         cls._registry[source] = cls
 
-    def __new__(cls, source: str, **_) -> "OcrParser":  # pragma: no cover
+    def __new__(cls, source: str, **_) -> "DataFrameParser":  # pragma: no cover
         subclass = cls._registry[source]
         final_obj = object.__new__(subclass)
 

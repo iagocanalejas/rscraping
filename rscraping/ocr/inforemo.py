@@ -15,26 +15,30 @@ from rscraping.ocr.image import ImageProcessor
 class InforemoImageProcessor(ImageProcessor, source=Datasource.INFOREMO):
     DATASOURCE = Datasource.INFOREMO
 
-    def retrieve_header_data(self, path: str, language: str = "es_ES.utf8", **_) -> DataFrame:
+    def retrieve_header_data(self, path: str, header_size: int = 3, **_) -> DataFrame:
         if not os.path.exists(path) or not os.path.isfile(path):
             raise ValueError(f"invalid {path=}")
 
-        locale.setlocale(locale.LC_TIME, language)
+        default_locale = locale.getlocale(locale.LC_TIME)
+        locale.setlocale(locale.LC_TIME, "es_ES.utf8")
 
-        self._load_header_image(path)
+        self._load_header_image(path, header_size=header_size)
 
         out = pytesseract.image_to_string(self.img, config="--psm 4")
         if len(out) == 0:
             out = pytesseract.image_to_string(self.img, config="--psm 10")
+
+        locale.setlocale(locale.LC_TIME, default_locale)
         return out
 
-    def retrieve_tabular_dataframe(self, path: str, language: str = "es_ES.utf8", **_) -> DataFrame:
+    def retrieve_tabular_dataframe(self, path: str, header_size: int = 3, **_) -> DataFrame:
         if not os.path.exists(path) or not os.path.isfile(path):
             raise ValueError(f"invalid {path=}")
 
-        locale.setlocale(locale.LC_TIME, language)
+        default_locale = locale.getlocale(locale.LC_TIME)
+        locale.setlocale(locale.LC_TIME, "es_ES.utf8")
 
-        self._load_tabular_image(path)
+        self._load_tabular_image(path, header_size=header_size)
 
         final_boxes, (count_col, count_row) = self._get_boxes(self.img_vh)
         # from every single image-based cell/box the strings are extracted via pytesseract and stored in a list
@@ -64,23 +68,24 @@ class InforemoImageProcessor(ImageProcessor, source=Datasource.INFOREMO):
 
         # Creating a dataframe of the generated OCR list
         arr = np.array(outer)
+
+        locale.setlocale(locale.LC_TIME, default_locale)
         return self._clean_dataframe(DataFrame(arr.reshape(count_row, count_col)))
 
-    def _load_header_image(self, image_path: str):
+    def _load_header_image(self, image_path: str, header_size: int):
         # load and remove parts of an image
         img = cv2.imread(image_path, 0)
 
-        width_part = img.shape[1] // 5
-        img = img[: img.shape[0] // 3, width_part : 4 * width_part]
+        img = img[: img.shape[0] // header_size, :]
         self._plot(img)
 
         # can't be done directly
         self.img = img
 
-    def _load_tabular_image(self, image_path: str):
+    def _load_tabular_image(self, image_path: str, header_size: int):
         # load and remove the top third of the image
         img = cv2.imread(image_path, 0)
-        img = img[img.shape[0] // 3 :, :]
+        img = img[img.shape[0] // header_size :, :]
         self._plot(img)
 
         # thresholding the image to a binary image and invert it
