@@ -8,6 +8,7 @@ Tries to find the race information searching in the leagues webpages.
 python findrace.py <datasource> <race_id> <options>
     # --female=<bool>: Specifies if we need to search in the female pages.
     # --lineups=<bool>: Tryies to fill the lineups.
+    # --save=<bool>: Saves the output to a csv file.
 ```
 
 ## Find Lineup
@@ -17,6 +18,7 @@ Tries to parse a line-up for a given race to retrieved all the participants.
 ```sh
 python findlineup.py <datasource> <race_id> <options>
     # --female=<bool>: Specifies if we need to search in the female pages.
+    # --save=<bool>: Saves the output to a csv file.
 ```
 
 ## Parse Image
@@ -26,19 +28,8 @@ Tries to parse an Inforemo image to retrieve the race data and participants.
 ```sh
 python parseimage.py <datasource> <path> <options>
     # --header=<int>: Indicates the ammount of the image used for the header (default = 3) representing 1/3.
+    # --save=<bool>: Saves the output to a csv file.
     # --debug: Plot the image processing steps and dataframes transformations done.
-```
-
-## Parse PDF
-
-Tries to parse a line-up image to retrieve all the participants and the line-ups.
-
-```sh
-python parsepdf.py <path> <options>
-    # --datasource=<source>: Specifies the format of the PDF.
-    #     - lgt
-    #     - act
-    # --debug: Logs the extracted PDF values.
 ```
 
 # Utils

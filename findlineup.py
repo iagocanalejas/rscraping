@@ -18,11 +18,17 @@ def _parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("datasource", type=str, help="Datasource from where to retrieve.")
     parser.add_argument("race_id", type=str, help="Race to find.")
-    parser.add_argument("--female", action="store_true", default=False)
+    parser.add_argument(
+        "--female",
+        action="store_true",
+        default=False,
+        help="Specifies if we need to search in the female pages.",
+    )
+    parser.add_argument("--save", action="store_true", default=False, help="Saves the output to a csv file.")
     return parser.parse_args()
 
 
-def main(race_id: str, datasource: str, is_female: bool):
+def main(race_id: str, datasource: str, is_female: bool, save: bool):
     if not Datasource.has_value(datasource):
         raise ValueError(f"invalid datasource={datasource}")
 
@@ -35,11 +41,12 @@ def main(race_id: str, datasource: str, is_female: bool):
         raise ValueError(f"not found lineup for race_id={args.race_id}")
 
     print(",\n".join(lineup.to_json() for lineup in lineups))
-    save_csv(lineups, file_name=datasource.upper())
+    if save:
+        save_csv(lineups, file_name=f"lineup_{race_id}_{datasource.upper()}")
 
 
 if __name__ == "__main__":
     args = _parse_arguments()
     logger.info(f"{os.path.basename(__file__)}:: args -> {args.__dict__}")
 
-    main(args.race_id, args.datasource, args.female)
+    main(args.race_id, args.datasource, args.female, args.save)

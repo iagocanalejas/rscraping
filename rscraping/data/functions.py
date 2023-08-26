@@ -28,13 +28,13 @@ def expand_path(path: str, valid_files: List[str]) -> List[str]:
     return [f for f in files if is_valid(f)]
 
 
-def save_csv(items: List[Race] | List[Lineup], file_name: str):
-    if not len(items):
+def save_csv(lineups: List[Race] | List[Lineup], file_name: str):
+    if not len(lineups):
         return
 
     file_name = file_name if ".csv" in file_name else f"{file_name}.csv"
     with open(file_name, "w") as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(items[0].__dict__.keys())  # write headers
-        for item in items:
+        writer.writerow(lineups[0].__dict__.keys())  # write headers
+        for item in lineups:
             writer.writerow(item.__dict__.values())

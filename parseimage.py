@@ -7,7 +7,7 @@ import sys
 from typing import List
 
 from rscraping import parse_race_image
-from rscraping.data.functions import expand_path
+from rscraping.data.functions import expand_path, save_csv
 from rscraping.data.models import Datasource, Race
 
 logger = logging.getLogger()
@@ -20,11 +20,12 @@ def _parse_arguments():
     parser.add_argument("datasource", type=str, help="Datasource from where to retrieve.")
     parser.add_argument("path", help="Path to be handled")
     parser.add_argument("--header", type=int, help="Amount of the image representing the header (1/split)")
-    parser.add_argument("--debug", action="store_true", default=False)
+    parser.add_argument("--save", action="store_true", default=False, help="Saves the output to a csv file.")
+    parser.add_argument("--debug", action="store_true", default=False, help="Plot the images to see the processing.")
     return parser.parse_args()
 
 
-def main(paths: List[str], datasource: str, header_size: int = 3, allow_plot: bool = False):
+def main(paths: List[str], datasource: str, header_size: int = 3, allow_plot: bool = False, save: bool = False):
     if not Datasource.is_OCR(datasource):
         raise ValueError(f"invalid datasource={datasource}")
 
@@ -42,7 +43,8 @@ def main(paths: List[str], datasource: str, header_size: int = 3, allow_plot: bo
     for race in parsed_items:
         print(race.to_json())
 
-    # save_csv(parsed_items, file_name=scrapper.DATASOURCE.value)
+    if save:
+        save_csv(parsed_items, file_name=f"img_races_{datasource.upper()}")
 
 
 if __name__ == "__main__":
@@ -54,4 +56,5 @@ if __name__ == "__main__":
         datasource=args.datasource,
         header_size=args.header or 3,
         allow_plot=args.debug,
+        save=args.save,
     )
