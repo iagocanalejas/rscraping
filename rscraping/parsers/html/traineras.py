@@ -148,8 +148,8 @@ class TrainerasHtmlParser(HtmlParser):
         return max(int(lane) for lane in lanes)
 
     def get_race_laps(self, selector: Selector, day: int) -> int:
-        cia = selector.xpath(f"/html/body/div[1]/main/div[1]/div/div/div[2]/table[{day}]/tr[1]/th/text()").getall()
-        return len(cia) - 6
+        cia = selector.xpath(f"/html/body/div[1]/main/div[1]/div/div/div[2]/table[{day}]/tr[2]/td/text()").getall()
+        return len([c for c in cia if ":" in c])
 
     def is_cancelled(self, participants: List[Selector]) -> bool:
         # race_id=4061|211
