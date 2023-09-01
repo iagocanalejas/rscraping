@@ -45,10 +45,11 @@ def normalize_name_parts(normalized_name: str) -> List[Tuple[str, Optional[int]]
 
 def normalize_race_name(name: str) -> str:
     name = whitespaces_clean(name).upper()
+    name = deacronym_race_name(name)  # need to be executed before "." removal
+
     name = re.sub(r"[\'\".:ª]", " ", name)
 
     name = amend_race_name(name)
-    name = deacronym_race_name(name)
     name = remove_league_indicator(name)
     name = remove_race_sponsor(name)
 

@@ -1,4 +1,5 @@
 import logging
+import re
 
 from pyutils.strings import remove_parenthesis, whitespaces_clean
 
@@ -100,7 +101,10 @@ _KNOWN_SPONSORS = [
 
 
 def normalize_club_name(name: str) -> str:
-    name = whitespaces_clean(remove_parenthesis(name.upper().replace(".", "")))
+    name = whitespaces_clean(remove_parenthesis(name.upper()))
+    name = deacronym_club_name(name)
+
+    name = name.replace(".", "")
     name = remove_club_title(name)
     name = remove_club_sponsor(name)
 
@@ -110,6 +114,11 @@ def normalize_club_name(name: str) -> str:
             name = k
             break
 
+    return whitespaces_clean(name)
+
+
+def deacronym_club_name(name: str) -> str:
+    name = re.sub(r"P\.? ?D\.?", "PASAIA DONIBANE", name)
     return whitespaces_clean(name)
 
 
