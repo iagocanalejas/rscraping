@@ -56,12 +56,16 @@ class LGTHtmlParser(HtmlParser):
             logger.error(f"{self.DATASOURCE}: unable to normalize {name=}")
             return None
         normalized_names = [
-            self._hardcoded_playoff_edition(self._normalize_race_name(n), year=t_date.year, edition=e)
+            self._hardcoded_playoff_edition(self._normalize_race_name(n, t_date), year=t_date.year, edition=e)
             for (n, e) in normalized_names
         ]
         logger.info(f"{self.DATASOURCE}: race normalized to {normalized_names=}")
 
         participants = self.get_participants(results_selector)
+        race_laps = self.get_race_laps(results_selector)
+        if race_laps < 0:
+            logger.error(f"{self.DATASOURCE}: unable to parse laps {normalized_names=}")
+            return None
 
         race = Race(
             name=self.get_name(selector),
@@ -79,7 +83,7 @@ class LGTHtmlParser(HtmlParser):
             datasource=self.DATASOURCE.value,
             gender=gender,
             cancelled=self.is_cancelled(participants),
-            race_laps=self.get_race_laps(results_selector),
+            race_laps=race_laps,
             race_lanes=self.get_race_lanes(participants),
             participants=[],
         )
@@ -232,11 +236,11 @@ class LGTHtmlParser(HtmlParser):
     ####################################################
 
     @staticmethod
-    def _normalize_race_name(name: str) -> str:
+    def _normalize_race_name(name: str, t_date: date) -> str:
         name = remove_day_indicator(name)
 
         if "TERESA HERRERA" in name:  # lgt never saves the final
-            return "TROFEO TERESA HERRERA (CLASIFICATORIA)"
+            return "TROFEO TERESA HERRERA" if t_date.isoweekday() == 7 else "TROFEO TERESA HERRERA (CLASIFICATORIA)"
 
         if "PLAY" in name:
             return "PLAY-OFF LGT"
