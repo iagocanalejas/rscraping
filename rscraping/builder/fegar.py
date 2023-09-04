@@ -4,7 +4,8 @@ from typing import Optional
 
 from fillpdf import fillpdfs
 
-from ._item import Field, PdfItem
+from ._fields import Fields
+from ._item import PdfItem
 
 FILE = "templates/fegar.pdf"
 NIF_SIZE = (245, 150)
@@ -17,42 +18,42 @@ def fill_fegar_form(
     logging.info("fegar:: starting fegar form")
 
     values = {
-        Field.FORM_NAME: data.name,
-        Field.FORM_SURNAME: data.surname,
-        Field.FORM_NIF: data.nif,
-        Field.FORM_GENDER: data.gender,
-        Field.FORM_BIRTH: data.birth,
-        Field.FORM_CATEGORY: data.category,
-        Field.FORM_TOWN: data.town,
-        Field.FORM_STATE: data.state,
-        Field.FORM_NATIONALITY: data.nationality,
-        Field.FORM_ADDRESS: data.address,
-        Field.FORM_ADDRESS_NUMBER: data.address_number,
-        Field.FORM_POSTAL_CODE: data.postal_code,
-        Field.FORM_COUNTRY: data.country,
-        Field.FORM_PHONE: data.phone,
-        Field.FORM_ENTITY: data.entity,
-        Field.FORM_EMAIL: data.email,
-        Field.FORM_SIGN_IN: data.sign_in,
-        Field.FORM_SIGN_ON_DAY: data.sign_on_day,
-        Field.FORM_SIGN_ON_MONTH: data.sign_on_month,
-        Field.FORM_SIGN_ON_YEAR: data.sign_on_year[2:] if data.sign_on_year else None,
-        Field.FORM_ENTITY_ADDRESS: data.entity_town,
-        Field.FORM_ENTITY_STATE: data.entity_state,
-        Field.FORM_ROWER: "Yes" if data.is_rower else None,
-        Field.FORM_COACH: "Yes" if data.is_coach else None,
-        Field.FORM_DIRECTIVE: "Yes" if data.is_directive else None,
+        Fields.FORM_NAME: data.name,
+        Fields.FORM_SURNAME: data.surname,
+        Fields.FORM_NIF: data.nif,
+        Fields.FORM_GENDER: data.gender,
+        Fields.FORM_BIRTH: data.birth,
+        Fields.FORM_CATEGORY: data.category,
+        Fields.FORM_TOWN: data.town,
+        Fields.FORM_STATE: data.state,
+        Fields.FORM_NATIONALITY: data.nationality,
+        Fields.FORM_ADDRESS: data.address,
+        Fields.FORM_ADDRESS_NUMBER: data.address_number,
+        Fields.FORM_POSTAL_CODE: data.postal_code,
+        Fields.FORM_COUNTRY: data.country,
+        Fields.FORM_PHONE: data.phone,
+        Fields.FORM_ENTITY: data.entity,
+        Fields.FORM_EMAIL: data.email,
+        Fields.FORM_SIGN_IN: data.sign_in,
+        Fields.FORM_SIGN_ON_DAY: data.sign_on_day,
+        Fields.FORM_SIGN_ON_MONTH: data.sign_on_month,
+        Fields.FORM_SIGN_ON_YEAR: data.sign_on_year[2:] if data.sign_on_year else None,
+        Fields.FORM_ENTITY_ADDRESS: data.entity_town,
+        Fields.FORM_ENTITY_STATE: data.entity_state,
+        Fields.FORM_ROWER: "Yes" if data.is_rower else None,
+        Fields.FORM_COACH: "Yes" if data.is_coach else None,
+        Fields.FORM_DIRECTIVE: "Yes" if data.is_directive else None,
     }
     assert data.birth
 
     if with_parent:
-        values[f"parent_{Field.FORM_NAME}"] = data.parent_name
-        values[f"parent_{Field.FORM_SURNAME}"] = data.parent_surname
-        values[f"parent_{Field.FORM_NIF}"] = data.parent_dni
-        values[f"parent_{Field.FORM_ADDRESS}"] = data.address
-        values[f"parent_{Field.FORM_ADDRESS_NUMBER}"] = data.address_number
-        values[f"parent_{Field.FORM_TOWN}"] = data.town
-        values[f"parent_{Field.FORM_POSTAL_CODE}"] = data.postal_code
+        values[f"parent_{Fields.FORM_NAME}"] = data.parent_name
+        values[f"parent_{Fields.FORM_SURNAME}"] = data.parent_surname
+        values[f"parent_{Fields.FORM_NIF}"] = data.parent_dni
+        values[f"parent_{Fields.FORM_ADDRESS}"] = data.address
+        values[f"parent_{Fields.FORM_ADDRESS_NUMBER}"] = data.address_number
+        values[f"parent_{Fields.FORM_TOWN}"] = data.town
+        values[f"parent_{Fields.FORM_POSTAL_CODE}"] = data.postal_code
 
     logging.info(f"fegar:: {values=}")
     file_name = f"./out/{data.birth.split('/')[-1]} - {data.surname}, {data.name}_fegar"
