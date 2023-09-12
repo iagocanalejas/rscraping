@@ -4,6 +4,7 @@ import argparse
 import logging
 import os
 import sys
+from typing import Optional
 
 from rscraping import find_race
 from rscraping.data.functions import save_csv
@@ -24,12 +25,13 @@ def _parse_arguments():
         default=False,
         help="Specifies if we need to search in the female pages.",
     )
+    parser.add_argument("--day", type=int, help="Day we want (for multi races pages).")
     parser.add_argument("--lineups", action="store_true", default=False, help="Tryies to fill the lineups.")
     parser.add_argument("--save", action="store_true", default=False, help="Saves the output to a csv file.")
     return parser.parse_args()
 
 
-def main(race_id: str, datasource: str, is_female: bool, with_lineups: bool, save: bool):
+def main(race_id: str, datasource: str, is_female: bool, with_lineups: bool, save: bool, day: Optional[int]):
     if not Datasource.has_value(datasource):
         raise ValueError(f"invalid datasource={datasource}")
 
@@ -38,6 +40,7 @@ def main(race_id: str, datasource: str, is_female: bool, with_lineups: bool, sav
         datasource=Datasource(datasource),
         is_female=is_female,
         with_lineup=with_lineups,
+        day=day,
     )
     if not race:
         raise ValueError(f"not found race for race_id={args.race_id}")
@@ -51,4 +54,4 @@ if __name__ == "__main__":
     args = _parse_arguments()
     logger.info(f"{os.path.basename(__file__)}:: args -> {args.__dict__}")
 
-    main(args.race_id, args.datasource, args.female, args.lineups, args.save)
+    main(args.race_id, args.datasource, args.female, args.lineups, args.save, args.day)

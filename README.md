@@ -6,6 +6,7 @@ Tries to find the race information searching in the leagues webpages.
 
 ```sh
 python findrace.py <datasource> <race_id> <options>
+    # --day=<int>: Tells the parser the day of the race we want (for multi-race pages).
     # --female=<bool>: Specifies if we need to search in the female pages.
     # --lineups=<bool>: Tryies to fill the lineups.
     # --save=<bool>: Saves the output to a csv file.

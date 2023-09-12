@@ -48,7 +48,7 @@ class TrainerasHtmlParser(HtmlParser):
             return None
         logger.info(f"{self.DATASOURCE}: found race {name}")
 
-        t_date = find_date(selector.xpath("/html/body/div[1]/main/div/div/div/div[1]/h2/text()").get(""))
+        t_date = find_date(selector.xpath(f"/html/body/div[1]/main/div/div/div/div[{day}]/h2/text()").get(""))
         gender = self.get_gender(selector)
         distance = self.get_distance(selector)
 
