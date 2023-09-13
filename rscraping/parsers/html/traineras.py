@@ -91,7 +91,7 @@ class TrainerasHtmlParser(HtmlParser):
                     category=PARTICIPANT_CATEGORY_ABSOLUT,
                     club_name=self.get_club_name(row),
                     lane=self.get_lane(row) if ttype == RACE_CONVENTIONAL else 1,
-                    series=self.get_series(selector) if ttype == RACE_CONVENTIONAL else 1,
+                    series=self.get_series(row) if ttype == RACE_CONVENTIONAL else 1,
                     laps=self.get_laps(row),
                     distance=distance,
                     handicap=None,
