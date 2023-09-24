@@ -4,9 +4,9 @@ matplotlib==3.7.3
 numpy==1.25.1
 opencv-python==4.8.0.76
 openpyxl==3.1.2
-pandas==2.0.3
+pandas==2.1.0
 parsel==1.8.1
-PyMuPDF==1.22.5
+PyMuPDF==1.23.3
 pytesseract==0.3.10
 pyutils @ git+https://github.com/iagocanalejas/pyutils.git@master
 reportlab~=4.0.4

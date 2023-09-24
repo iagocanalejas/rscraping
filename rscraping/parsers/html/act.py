@@ -4,7 +4,7 @@ from typing import List, Optional, Tuple
 
 from parsel import Selector
 
-from pyutils.strings import find_date, whitespaces_clean
+from pyutils.strings import find_date, remove_parenthesis, whitespaces_clean
 from rscraping.data.constants import (
     GENDER_FEMALE,
     GENDER_MALE,
@@ -61,7 +61,7 @@ class ACTHtmlParser(HtmlParser):
             name=self.get_name(selector),
             normalized_names=normalized_names,
             date=t_date.strftime("%d/%m/%Y"),
-            type=self.get_type(participants),
+            type=self.get_type(selector, participants),
             day=self.get_day(selector),
             modality=RACE_TRAINERA,
             league=self.get_league(selector, is_female),
@@ -74,7 +74,7 @@ class ACTHtmlParser(HtmlParser):
             datasource=self.DATASOURCE.value,
             cancelled=self.is_cancelled(selector),
             race_laps=self.get_race_laps(selector),
-            race_lanes=self.get_race_lanes(participants),
+            race_lanes=self.get_race_lanes(selector, participants),
             participants=[],
         )
 
@@ -120,12 +120,14 @@ class ACTHtmlParser(HtmlParser):
     def get_day(self, selector: Selector) -> int:
         name = self.get_name(selector)
         if is_play_off(name):
-            return 1 if "1" in name else 2
+            return 1 if "1" in remove_parenthesis(name) else 2
 
         matches = re.findall(r"\(?(\dJ|J\d)\)?", name)
         return int(re.findall(r"\d+", matches[0])[0].strip()) if matches else 1
 
-    def get_type(self, participants: List[Selector]) -> str:
+    def get_type(self, selector: Selector, participants: List[Selector]) -> str:
+        if is_play_off(self.get_name(selector)):
+            return RACE_TIME_TRIAL
         lanes = list(self.get_lane(p) for p in participants)
         return RACE_TIME_TRIAL if all(int(lane) == int(lanes[0]) for lane in lanes) else RACE_CONVENTIONAL
 
@@ -143,8 +145,8 @@ class ACTHtmlParser(HtmlParser):
         ).upper()
         return organizer if organizer else None
 
-    def get_race_lanes(self, participants: List[Selector]) -> int:
-        if self.get_type(participants) == RACE_TIME_TRIAL:
+    def get_race_lanes(self, selector: Selector, participants: List[Selector]) -> int:
+        if self.get_type(selector, participants) == RACE_TIME_TRIAL:
             return 1
         lanes = list(self.get_lane(p) for p in participants)
         return max(int(lane) for lane in lanes)
@@ -215,6 +217,6 @@ class ACTHtmlParser(HtmlParser):
             name, edition = "GRAN PREMIO EL CORTE INGLÉS", (year - 1970)
 
         if is_play_off(name):
-            name, edition = ("PLAY-OFF ACT (FEMENINO)", (year - 2017)) if is_female else ("PLAY-OFF ACT", (year - 2002))
+            name, edition = ("PLAY-OFF ACT (FEMENINO)", (year - 2016)) if is_female else ("PLAY-OFF ACT", (year - 2002))
 
         return name, edition

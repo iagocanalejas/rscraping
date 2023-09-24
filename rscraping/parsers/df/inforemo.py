@@ -93,7 +93,6 @@ class InforemoDataFrameParser(DataFrameParser, source=Datasource.INFOREMO):
 
             yield race
 
-
     def _get_race_participants(self, participants: DataFrame, race: Race) -> List[Participant]:
         items: List[Participant] = []
         for _, participant in participants.iterrows():
@@ -224,7 +223,7 @@ class InforemoDataFrameParser(DataFrameParser, source=Datasource.INFOREMO):
         df.drop(remove, inplace=True)
         df.drop([0, len(df.columns) - 1], axis=1, inplace=True)
 
-        df = df.applymap(lambda w: w[1:] if w.startswith("I") else w)  # some vertical lines are confused with I
+        df = df.map(lambda w: w[1:] if w.startswith("I") else w)  # some vertical lines are confused with I
         df[2] = df[2].apply(lambda w: whitespaces_clean("".join([c for c in w if c.isalpha()])))
 
         return df

@@ -97,6 +97,7 @@ _KNOWN_SPONSORS = [
     "NORTEGAS",
     "SIMEI",
     "NATURHOUSE",
+    "SALEGI JATETXEA",
 ]
 
 
