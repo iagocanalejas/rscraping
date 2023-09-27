@@ -16,6 +16,7 @@ from rscraping.data.models import Datasource, Participant, Race, RaceName
 from rscraping.data.normalization.clubs import normalize_club_name
 from rscraping.data.normalization.races import find_race_sponsor, normalize_race_name
 from rscraping.data.normalization.times import normalize_lap_time
+from rscraping.data.normalization.towns import normalize_town
 
 from ._parser import HtmlParser
 
@@ -71,7 +72,7 @@ class TrainerasHtmlParser(HtmlParser):
             day=day,
             modality=RACE_TRAINERA,
             league=None,  # not present
-            town=self.get_town(selector),
+            town=self.get_town(selector, day=day),
             organizer=None,
             sponsor=find_race_sponsor(self.get_name(selector)),
             race_id=race_id,
@@ -137,9 +138,9 @@ class TrainerasHtmlParser(HtmlParser):
         series = [p.xpath("//*/td[4]/text()").get("") for p in participants]
         return RACE_TIME_TRIAL if len(set(series)) == len(series) else RACE_CONVENTIONAL
 
-    def get_town(self, selector: Selector) -> str:
-        parts = selector.xpath("/html/body/div[1]/main/div/div/div/div[1]/h2/text()").get("")
-        return whitespaces_clean(parts.split(" - ")[0]).upper()
+    def get_town(self, selector: Selector, day: int) -> str:
+        parts = selector.xpath(f"/html/body/div[1]/main/div/div/div/div[{day}]/h2/text()").get("")
+        return normalize_town(whitespaces_clean(parts.split(" - ")[0]))
 
     def get_race_lanes(self, participants: List[Selector]) -> int:
         if self.get_type(participants) == RACE_TIME_TRIAL:

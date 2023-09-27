@@ -11,4 +11,5 @@ from .races import (
     find_race_sponsor,  # pyright: ignore
 )
 from .times import normalize_lap_time, normalize_spanish_months  # pyright: ignore
+from .towns import normalize_town, amend_town, remove_province  # pyright: ignore
 from .leagues import normalize_league_name  # pyright: ignore

@@ -24,6 +24,7 @@ from rscraping.data.normalization.races import (
     remove_day_indicator,
 )
 from rscraping.data.normalization.times import normalize_lap_time
+from rscraping.data.normalization.towns import normalize_town
 
 from ._parser import HtmlParser
 
@@ -201,7 +202,7 @@ class ARCHtmlParser(HtmlParser):
     def get_town(self, selector: Selector) -> str:
         text = remove_parenthesis(selector.xpath('//*[@id="main"]/div[2]/div[2]/div[1]/div[1]/ul/li[4]/text()').get(""))
         text = text.replace(" Ver mapaOcultar mapa", "")
-        return whitespaces_clean(text).upper()
+        return normalize_town(text)
 
     def get_race_lanes(self, selector: Selector) -> int:
         text = selector.xpath('//*[@id="main"]/div[2]/div[2]/div[1]/div[1]/ul/li[3]/text()').get("")

@@ -47,7 +47,7 @@ class TestACTParser(unittest.TestCase):
         modality="TRAINERA",
         type="CONVENTIONAL",
         league="EUSKO LABEL LIGA",
-        town="ZIERBENA BIZKAIA",
+        town="ZIERBENA",
         organizer=None,
         sponsor=None,
         normalized_names=[("ORIOKO ESTROPADAK", 33), ("ORIO KANPINA BANDERA", 11)],

@@ -23,6 +23,7 @@ from rscraping.data.normalization.races import (
     remove_day_indicator,
 )
 from rscraping.data.normalization.times import normalize_lap_time
+from rscraping.data.normalization.towns import normalize_town
 
 from ._parser import HtmlParser
 
@@ -135,9 +136,8 @@ class ACTHtmlParser(HtmlParser):
         return "ACT" if is_play_off(self.get_name(selector)) else "LIGA EUSKOTREN" if is_female else "EUSKO LABEL LIGA"
 
     def get_town(self, selector: Selector) -> str:
-        return whitespaces_clean(
-            selector.xpath('//*[@id="col-a"]/div/section/div[2]/table/tbody/tr/td[2]/text()').get("")
-        ).upper()
+        value = selector.xpath('//*[@id="col-a"]/div/section/div[2]/table/tbody/tr/td[2]/text()').get("")
+        return normalize_town(value)
 
     def get_organizer(self, selector: Selector) -> Optional[str]:
         organizer = whitespaces_clean(

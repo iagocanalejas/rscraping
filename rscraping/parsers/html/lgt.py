@@ -24,6 +24,7 @@ from rscraping.data.normalization.races import (
     remove_day_indicator,
 )
 from rscraping.data.normalization.times import normalize_lap_time
+from rscraping.data.normalization.towns import normalize_town
 
 from ._parser import HtmlParser
 
@@ -163,7 +164,7 @@ class LGTHtmlParser(HtmlParser):
 
     def get_town(self, selector: Selector) -> str:
         value = selector.xpath('//*[@id="regata"]/div/div/div[3]/div[2]/p[1]/text()').get("")
-        return whitespaces_clean(value).upper().replace("PORTO DE ", "")
+        return normalize_town(value)
 
     def get_organizer(self, selector: Selector) -> Optional[str]:
         organizer = selector.xpath('//*[@id="regata"]/div/div/div[3]/div[1]/text()').get("")
