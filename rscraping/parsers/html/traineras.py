@@ -8,6 +8,8 @@ from rscraping.data.constants import (
     GENDER_FEMALE,
     GENDER_MALE,
     PARTICIPANT_CATEGORY_ABSOLUT,
+    PARTICIPANT_CATEGORY_SCHOOL,
+    PARTICIPANT_CATEGORY_VETERAN,
     RACE_CONVENTIONAL,
     RACE_TIME_TRIAL,
     RACE_TRAINERA,
@@ -37,6 +39,8 @@ class TrainerasHtmlParser(HtmlParser):
     DATASOURCE = Datasource.TRAINERAS
 
     _FEMALE = ["SF", "VF", "JF", "F"]
+    _VETERAN = ["VF", "VM"]
+    _SCHOOL = ["M", "JM", "JF", "CM", "CF"]
 
     def parse_race(self, selector: Selector, race_id: str, day: Optional[int] = None, **_) -> Optional[Race]:
         if len(selector.xpath("/html/body/div[1]/main/div[1]/div/div/div[2]/table[*]").getall()) > 1 and not day:
@@ -63,6 +67,7 @@ class TrainerasHtmlParser(HtmlParser):
 
         participants = self.get_participants(selector, day)
         ttype = self.get_type(participants)
+        category = self.get_category(selector)
 
         race = Race(
             name=self.get_name(selector),
@@ -89,7 +94,7 @@ class TrainerasHtmlParser(HtmlParser):
             race.participants.append(
                 Participant(
                     gender=gender,
-                    category=PARTICIPANT_CATEGORY_ABSOLUT,
+                    category=category,
                     club_name=self.get_club_name(row),
                     lane=self.get_lane(row) if ttype == RACE_CONVENTIONAL else 1,
                     series=self.get_series(row) if ttype == RACE_CONVENTIONAL else 1,
@@ -104,9 +109,16 @@ class TrainerasHtmlParser(HtmlParser):
 
         return race
 
-    def parse_race_ids(self, selector: Selector, **_) -> List[str]:
-        ids = selector.xpath("/html/body/div[1]/div[2]/table/tbody/tr/td[1]/a/@href").getall()
-        return [e.split("/")[-1] for e in ids]
+    def parse_race_ids(self, selector: Selector, is_female: bool, **_) -> List[str]:
+        def has_gender(value: str) -> bool:
+            return value in self._FEMALE if is_female else value not in self._FEMALE
+
+        rows = selector.xpath("/html/body/div[1]/div[2]/table/tbody/tr").getall()
+        return [
+            Selector(row).xpath("//*/td[1]/a/@href").get("").split("/")[-1]
+            for row in rows
+            if has_gender(Selector(row).xpath("//*/td[2]/text()").get(""))
+        ]
 
     def parse_race_names(self, selector: Selector, **_) -> List[RaceName]:
         hrefs = selector.xpath("/html/body/div[1]/div[2]/table/tbody/tr/td[1]/a").getall()
@@ -137,6 +149,15 @@ class TrainerasHtmlParser(HtmlParser):
     def get_type(self, participants: List[Selector]) -> str:
         series = [p.xpath("//*/td[4]/text()").get("") for p in participants]
         return RACE_TIME_TRIAL if len(set(series)) == len(series) else RACE_CONVENTIONAL
+
+    def get_category(self, selector: Selector) -> str:
+        subtitle = selector.xpath("/html/body/div[1]/main/div/div/div/div[1]/h2/text()").get("").upper()
+        category = whitespaces_clean(subtitle.split("-")[-1])
+        if category in self._VETERAN:
+            return PARTICIPANT_CATEGORY_VETERAN
+        if category in self._SCHOOL:
+            return PARTICIPANT_CATEGORY_SCHOOL
+        return PARTICIPANT_CATEGORY_ABSOLUT
 
     def get_town(self, selector: Selector, day: int) -> str:
         parts = selector.xpath(f"/html/body/div[1]/main/div/div/div/div[{day}]/h2/text()").get("")

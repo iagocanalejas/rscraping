@@ -49,7 +49,7 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
 
         ids: List[str] = []
         for page in self.get_pages(year):
-            ids.extend(self._html_parser.parse_race_ids(page))
+            ids.extend(self._html_parser.parse_race_ids(page, is_female=self._is_female))
         return ids
 
     def get_race_names_by_year(self, year: int, **_) -> List[RaceName]:

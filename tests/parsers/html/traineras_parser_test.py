@@ -45,9 +45,9 @@ class TestTrainerasParser(unittest.TestCase):
 
     def test_parse_race_ids(self):
         with open(os.path.join(self.fixtures, "traineras_results.html")) as file:
-            ids = self.parser.parse_race_ids(Selector(file.read()))
+            ids = self.parser.parse_race_ids(Selector(file.read()), is_female=False)
 
-        self.assertEqual(ids, ["5455", "5456", "5457", "5458", "5535", "5536"])
+        self.assertEqual(ids, ["5455", "5457", "5458", "5535", "5536"])
 
     def test_parse_race_names(self):
         with open(os.path.join(self.fixtures, "traineras_results.html")) as file:
