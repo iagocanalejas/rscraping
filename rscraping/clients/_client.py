@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import date
-from typing import List, Optional
+from typing import Any, Generator, Optional
 
 import requests
 from parsel import Selector
@@ -27,7 +27,7 @@ class Client(ABC):
         if source:
             cls._registry[source] = cls
 
-    def __new__(cls, source: Datasource, is_female: bool = False, **kwargs) -> "Client":  # pyright: ignore
+    def __new__(cls, source: Datasource, is_female: bool = False, **_) -> "Client":
         subclass = cls._registry[source]
         final_obj = object.__new__(subclass)
         final_obj._is_female = is_female
@@ -51,20 +51,20 @@ class Client(ABC):
             race.url = url
         return race
 
-    def get_race_ids_by_year(self, year: int, **kwargs) -> List[str]:
+    def get_race_ids_by_year(self, year: int, **kwargs) -> Generator[str, Any, Any]:
         self.validate_year_or_raise_exception(year)
 
         url = self.get_races_url(year, is_female=self._is_female)
-        return self._html_parser.parse_race_ids(
+        yield from self._html_parser.parse_race_ids(
             selector=Selector(requests.get(url=url, headers=HTTP_HEADERS).text),
             **kwargs,
         )
 
-    def get_race_names_by_year(self, year: int, **kwargs) -> List[RaceName]:
+    def get_race_names_by_year(self, year: int, **kwargs) -> Generator[RaceName, Any, Any]:
         self.validate_year_or_raise_exception(year)
 
         url = self.get_races_url(year, is_female=self._is_female)
-        return self._html_parser.parse_race_names(
+        yield from self._html_parser.parse_race_names(
             selector=Selector(requests.get(url=url, headers=HTTP_HEADERS).content.decode("utf-8")),
             **kwargs,
         )
@@ -89,5 +89,9 @@ class Client(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_lineup_by_race_id(self, race_id: str, **kwargs) -> List[Lineup]:
+    def get_race_ids_by_rower(self, rower_id: str, **_) -> Generator[str, Any, Any]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_lineup_by_race_id(self, race_id: str, **kwargs) -> Generator[Lineup, Any, Any]:
         raise NotImplementedError

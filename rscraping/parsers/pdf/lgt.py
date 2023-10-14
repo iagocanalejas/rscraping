@@ -43,6 +43,7 @@ class LGTPdfParser(PdfParser):
             larboard=[r for t, r in rowers if any(k in t for k in ["BABOR"])],
             substitute=[r for t, r in rowers if any(k in t for k in ["SUPLENTE"])],
             bow=[r for t, r in rowers if t in ["PROEL"]][0],
+            images=[],
         )
 
     @staticmethod

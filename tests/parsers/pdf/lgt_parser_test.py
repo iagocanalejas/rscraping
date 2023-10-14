@@ -44,4 +44,5 @@ class TestLGTParser(unittest.TestCase):
         ],
         substitute=["JACOBO PAZOS PARDAVILA", "MARTIN GONZALEZ LOPEZ"],
         bow="RUBEN OLIVEIRA PIÑEIRO",
+        images=[],
     )

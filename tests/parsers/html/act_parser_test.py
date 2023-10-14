@@ -32,13 +32,13 @@ class TestACTParser(unittest.TestCase):
         with open(os.path.join(self.fixtures, "act_races.html")) as file:
             ids = self.parser.parse_race_ids(Selector(file.read()))
 
-        self.assertEqual(ids, ["1616789082", "1616789390", "1616789420"])
+        self.assertEqual(list(ids), ["1616789082", "1616789390", "1616789420"])
 
     def test_parse_race_names(self):
         with open(os.path.join(self.fixtures, "act_races.html")) as file:
             race_names = self.parser.parse_race_names(Selector(file.read()), is_female=False)
 
-        self.assertEqual(race_names, self._RACE_NAMES)
+        self.assertEqual(list(race_names), self._RACE_NAMES)
 
     _RACE = Race(
         name="ORIOKO XXXIII. ESTROPADA - ORIO KANPINA XI. BANDERA (16-07-2023)",

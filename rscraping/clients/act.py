@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, Generator, override
 
 import fitz
 import requests
@@ -24,31 +24,35 @@ class ACTClient(Client, source=Datasource.ACT):
         self._html_parser = ACTHtmlParser()
         self._pdf_parser = ACTPdfParser()
 
+    @override
     @staticmethod
     def get_race_details_url(race_id: str, is_female: bool, **_) -> str:
         female = "/femenina" if is_female else ""
         return f"https://www.euskolabelliga.com{female}/resultados/ver.php?r={race_id}"
 
+    @override
     @staticmethod
     def get_races_url(year: int, is_female: bool, **_) -> str:
         female = "/femenina" if is_female else ""
         return f"https://www.euskolabelliga.com{female}/resultados/index.php?t={year}"
 
+    @override
     @staticmethod
     def get_lineup_url(race_id: str, is_female: bool, **_) -> str:
         female = "/femenina" if is_female else ""
         return f"https://www.euskolabelliga.com{female}/resultados/tripulacionespdf.php?r={race_id}"
 
-    def get_lineup_by_race_id(self, race_id: str, **_) -> List[Lineup]:
+    @override
+    def get_lineup_by_race_id(self, race_id: str, **_) -> Generator[Lineup, Any, Any]:
         url = self.get_lineup_url(race_id, self._is_female)
         raw_pdf = requests.get(url=url, headers=HTTP_HEADERS).content
 
-        parsed_items: List[Lineup] = []
-
-        with fitz.open('pdf', raw_pdf) as pdf:
+        with fitz.open("pdf", raw_pdf) as pdf:
             for page_num in range(pdf.page_count):
-                items = self._pdf_parser.parse_lineup(page=pdf[page_num])
-                if items:
-                    parsed_items.append(items)
+                lineup = self._pdf_parser.parse_lineup(page=pdf[page_num])
+                if lineup:
+                    yield lineup
 
-        return parsed_items
+    @override
+    def get_race_ids_by_rower(self, **_):
+        raise NotImplementedError

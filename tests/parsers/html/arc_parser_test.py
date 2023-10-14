@@ -33,19 +33,19 @@ class TestARCParser(unittest.TestCase):
         with open(os.path.join(self.fixtures, "arc_races.html")) as file:
             ids = self.parser.parse_race_ids(Selector(file.read()))
 
-        self.assertEqual(ids, ["446", "474", "475"])
+        self.assertEqual(list(ids), ["446", "474", "475"])
 
     def test_parse_race_names(self):
         with open(os.path.join(self.fixtures, "arc_races.html")) as file:
             race_names = self.parser.parse_race_names(Selector(file.read()), is_female=False)
 
-        self.assertEqual(race_names, self._RACE_NAMES)
+        self.assertEqual(list(race_names), self._RACE_NAMES)
 
     def test_parse_club_ids(self):
         with open(os.path.join(self.fixtures, "arc_lineups.html")) as file:
             ids = self.parser.parse_club_ids(Selector(file.read()))
 
-        self.assertEqual(ids, ["481", "485"])
+        self.assertEqual(list(ids), ["481", "485"])
 
     def test_parse_lineup(self):
         with open(os.path.join(self.fixtures, "arc_lineup.html")) as file:
@@ -138,4 +138,5 @@ class TestARCParser(unittest.TestCase):
             "JON OLAIZOLA MARTINEZ",
         ],
         bow="UNAX LARRAÑAGA ANDUEZA",
+        images=[],
     )

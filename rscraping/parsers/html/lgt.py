@@ -1,7 +1,7 @@
 import logging
 import re
 from datetime import date, datetime
-from typing import List, Optional, Tuple
+from typing import Any, Generator, List, Optional, Tuple, override
 
 from parsel import Selector
 
@@ -34,6 +34,7 @@ logger = logging.getLogger(__name__)
 class LGTHtmlParser(HtmlParser):
     DATASOURCE = Datasource.LGT
 
+    @override
     def parse_race(
         self,
         selector: Selector,
@@ -108,11 +109,13 @@ class LGTHtmlParser(HtmlParser):
 
         return race
 
-    def parse_race_ids(self, selector: Selector, **_):
+    @override
+    def parse_race_ids(self, selector: Selector, **_) -> Generator[str, Any, Any]:
         urls = selector.xpath("//*/div/div/div[*]/div/a/@href").getall()
-        return [u.split("/")[-1].split("-")[0] for u in urls[0:]]
+        return (u.split("/")[-1].split("-")[0] for u in urls[0:])
 
-    def parse_race_names(self, selector: Selector, **_) -> List[RaceName]:
+    @override
+    def parse_race_names(self, selector: Selector, **_) -> Generator[RaceName, Any, Any]:
         values = [Selector(u) for u in selector.xpath("//*/div/div/div[*]/div").getall()]
         values = [
             (
@@ -121,8 +124,9 @@ class LGTHtmlParser(HtmlParser):
             )
             for u in values
         ]
-        return [RaceName(p[0], whitespaces_clean(p[1]).upper()) for p in values]
+        return (RaceName(p[0], whitespaces_clean(p[1]).upper()) for p in values)
 
+    @override
     def parse_lineup(self, **_):
         raise NotImplementedError
 

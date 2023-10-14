@@ -1,6 +1,6 @@
-from typing import List
+from typing import override
 
-from rscraping.data.models import Datasource, Lineup
+from rscraping.data.models import Datasource
 from rscraping.parsers.html import ABEHtmlParser
 
 from ._client import Client
@@ -16,17 +16,25 @@ class ABEClient(Client, source=Datasource.ABE):
         super().__init__()
         self._html_parser = ABEHtmlParser()
 
+    @override
     @staticmethod
     def get_race_details_url(race_id: str, **_) -> str:
         return f"https://lasalveliga.com/es/regata/{race_id}/"
 
+    @override
     @staticmethod
     def get_races_url(year: int, **_) -> str:
         return f"https://lasalveliga.com/es/regatas-{year - 1}/"
 
+    @override
     @staticmethod
-    def get_lineup_url(**_) -> str:
+    def get_lineup_url(**_):
         raise NotImplementedError
 
-    def get_lineup_by_race_id(self, **_) -> List[Lineup]:
+    @override
+    def get_race_ids_by_rower(self, **_):
+        raise NotImplementedError
+
+    @override
+    def get_lineup_by_race_id(self, **_):
         raise NotImplementedError

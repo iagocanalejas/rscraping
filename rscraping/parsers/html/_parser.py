@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import Any, Generator, Optional
 
 from parsel import Selector
 
@@ -14,11 +14,11 @@ class HtmlParser(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def parse_race_ids(self, selector: Selector, **kwargs) -> List[str]:
+    def parse_race_ids(self, selector: Selector, **kwargs) -> Generator[str, Any, Any]:
         raise NotImplementedError
 
     @abstractmethod
-    def parse_race_names(self, selector: Selector, **kwargs) -> List[RaceName]:
+    def parse_race_names(self, selector: Selector, **kwargs) -> Generator[RaceName, Any, Any]:
         raise NotImplementedError
 
     @abstractmethod

@@ -42,6 +42,7 @@ class ACTPdfParser(PdfParser):
             larboard=lardboard,
             substitute=substitutes,
             bow=bow,
+            images=[],
         )
 
     @staticmethod

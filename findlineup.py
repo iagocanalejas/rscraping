@@ -42,7 +42,7 @@ def main(race_id: str, datasource: str, is_female: bool, save: bool):
 
     print(",\n".join(lineup.to_json() for lineup in lineups))
     if save:
-        save_csv(lineups, file_name=f"lineup_{race_id}_{datasource.upper()}")
+        save_csv(list(lineups), file_name=f"lineup_{race_id}_{datasource.upper()}")
 
 
 if __name__ == "__main__":

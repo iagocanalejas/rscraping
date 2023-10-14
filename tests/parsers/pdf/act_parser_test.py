@@ -44,4 +44,5 @@ class TestACTParser(unittest.TestCase):
             "MARKEL KALZAKORTA",
         ],
         bow="JULEN AROSTEGI",
+        images=[],
     )

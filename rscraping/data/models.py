@@ -49,6 +49,7 @@ class Lineup:
     larboard: List[str]
     substitute: List[str]
     bow: Optional[str]
+    images: List[str]
 
     def to_json(self) -> str:
         d = {k: v for k, v in self.__dict__.items()}

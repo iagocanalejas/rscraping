@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Dict, List, Optional
+from typing import Any, Dict, Generator, Optional, override
 
 import requests
 from fitz import fitz
@@ -81,14 +81,17 @@ class LGTClient(Client, source=Datasource.LGT):
         self._html_parser = LGTHtmlParser()
         self._pdf_parser = LGTPdfParser()
 
+    @override
     @staticmethod
     def get_race_details_url(race_id: str, **_) -> str:
         return f"https://www.ligalgt.com/principal/regata/{race_id}"
 
+    @override
     @staticmethod
     def get_races_url(**_) -> str:
         raise NotImplementedError
 
+    @override
     @staticmethod
     def get_lineup_url(race_id: str, **_) -> str:
         return f"https://www.ligalgt.com/pdf/alinacion.php?regata_id={race_id}"
@@ -105,6 +108,7 @@ class LGTClient(Client, source=Datasource.LGT):
         data = {"lng": "es"}
         return Selector(requests.post(url=url, headers=HTTP_HEADERS, data=data).content.decode("utf-8"))
 
+    @override
     def get_race_by_id(self, race_id: str, **kwargs) -> Optional[Race]:
         if race_id in self._excluded_ids:
             return None
@@ -112,7 +116,8 @@ class LGTClient(Client, source=Datasource.LGT):
         kwargs["results_selector"] = self.get_results_selector(race_id)
         return super().get_race_by_id(race_id, **kwargs)
 
-    def get_race_ids_by_year(self, year: int, **_) -> List[str]:
+    @override
+    def get_race_ids_by_year(self, year: int, **_) -> Generator[str, Any, Any]:
         """
         As this datasource doesn't give us an easy way of retrieving the races for a given year we need to bruteforce
         it, this method will do a binary search for the 'upper' and 'lower' bounds of a season.
@@ -128,7 +133,8 @@ class LGTClient(Client, source=Datasource.LGT):
         if today == year:
             race_ids = self._html_parser.parse_race_ids(selector=self.get_calendar_selector())
             if race_ids:
-                return race_ids
+                yield from race_ids
+                return
 
         self.validate_year_or_raise_exception(year)
         since = self.MALE_START
@@ -161,19 +167,18 @@ class LGTClient(Client, source=Datasource.LGT):
                 left = mid + 1
         upper_race_id = right
 
-        return [str(r) for r in range(lower_race_id, (upper_race_id + 1)) if r not in self._excluded_ids]
+        return (str(r) for r in range(lower_race_id, (upper_race_id + 1)) if r not in self._excluded_ids)
 
-    def get_race_names_by_year(self, year: int, **_) -> List[RaceName]:
+    @override
+    def get_race_names_by_year(self, year: int, **_) -> Generator[RaceName, Any, Any]:
         today = date.today().year
         if today == year:
             race_names = self._html_parser.parse_race_names(selector=self.get_calendar_selector())
             if race_names:
-                return race_names
+                yield from race_names
+                return
 
-        ids = self.get_race_ids_by_year(year)
-        race_names: List[RaceName] = []
-
-        for id in ids:
+        for id in self.get_race_ids_by_year(year):
             if id in self._excluded_ids:
                 pass
 
@@ -181,26 +186,25 @@ class LGTClient(Client, source=Datasource.LGT):
             selector = Selector(requests.get(url=url, headers=HTTP_HEADERS).content.decode("utf-8"))
             if self._html_parser.is_valid_race(selector):
                 name = self._html_parser.get_name(selector)
-                race_names.append(RaceName(id, whitespaces_clean(name).upper()))
+                yield RaceName(id, whitespaces_clean(name).upper())
 
-        return race_names
-
-    def get_lineup_by_race_id(self, race_id: str, **_) -> List[Lineup]:
+    @override
+    def get_lineup_by_race_id(self, race_id: str, **_) -> Generator[Lineup, Any, Any]:
         if race_id in self._excluded_ids:
-            return []
+            return
 
         url = self.get_lineup_url(race_id)
         raw_pdf = requests.get(url=url, headers=HTTP_HEADERS).content
 
-        parsed_items: List[Lineup] = []
-
         with fitz.open("pdf", raw_pdf) as pdf:
             for page_num in range(pdf.page_count):
-                items = self._pdf_parser.parse_lineup(page=pdf[page_num])
-                if items:
-                    parsed_items.append(items)
+                lineup = self._pdf_parser.parse_lineup(page=pdf[page_num])
+                if lineup:
+                    yield lineup
 
-        return parsed_items
+    @override
+    def get_race_ids_by_rower(self, **_):
+        raise NotImplementedError
 
     ####################################################
     #                      UTILS                       #

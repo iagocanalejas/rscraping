@@ -4,7 +4,7 @@ import unittest
 from parsel import Selector
 
 from rscraping.data.constants import GENDER_MALE
-from rscraping.data.models import Participant, Race, RaceName
+from rscraping.data.models import Lineup, Participant, Race, RaceName
 from rscraping.parsers.html.traineras import MultiDayRaceException, TrainerasHtmlParser
 
 
@@ -47,13 +47,24 @@ class TestTrainerasParser(unittest.TestCase):
         with open(os.path.join(self.fixtures, "traineras_results.html")) as file:
             ids = self.parser.parse_race_ids(Selector(file.read()), is_female=False)
 
-        self.assertEqual(ids, ["5455", "5457", "5458", "5535", "5536"])
+        self.assertEqual(list(ids), ["5455", "5457", "5458", "5535", "5536"])
+
+    def test_parse_rower_race_ids(self):
+        with open(os.path.join(self.fixtures, "traineras_rower.html")) as file:
+            ids = self.parser.parse_rower_race_ids(Selector(file.read()))
+        self.assertEqual(list(ids), ["732", "3041", "1981", "733", "570", "516", "3309"])
 
     def test_parse_race_names(self):
         with open(os.path.join(self.fixtures, "traineras_results.html")) as file:
             race_names = self.parser.parse_race_names(Selector(file.read()))
 
-        self.assertEqual(race_names, self._RACE_NAMES)
+        self.assertEqual(list(race_names), self._RACE_NAMES)
+
+    def test_parse_lineup(self):
+        with open(os.path.join(self.fixtures, "traineras_lineup.html")) as file:
+            lineup = self.parser.parse_lineup(Selector(file.read()))
+
+        self.assertEqual(lineup, self._LINEUP)
 
     def test_get_number_of_pages(self):
         with open(os.path.join(self.fixtures, "traineras_results.html")) as file:
@@ -135,3 +146,33 @@ class TestTrainerasParser(unittest.TestCase):
         RaceName(race_id="5535", name="MEMORIAL AURORA TRUEBA"),
         RaceName(race_id="5536", name="MEMORIAL AURORA TRUEBA"),
     ]
+
+    _LINEUP = Lineup(
+        race="BANDERA CCD CESANTES",
+        club="C.M. CASTROPOL",
+        coach="Unai Fernández Fernández",
+        delegate="",
+        coxswain="Roberto Villamil López",
+        starboard=[
+            "Natalia Fernández Bedia",
+            "Valeria Álvarez Fojo",
+            "Izaskun Fernández Fernández",
+            "Cristina Blanco Álvarez",
+            "Lucía Carballido González",
+            "María Enar García Gutiérrez",
+        ],
+        larboard=[
+            "Lorena Rodríguez Castaño",
+            "Carolina Yáñez Santana",
+            "Laura Villabrille López",
+            "Eva María Maica Sáez",
+            "María Fernández Mariñas",
+            "Mónica Fernández Fernández",
+        ],
+        substitute=[],
+        bow="María García López",
+        images=[
+            "https://traineras.es/images/regatas/52960-0.jpg",
+            "https://traineras.es/images/regatas/52960-1.jpg",
+        ],
+    )

@@ -32,13 +32,13 @@ class TestABEParser(unittest.TestCase):
         with open(os.path.join(self.fixtures, "abe_races.html")) as file:
             ids = self.parser.parse_race_ids(Selector(file.read()))
 
-        self.assertEqual(ids, ["getxo", "plentzia", "fortuna"])
+        self.assertEqual(list(ids), ["getxo", "plentzia", "fortuna"])
 
     def test_parse_race_names(self):
         with open(os.path.join(self.fixtures, "abe_races.html")) as file:
             race_names = self.parser.parse_race_names(Selector(file.read()), is_female=False)
 
-        self.assertEqual(race_names, self._RACE_NAMES)
+        self.assertEqual(list(race_names), self._RACE_NAMES)
 
     _RACE = Race(
         name="XIII BANDERA CRV PONTEJOS (3/6/2023)",

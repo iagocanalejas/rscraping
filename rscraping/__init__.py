@@ -89,11 +89,13 @@ def parse_race_image(
     df = processor.retrieve_tabular_dataframe(path=path, header_size=header_size)
 
     return parser.parse_races_from(
-        file_name=os.path.splitext(os.path.basename(path))[0], header=header_data, tabular=df
+        file_name=os.path.splitext(os.path.basename(path))[0],
+        header=header_data,
+        tabular=df,
     )
 
 
-def find_lineup(race_id: str, datasource: Datasource, is_female: bool) -> List[Lineup]:
+def find_lineup(race_id: str, datasource: Datasource, is_female: bool) -> Generator[Lineup, Any, Any]:
     client = Client(source=datasource, is_female=is_female)  # type: ignore
     return client.get_lineup_by_race_id(race_id)
 

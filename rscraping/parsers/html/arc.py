@@ -1,7 +1,7 @@
 import logging
 import re
 from datetime import date, datetime
-from typing import List, Optional
+from typing import Any, Generator, List, Optional, override
 
 from parsel import Selector
 
@@ -34,6 +34,7 @@ logger = logging.getLogger(__name__)
 class ARCHtmlParser(HtmlParser):
     DATASOURCE = Datasource.ARC
 
+    @override
     def parse_race(self, selector: Selector, race_id: str, is_female: bool, **_) -> Optional[Race]:
         name = self.get_name(selector)
         if not name:
@@ -92,15 +93,17 @@ class ARCHtmlParser(HtmlParser):
 
         return race
 
-    def parse_race_ids(self, selector: Selector, **_) -> List[str]:
+    @override
+    def parse_race_ids(self, selector: Selector, **_) -> Generator[str, Any, Any]:
         urls = (
             selector.xpath('//*[@id="main"]/div[6]/table/tbody/tr[*]/td[2]/span/a/@href').getall()
             if selector.xpath('//*[@id="proximas-regatas"]').get()
             else selector.xpath('//*[@id="main"]/div[4]/table/tbody/tr[*]/td[2]/span/a/@href').getall()
         )
-        return [url_parts[-2] for url_parts in (url.split("/") for url in urls)]
+        return (url_parts[-2] for url_parts in (url.split("/") for url in urls))
 
-    def parse_race_names(self, selector: Selector, **_) -> List[RaceName]:
+    @override
+    def parse_race_names(self, selector: Selector, **_) -> Generator[RaceName, Any, Any]:
         hrefs = (
             selector.xpath('//*[@id="main"]/div[6]/table/tbody/tr[*]/td[2]/span/a').getall()
             if selector.xpath('//*[@id="proximas-regatas"]').get()
@@ -108,15 +111,16 @@ class ARCHtmlParser(HtmlParser):
         )
         selectors = [Selector(h) for h in hrefs]
         pairs = [(s.xpath("//*/@href").get("").split("/")[-2], s.xpath("//*/text()").get("")) for s in selectors]
-        return [RaceName(p[0], whitespaces_clean(p[1]).upper()) for p in pairs]
+        return (RaceName(p[0], whitespaces_clean(p[1]).upper()) for p in pairs)
 
-    def parse_club_ids(self, selector: Selector) -> List[str]:
+    def parse_club_ids(self, selector: Selector) -> Generator[str, Any, Any]:
         urls = (
             selector.xpath('//*[@id="main"]/div/div[2]/h2[*]/a/@href').getall()
             + selector.xpath('//*[@id="main"]/div/div[3]/h2[*]/a/@href').getall()
         )
-        return [url_parts[-2] for url_parts in (url.split("/") for url in urls)]
+        return (url_parts[-2] for url_parts in (url.split("/") for url in urls))
 
+    @override
     def parse_lineup(self, selector: Selector, **_) -> Lineup:
         race = selector.xpath('//*[@id="main"]/div[2]/div[1]/h2/a/text()').get("")
         club = selector.xpath('//*[@id="main"]/div[2]/div[2]/div[1]/div[2]/div/h2/a/text()').get("")
@@ -166,6 +170,7 @@ class ARCHtmlParser(HtmlParser):
             larboard=[whitespaces_clean(s).upper() for s in larboard if s],
             substitute=[whitespaces_clean(s).upper() for s in substitute if s],
             bow=whitespaces_clean(bow).upper(),
+            images=[],
         )
 
     ####################################################

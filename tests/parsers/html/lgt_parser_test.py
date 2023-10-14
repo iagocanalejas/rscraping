@@ -36,13 +36,13 @@ class TestLGTParser(unittest.TestCase):
         with open(os.path.join(self.fixtures, "lgt_races.html")) as file:
             ids = self.parser.parse_race_ids(Selector(file.read()))
 
-        self.assertEqual(ids, ["152", "153", "154"])
+        self.assertEqual(list(ids), ["152", "153", "154"])
 
     def test_parse_race_names(self):
         with open(os.path.join(self.fixtures, "lgt_races.html")) as file:
             race_names = self.parser.parse_race_names(Selector(file.read()), is_female=False)
 
-        self.assertEqual(race_names, self._RACE_NAMES)
+        self.assertEqual(list(race_names), self._RACE_NAMES)
 
     _RACE = Race(
         name="IX BANDEIRA VIRXE DO CARME",
