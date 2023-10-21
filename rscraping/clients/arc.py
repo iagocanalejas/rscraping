@@ -1,4 +1,5 @@
-from typing import Any, Generator, override
+from collections.abc import Generator
+from typing import Any, override
 
 import requests
 from parsel import Selector

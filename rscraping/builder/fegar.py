@@ -1,6 +1,5 @@
 import logging
 import os
-from typing import Optional
 
 from fillpdf import fillpdfs
 
@@ -13,7 +12,7 @@ IMAGE_SIZE = (90, 110)
 
 
 def fill_fegar_form(
-    data: PdfItem, with_parent: bool, images_folder: Optional[str] = None, remove_temp_files: bool = True
+    data: PdfItem, with_parent: bool, images_folder: str | None = None, remove_temp_files: bool = True
 ):
     logging.info("fegar:: starting fegar form")
 

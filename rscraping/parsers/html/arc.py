@@ -1,7 +1,8 @@
 import logging
 import re
+from collections.abc import Generator
 from datetime import date, datetime
-from typing import Any, Generator, List, Optional, override
+from typing import Any, override
 
 from parsel import Selector
 
@@ -35,7 +36,7 @@ class ARCHtmlParser(HtmlParser):
     DATASOURCE = Datasource.ARC
 
     @override
-    def parse_race(self, selector: Selector, race_id: str, is_female: bool, **_) -> Optional[Race]:
+    def parse_race(self, selector: Selector, race_id: str, is_female: bool, **_) -> Race | None:
         name = self.get_name(selector)
         if not name:
             logger.error(f"{self.DATASOURCE}: no race found for {race_id=}")
@@ -192,11 +193,11 @@ class ARCHtmlParser(HtmlParser):
         matches = re.findall(r"\d+ª día|\(\d+ª? JORNADA\)", name)
         return int(re.findall(r"\d+", matches[0])[0].strip()) if matches else 1
 
-    def get_type(self, participants: List[Selector]) -> str:
+    def get_type(self, participants: list[Selector]) -> str:
         lanes = list(self.get_lane(p) for p in participants)
         return RACE_TIME_TRIAL if all(int(lane) == int(lanes[0]) for lane in lanes) else RACE_CONVENTIONAL
 
-    def get_league(self, selector: Selector, is_female: bool) -> Optional[str]:
+    def get_league(self, selector: Selector, is_female: bool) -> str | None:
         if is_female:
             return "EMAKUMEZKO TRAINERUEN ELKARTEA"
         text = whitespaces_clean(selector.xpath('//*[@id="main"]/h1/span/span/text()').get("")).upper()
@@ -227,7 +228,7 @@ class ARCHtmlParser(HtmlParser):
             in whitespaces_clean(selector.xpath('//*[@id="main"]/div[2]/div[1]/h2/text()').get("")).upper()
         )
 
-    def get_participants(self, selector: Selector) -> List[Selector]:
+    def get_participants(self, selector: Selector) -> list[Selector]:
         return [
             Selector(p)
             for p in selector.xpath('//*[@id="widget-resultados"]/div/div[3]/div/table[*]/tbody/tr').getall()
@@ -244,7 +245,7 @@ class ARCHtmlParser(HtmlParser):
     def get_distance(self, is_female: bool) -> int:
         return 2778 if is_female else 5556
 
-    def get_laps(self, participant: Selector) -> List[str]:
+    def get_laps(self, participant: Selector) -> list[str]:
         laps = participant.xpath("//*/td/text()").getall()
         return [t.strftime("%M:%S.%f") for t in [normalize_lap_time(e) for e in laps if e] if t is not None]
 

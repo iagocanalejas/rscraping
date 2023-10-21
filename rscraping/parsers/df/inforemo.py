@@ -1,7 +1,8 @@
 import logging
 import re
+from collections.abc import Generator
 from datetime import date, datetime
-from typing import Any, Generator, List, Optional
+from typing import Any
 
 import inquirer
 from pandas import DataFrame, Series
@@ -93,8 +94,8 @@ class InforemoDataFrameParser(DataFrameParser, source=Datasource.INFOREMO):
 
             yield race
 
-    def _get_race_participants(self, participants: DataFrame, race: Race) -> List[Participant]:
-        items: List[Participant] = []
+    def _get_race_participants(self, participants: DataFrame, race: Race) -> list[Participant]:
+        items: list[Participant] = []
         for _, participant in participants.iterrows():
             club_name = self.get_club_name(participant)
             items.append(
@@ -114,7 +115,7 @@ class InforemoDataFrameParser(DataFrameParser, source=Datasource.INFOREMO):
             )
         return items
 
-    def _try_find_race_name(self, data: str, manual_input: bool) -> Optional[str]:
+    def _try_find_race_name(self, data: str, manual_input: bool) -> str | None:
         name = None
         for part in data.split("\n"):
             if not part or any(w in part for w in ["@", "inforemo"]):
@@ -132,7 +133,7 @@ class InforemoDataFrameParser(DataFrameParser, source=Datasource.INFOREMO):
 
         return name
 
-    def _try_find_race_date(self, data: str, manual_input: bool) -> Optional[date]:
+    def _try_find_race_date(self, data: str, manual_input: bool) -> date | None:
         t_date = None
         for part in data.split("\n"):
             if not part or any(w in part for w in ["@", "inforemo"]):
@@ -164,7 +165,7 @@ class InforemoDataFrameParser(DataFrameParser, source=Datasource.INFOREMO):
         except ValueError:
             return 1
 
-    def get_series(self, data: Series) -> Optional[int]:
+    def get_series(self, data: Series) -> int | None:
         try:
             return int(data[3])
         except ValueError:
@@ -178,11 +179,11 @@ class InforemoDataFrameParser(DataFrameParser, source=Datasource.INFOREMO):
 
         return whitespaces_clean(maybe_tyme)
 
-    def get_laps(self, data: Series) -> List[str]:
+    def get_laps(self, data: Series) -> list[str]:
         idx = 3 if ":" in data[4] else 4
         return [t.isoformat() for t in [normalize_lap_time(self.clean_lap(t)) for t in data.iloc[idx:]] if t]
 
-    def get_gender(self, data: Series, club_name: Optional[str] = None) -> str:
+    def get_gender(self, data: Series, club_name: str | None = None) -> str:
         if club_name and "MIXTO" in club_name.upper():
             return GENDER_MIX
 

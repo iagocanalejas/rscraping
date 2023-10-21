@@ -1,5 +1,6 @@
 import logging
-from typing import Any, Generator, List, Optional, override
+from collections.abc import Generator
+from typing import Any, override
 
 from parsel import Selector
 
@@ -43,7 +44,7 @@ class TrainerasHtmlParser(HtmlParser):
     _SCHOOL = ["M", "JM", "JF", "CM", "CF"]
 
     @override
-    def parse_race(self, selector: Selector, race_id: str, day: Optional[int] = None, **_) -> Optional[Race]:
+    def parse_race(self, selector: Selector, race_id: str, day: int | None = None, **_) -> Race | None:
         if len(selector.xpath("/html/body/div[1]/main/div[1]/div/div/div[2]/table[*]").getall()) > 1 and not day:
             raise MultiDayRaceException()
         day = day if day else 1
@@ -122,7 +123,7 @@ class TrainerasHtmlParser(HtmlParser):
             if has_gender(Selector(row).xpath("//*/td[2]/text()").get(""))
         )
 
-    def parse_rower_race_ids(self, selector: Selector, year: Optional[str] = None, **_) -> Generator[str, Any, Any]:
+    def parse_rower_race_ids(self, selector: Selector, year: str | None = None, **_) -> Generator[str, Any, Any]:
         rows = selector.xpath("/html/body/main/section[2]/div/div/div[1]/div/table/tr/td/table/tr").getall()
         if not year:
             return (Selector(r).xpath("//*/td/a/@href").get("").split("/")[-1] for r in rows)
@@ -189,7 +190,7 @@ class TrainerasHtmlParser(HtmlParser):
         part = whitespaces_clean(parts.split(" - ")[-1])
         return GENDER_FEMALE if part in self._FEMALE else GENDER_MALE
 
-    def get_type(self, participants: List[Selector]) -> str:
+    def get_type(self, participants: list[Selector]) -> str:
         series = [s for s in [p.xpath("//*/td[4]/text()").get("") for p in participants] if s]
         return RACE_TIME_TRIAL if len(set(series)) == len(series) else RACE_CONVENTIONAL
 
@@ -206,7 +207,7 @@ class TrainerasHtmlParser(HtmlParser):
         parts = selector.xpath(f"/html/body/div[1]/main/div/div/div/div[{day}]/h2/text()").get("")
         return normalize_town(whitespaces_clean(parts.split(" - ")[0]))
 
-    def get_race_lanes(self, participants: List[Selector]) -> int:
+    def get_race_lanes(self, participants: list[Selector]) -> int:
         if self.get_type(participants) == RACE_TIME_TRIAL:
             return 1
         lanes = list(self.get_lane(p) for p in participants)
@@ -216,12 +217,12 @@ class TrainerasHtmlParser(HtmlParser):
         cia = selector.xpath(f"/html/body/div[1]/main/div[1]/div/div/div[2]/table[{day}]/tr[2]/td/text()").getall()
         return len([c for c in cia if ":" in c])
 
-    def is_cancelled(self, participants: List[Selector]) -> bool:
+    def is_cancelled(self, participants: list[Selector]) -> bool:
         # race_id=4061|211
         laps = [self.get_laps(p) for p in participants if not self.is_disqualified(p)]
         return len([lap for lap in laps if len(lap) == 0]) >= len(participants) // 2
 
-    def get_participants(self, selector: Selector, day: int) -> List[Selector]:
+    def get_participants(self, selector: Selector, day: int) -> list[Selector]:
         rows = selector.xpath(f"/html/body/div[1]/main/div[1]/div/div/div[2]/table[{day}]/tr").getall()
         return [Selector(text=t) for t in rows][1:]
 
@@ -238,7 +239,7 @@ class TrainerasHtmlParser(HtmlParser):
         part = parts.split(" - ")[-2]
         return part is not None and int(part.replace(" metros", ""))
 
-    def get_laps(self, participant: Selector) -> List[str]:
+    def get_laps(self, participant: Selector) -> list[str]:
         laps = participant.xpath("//*/td/text()").getall()[2:-4]
         return [t.strftime("%M:%S.%f") for t in [normalize_lap_time(e) for e in laps if e] if t is not None]
 
@@ -261,5 +262,5 @@ class TrainerasHtmlParser(HtmlParser):
         name = whitespaces_clean(selector.xpath("/html/body/div[1]/header/div/div[2]/h4/text()").get("")).upper()
         return whitespaces_clean(name.split("(")[0])
 
-    def get_lineup_images(self, selector: Selector) -> List[str]:
+    def get_lineup_images(self, selector: Selector) -> list[str]:
         return selector.xpath('//*[@id="fotografias"]/a/img/@src').getall()

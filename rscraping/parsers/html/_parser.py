@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Any, Generator, Optional
+from collections.abc import Generator
+from typing import Any
 
 from parsel import Selector
 
@@ -10,7 +11,7 @@ class HtmlParser(ABC):
     DATASOURCE: Datasource
 
     @abstractmethod
-    def parse_race(self, selector: Selector, **kwargs) -> Optional[Race]:
+    def parse_race(self, selector: Selector, **kwargs) -> Race | None:
         raise NotImplementedError
 
     @abstractmethod

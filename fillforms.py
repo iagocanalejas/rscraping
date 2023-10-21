@@ -5,7 +5,6 @@ import logging
 import os
 import sys
 from datetime import datetime
-from typing import List
 
 from rscraping.builder import (
     PdfItem,
@@ -22,7 +21,7 @@ logger.addHandler(logging.StreamHandler(sys.stdout))
 
 def main(
     signed_on: str,
-    types: List[str],
+    types: list[str],
     image_path: str,
     use_preset: bool,
     prompt_entity: bool,

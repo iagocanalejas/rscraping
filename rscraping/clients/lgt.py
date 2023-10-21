@@ -1,5 +1,6 @@
+from collections.abc import Generator
 from datetime import date
-from typing import Any, Dict, Generator, Optional, override
+from typing import Any, override
 
 import requests
 from fitz import fitz
@@ -109,7 +110,7 @@ class LGTClient(Client, source=Datasource.LGT):
         return Selector(requests.post(url=url, headers=HTTP_HEADERS, data=data).content.decode("utf-8"))
 
     @override
-    def get_race_by_id(self, race_id: str, **kwargs) -> Optional[Race]:
+    def get_race_by_id(self, race_id: str, **kwargs) -> Race | None:
         if race_id in self._excluded_ids:
             return None
 
@@ -210,9 +211,9 @@ class LGTClient(Client, source=Datasource.LGT):
     #                      UTILS                       #
     ####################################################
 
-    _RACE_YEARS: Dict[str, Optional[int]] = {}
+    _RACE_YEARS: dict[str, int | None] = {}
 
-    def _get_race_year(self, race_id: str) -> Optional[int]:
+    def _get_race_year(self, race_id: str) -> int | None:
         if race_id in self._RACE_YEARS:
             return self._RACE_YEARS[race_id]
 

@@ -4,7 +4,6 @@ import argparse
 import logging
 import os
 import sys
-from typing import Optional
 
 from rscraping import find_race
 from rscraping.data.functions import save_csv
@@ -31,7 +30,7 @@ def _parse_arguments():
     return parser.parse_args()
 
 
-def main(race_id: str, datasource: str, is_female: bool, with_lineups: bool, save: bool, day: Optional[int]):
+def main(race_id: str, datasource: str, is_female: bool, with_lineups: bool, save: bool, day: int | None):
     if not Datasource.has_value(datasource):
         raise ValueError(f"invalid datasource={datasource}")
 

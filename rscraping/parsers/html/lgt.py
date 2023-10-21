@@ -1,7 +1,8 @@
 import logging
 import re
+from collections.abc import Generator
 from datetime import date, datetime
-from typing import Any, Generator, List, Optional, Tuple, override
+from typing import Any, override
 
 from parsel import Selector
 
@@ -41,7 +42,7 @@ class LGTHtmlParser(HtmlParser):
         results_selector: Selector,
         race_id: str,
         **_,
-    ) -> Optional[Race]:
+    ) -> Race | None:
         name = self.get_name(selector)
         if not name or name.upper() == "EREWEWEWERW" or name.upper() == "REGATA" or "?" in name:  # wtf
             logger.error(f"{self.DATASOURCE}: no race found for {race_id=}")
@@ -157,11 +158,11 @@ class LGTHtmlParser(HtmlParser):
             return 2 if self.get_date(selector).isoweekday() == 7 else 1  # 2 for sunday
         return 1
 
-    def get_type(self, participants: List[Selector]) -> str:
+    def get_type(self, participants: list[Selector]) -> str:
         lanes = list(self.get_lane(p) for p in participants)
         return RACE_TIME_TRIAL if all(int(lane) == int(lanes[0]) for lane in lanes) else RACE_CONVENTIONAL
 
-    def get_league(self, selector: Selector) -> Optional[str]:
+    def get_league(self, selector: Selector) -> str | None:
         if is_play_off(self.get_name(selector)):
             return "LGT"
         return whitespaces_clean(selector.xpath('//*[@id="regata"]/div/div/div[3]/div[2]/p[3]/span/text()').get(""))
@@ -170,12 +171,12 @@ class LGTHtmlParser(HtmlParser):
         value = selector.xpath('//*[@id="regata"]/div/div/div[3]/div[2]/p[1]/text()').get("")
         return normalize_town(value)
 
-    def get_organizer(self, selector: Selector) -> Optional[str]:
+    def get_organizer(self, selector: Selector) -> str | None:
         organizer = selector.xpath('//*[@id="regata"]/div/div/div[3]/div[1]/text()').get("")
         organizer = whitespaces_clean(organizer).upper().replace("ORGANIZA:", "").strip() if organizer else None
         return normalize_club_name(organizer) if organizer else None
 
-    def get_race_lanes(self, participants: List[Selector]) -> int:
+    def get_race_lanes(self, participants: list[Selector]) -> int:
         if self.get_type(participants) == RACE_TIME_TRIAL:
             return 1
         lanes = list(self.get_lane(p) for p in participants)
@@ -184,13 +185,13 @@ class LGTHtmlParser(HtmlParser):
     def get_race_laps(self, results_selector: Selector) -> int:
         return len(results_selector.xpath('//*[@id="tabla-tempos"]/tr[1]/th').getall()) - 2
 
-    def is_cancelled(self, participants: List[Selector]) -> bool:
+    def is_cancelled(self, participants: list[Selector]) -> bool:
         # race_id=114
         # assume no final time is set for cancelled races (as in the example)
         times = [p.xpath("//*/td/text()").getall()[-1] for p in participants]
         return len([x for x in times if x == "-"]) > len(times) / 3
 
-    def get_participants(self, results_selector: Selector) -> List[Selector]:
+    def get_participants(self, results_selector: Selector) -> list[Selector]:
         def is_valid(row: Selector) -> bool:
             if len(row.xpath("//*/td").getall()) <= 1:
                 return False
@@ -214,7 +215,7 @@ class LGTHtmlParser(HtmlParser):
     def get_distance(self) -> int:
         return 5556
 
-    def get_laps(self, participant: Selector) -> List[str]:
+    def get_laps(self, participant: Selector) -> list[str]:
         laps = participant.xpath("//*/td/text()").getall()[2:]
         return [t.strftime("%M:%S.%f") for t in [normalize_lap_time(e) for e in laps if e] if t is not None]
 
@@ -257,7 +258,7 @@ class LGTHtmlParser(HtmlParser):
         return whitespaces_clean(name)
 
     @staticmethod
-    def _hardcoded_playoff_edition(name: str, year: int, edition: Optional[int]) -> Tuple[str, Optional[int]]:
+    def _hardcoded_playoff_edition(name: str, year: int, edition: int | None) -> tuple[str, int | None]:
         if is_play_off(name):
             return name, (year - 2011)
         return name, edition

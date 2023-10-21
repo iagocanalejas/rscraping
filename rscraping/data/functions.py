@@ -1,6 +1,5 @@
 import csv
 import os
-from typing import List
 
 from pyutils.strings import remove_symbols
 from rscraping.data.models import Lineup, Race
@@ -19,7 +18,7 @@ def is_branch_club(name: str, letter: str = "B") -> bool:
     return any(e == letter for e in clean_name.upper().split())
 
 
-def expand_path(path: str, valid_files: List[str]) -> List[str]:
+def expand_path(path: str, valid_files: list[str]) -> list[str]:
     def is_valid(file: str) -> bool:
         _, extension = os.path.splitext(file)
         return extension.upper() in valid_files
@@ -28,7 +27,7 @@ def expand_path(path: str, valid_files: List[str]) -> List[str]:
     return [f for f in files if is_valid(f)]
 
 
-def save_csv(lineups: List[Race] | List[Lineup], file_name: str):
+def save_csv(lineups: list[Race] | list[Lineup], file_name: str):
     if not len(lineups):
         return
 

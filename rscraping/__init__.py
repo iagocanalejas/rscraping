@@ -1,5 +1,6 @@
 import os
-from typing import Any, Generator, List, Optional
+from typing import Any, List, Optional
+from collections.abc import Generator
 
 from pyutils.strings import normalize_synonyms, remove_conjunctions, remove_symbols
 from rscraping.clients import Client
@@ -15,9 +16,9 @@ def find_race(
     race_id: str,
     datasource: Datasource,
     is_female: bool,
-    day: Optional[int] = None,
+    day: int | None = None,
     with_lineup: bool = False,
-) -> Optional[Race]:
+) -> Race | None:
     """
     Find a race based on the provided parameters.
 
@@ -100,7 +101,7 @@ def find_lineup(race_id: str, datasource: Datasource, is_female: bool) -> Genera
     return client.get_lineup_by_race_id(race_id)
 
 
-def lemmatize(phrase: str, lang: str = "es") -> List[str]:
+def lemmatize(phrase: str, lang: str = "es") -> list[str]:
     phrase = normalize_synonyms(phrase, SYNONYMS)
     phrase = remove_symbols(remove_conjunctions(phrase))
     return list(set(text_lemmatizer(phrase, lang=lang)))

@@ -1,6 +1,5 @@
 import logging
 import re
-from typing import List, Tuple
 
 from fitz import Page
 
@@ -47,11 +46,11 @@ class LGTPdfParser(PdfParser):
         )
 
     @staticmethod
-    def _parse_name(name: str) -> Tuple[str, str]:
+    def _parse_name(name: str) -> tuple[str, str]:
         parts = name.split("-")
         return normalize_race_name(parts[0]), normalize_club_name(" ".join(parts[1:]))
 
-    def _parse_rowers(self, rowers: List[str]) -> List[Tuple[str, str]]:
+    def _parse_rowers(self, rowers: list[str]) -> list[tuple[str, str]]:
         new_rowers = self._clean_rowers_list(rowers)
 
         # converts a list of ['DELEGADO', 'EMILIO JOSE', 'DIESTE REGADES', 'ADESTRADOR', 'MANUEL RAUL', 'PAZOS'] in
@@ -63,7 +62,7 @@ class LGTPdfParser(PdfParser):
             valid_rowers.append((parts[0], " ".join(parts[1:])))
         return sorted(valid_rowers, key=lambda x: x[0])
 
-    def _clean_rowers_list(self, rowers: List[str]) -> List[str]:
+    def _clean_rowers_list(self, rowers: list[str]) -> list[str]:
         new_rowers = []
         for raw_name in rowers:
             if "Licenza" in raw_name:
@@ -73,7 +72,7 @@ class LGTPdfParser(PdfParser):
                 new_rowers.extend(self._split_token_from_name(raw_name))
         return new_rowers
 
-    def _split_token_from_name(self, name: str) -> List[str]:
+    def _split_token_from_name(self, name: str) -> list[str]:
         # finds the 'SUPLENTE' in 'VÁZQUEZ PENASUPLENTE 2'
         match = next((t for t in self._TOKEN if t in name and not name.startswith(t)), None)
         if not match:

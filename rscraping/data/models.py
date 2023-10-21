@@ -2,7 +2,7 @@ import collections
 import json
 from dataclasses import dataclass
 from enum import StrEnum, auto
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 
 RaceName = collections.namedtuple("RaceName", ["race_id", "name"])
 
@@ -44,12 +44,12 @@ class Lineup:
     club: str
     coach: str
     delegate: str
-    coxswain: Optional[str]
-    starboard: List[str]
-    larboard: List[str]
-    substitute: List[str]
-    bow: Optional[str]
-    images: List[str]
+    coxswain: str | None
+    starboard: list[str]
+    larboard: list[str]
+    substitute: list[str]
+    bow: str | None
+    images: list[str]
 
     def to_json(self) -> str:
         d = {k: v for k, v in self.__dict__.items()}
@@ -63,28 +63,28 @@ class Race:
     day: int
     modality: str
     type: str
-    league: Optional[str]
-    town: Optional[str]
-    organizer: Optional[str]
-    sponsor: Optional[str]
+    league: str | None
+    town: str | None
+    organizer: str | None
+    sponsor: str | None
 
     # normalized fields
-    normalized_names: List[Tuple[str, Optional[int]]]
+    normalized_names: list[tuple[str, int | None]]
 
     # datasource data
     race_id: str
-    url: Optional[str]
+    url: str | None
     datasource: str
-    gender: Optional[str]
+    gender: str | None
 
-    participants: List["Participant"]
+    participants: list["Participant"]
 
     # not available in all the datasource
-    race_laps: Optional[int] = None
-    race_lanes: Optional[int] = None
+    race_laps: int | None = None
+    race_lanes: int | None = None
     cancelled: bool = False
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         d = {k: v for k, v in self.__dict__.items()}
         d["participants"] = [p.to_dict() for p in d["participants"]]
         return d
@@ -98,11 +98,11 @@ class Participant:
     gender: str
     category: str
     club_name: str
-    lane: Optional[int]
-    series: Optional[int]
-    laps: List[str]
-    distance: Optional[int]
-    handicap: Optional[str]
+    lane: int | None
+    series: int | None
+    laps: list[str]
+    distance: int | None
+    handicap: str | None
 
     # normalized fields
     participant: str
@@ -114,7 +114,7 @@ class Participant:
     # extra arguments
     lineup: Optional["Lineup"] = None
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         d = {k: v for k, v in self.__dict__.items() if k not in ["race"]}
         d["lineup"] = {k: v for k, v in self.lineup.__dict__.items() if k not in ["race"]} if self.lineup else None
         return d

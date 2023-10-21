@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
+from collections.abc import Generator
 from datetime import date
-from typing import Any, Generator, Optional
+from typing import Any
 
 import requests
 from parsel import Selector
@@ -40,7 +41,7 @@ class Client(ABC):
         if year < since or year > today:
             raise ValueError(f"invalid 'year', available values are [{since}, {today}]")
 
-    def get_race_by_id(self, race_id: str, **kwargs) -> Optional[Race]:
+    def get_race_by_id(self, race_id: str, **kwargs) -> Race | None:
         url = self.get_race_details_url(race_id, is_female=self._is_female)
         race = self._html_parser.parse_race(
             selector=Selector(requests.get(url=url, headers=HTTP_HEADERS).content.decode("utf-8")),

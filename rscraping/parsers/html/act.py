@@ -1,6 +1,7 @@
 import logging
 import re
-from typing import Any, Generator, List, Optional, Tuple, override
+from collections.abc import Generator
+from typing import Any, override
 
 from parsel import Selector
 
@@ -34,7 +35,7 @@ class ACTHtmlParser(HtmlParser):
     DATASOURCE = Datasource.ACT
 
     @override
-    def parse_race(self, selector: Selector, race_id: str, is_female: bool, **_) -> Optional[Race]:
+    def parse_race(self, selector: Selector, race_id: str, is_female: bool, **_) -> Race | None:
         name = self.get_name(selector)
         if not name:
             logger.error(f"{self.DATASOURCE}: no race found for {race_id=}")
@@ -130,32 +131,32 @@ class ACTHtmlParser(HtmlParser):
         matches = re.findall(r"\(?(\dJ|J\d)\)?", name)
         return int(re.findall(r"\d+", matches[0])[0].strip()) if matches else 1
 
-    def get_type(self, selector: Selector, participants: List[Selector]) -> str:
+    def get_type(self, selector: Selector, participants: list[Selector]) -> str:
         if is_play_off(self.get_name(selector)):
             return RACE_TIME_TRIAL
         lanes = list(self.get_lane(p) for p in participants)
         return RACE_TIME_TRIAL if all(int(lane) == int(lanes[0]) for lane in lanes) else RACE_CONVENTIONAL
 
-    def get_league(self, selector: Selector, is_female: bool) -> Optional[str]:
+    def get_league(self, selector: Selector, is_female: bool) -> str | None:
         return "ACT" if is_play_off(self.get_name(selector)) else "LIGA EUSKOTREN" if is_female else "EUSKO LABEL LIGA"
 
     def get_town(self, selector: Selector) -> str:
         value = selector.xpath('//*[@id="col-a"]/div/section/div[2]/table/tbody/tr/td[2]/text()').get("")
         return normalize_town(value)
 
-    def get_organizer(self, selector: Selector) -> Optional[str]:
+    def get_organizer(self, selector: Selector) -> str | None:
         organizer = whitespaces_clean(
             selector.xpath('//*[@id="col-a"]/div/section/div[2]/table/tbody/tr/td[1]/text()').get("")
         ).upper()
         return organizer if organizer else None
 
-    def get_race_lanes(self, selector: Selector, participants: List[Selector]) -> int:
+    def get_race_lanes(self, selector: Selector, participants: list[Selector]) -> int:
         if self.get_type(selector, participants) == RACE_TIME_TRIAL:
             return 1
         lanes = list(self.get_lane(p) for p in participants)
         return max(int(lane) for lane in lanes)
 
-    def get_race_laps(self, selector: Selector) -> Optional[int]:
+    def get_race_laps(self, selector: Selector) -> int | None:
         columns = selector.xpath('//*[@id="col-a"]/div/section/div[3]/div[2]/div/table/tbody/tr').getall()
         columns = [Selector(c).xpath("//*/td/text()").getall() for c in columns]
         columns = max(len(c) - 3 for c in columns)
@@ -166,7 +167,7 @@ class ACTHtmlParser(HtmlParser):
         # try to find the "No puntuable" text in the header
         return selector.xpath('//*[@id="col-a"]/div/section/div[1]/p/span/text()').get("").upper() == "NO PUNTUABLE"
 
-    def get_participants(self, selector: Selector) -> List[Selector]:
+    def get_participants(self, selector: Selector) -> list[Selector]:
         rows = selector.xpath('//*[@id="col-a"]/div/section/div[*]/div[2]/div/table/tbody/tr[*]').getall()
         return [Selector(text=t) for t in rows]
 
@@ -181,7 +182,7 @@ class ACTHtmlParser(HtmlParser):
     def get_distance(self, is_female: bool) -> int:
         return 2778 if is_female else 5556
 
-    def get_laps(self, participant: Selector) -> List[str]:
+    def get_laps(self, participant: Selector) -> list[str]:
         laps = participant.xpath("//*/td/text()").getall()[2:-1]
         return [t.strftime("%M:%S.%f") for t in [normalize_lap_time(e) for e in laps if e] if t is not None]
 
@@ -206,8 +207,8 @@ class ACTHtmlParser(HtmlParser):
     ####################################################
     @staticmethod
     def _hardcoded_name_edition(
-        name: str, is_female: bool, year: int, edition: Optional[int]
-    ) -> Tuple[str, Optional[int]]:
+        name: str, is_female: bool, year: int, edition: int | None
+    ) -> tuple[str, int | None]:
         if "ASTILLERO" in name:
             name, edition = "BANDERA AYUNTAMIENTO DE ASTILLERO", (year - 1970)
 

@@ -1,6 +1,7 @@
 import logging
 import re
-from typing import Any, Generator, List, Optional, override
+from collections.abc import Generator
+from typing import Any, override
 
 from parsel import Selector
 
@@ -25,7 +26,7 @@ class ABEHtmlParser(HtmlParser):
     DATASOURCE = Datasource.ABE
 
     @override
-    def parse_race(self, selector: Selector, race_id: str, **_) -> Optional[Race]:
+    def parse_race(self, selector: Selector, race_id: str, **_) -> Race | None:
         name = self.get_name(selector)
         if not name:
             logger.error(f"{self.DATASOURCE}: no race found for {race_id=}")
@@ -119,7 +120,7 @@ class ABEHtmlParser(HtmlParser):
         matches = re.findall(r"\(?(\dJ|J\d)\)?", name)
         return int(re.findall(r"\d+", matches[0])[0].strip()) if matches else 1
 
-    def get_participants(self, selector: Selector) -> List[Selector]:
+    def get_participants(self, selector: Selector) -> list[Selector]:
         rows = selector.xpath('//*[@id="page"]/div/section/div/div/div/div/div/table/tbody/tr[*]').getall()
         return [Selector(text=t) for t in rows[1:]]
 
@@ -127,11 +128,11 @@ class ABEHtmlParser(HtmlParser):
         name = participant.xpath("//*/td[2]/text()").get()
         return whitespaces_clean(name).upper() if name else ""
 
-    def get_laps(self, participant: Selector) -> List[str]:
+    def get_laps(self, participant: Selector) -> list[str]:
         lap = normalize_lap_time(participant.xpath("//*/td[3]/text()").get(""))
         return [lap.strftime("%M:%S.%f")] if lap is not None else []
 
-    def get_handicap(self, participant: Selector) -> Optional[str]:
+    def get_handicap(self, participant: Selector) -> str | None:
         if len(participant.xpath("//*/td/text()").getall()) <= 4:
             return None
         lap = normalize_lap_time(participant.xpath("//*/td[4]/text()").get(""))

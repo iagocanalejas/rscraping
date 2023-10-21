@@ -1,4 +1,5 @@
-from typing import Any, Generator, Optional, override
+from collections.abc import Generator
+from typing import Any, override
 
 import requests
 from parsel import Selector
@@ -57,7 +58,7 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
         for page in self.get_pages(year):
             yield from self._html_parser.parse_race_ids(page, is_female=self._is_female)
 
-    def get_race_ids_by_rower(self, rower_id: str, year: Optional[str] = None, **_) -> Generator[str, Any, Any]:
+    def get_race_ids_by_rower(self, rower_id: str, year: str | None = None, **_) -> Generator[str, Any, Any]:
         content = requests.get(url=self.get_rower_url(rower_id), headers=HTTP_HEADERS).content.decode("utf-8")
         yield from self._html_parser.parse_rower_race_ids(Selector(content), year=year)
 

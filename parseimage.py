@@ -4,7 +4,6 @@ import argparse
 import logging
 import os
 import sys
-from typing import List
 
 from rscraping import parse_race_image
 from rscraping.data.functions import expand_path, save_csv
@@ -25,11 +24,11 @@ def _parse_arguments():
     return parser.parse_args()
 
 
-def main(paths: List[str], datasource: str, header_size: int = 3, allow_plot: bool = False, save: bool = False):
+def main(paths: list[str], datasource: str, header_size: int = 3, allow_plot: bool = False, save: bool = False):
     if not Datasource.is_OCR(datasource):
         raise ValueError(f"invalid datasource={datasource}")
 
-    parsed_items: List[Race] = []
+    parsed_items: list[Race] = []
     for path in paths:
         parsed_items.extend(
             parse_race_image(

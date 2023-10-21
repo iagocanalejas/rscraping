@@ -1,9 +1,8 @@
 import re
 from datetime import datetime, time
-from typing import Optional
 
 
-def normalize_lap_time(value: str) -> Optional[time]:
+def normalize_lap_time(value: str) -> time | None:
     if value.startswith(":"):
         # try to fix ':18,62' | ':45' page errors
         value = "00" + value

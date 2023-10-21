@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
 
 import inquirer
 
@@ -9,40 +8,40 @@ from pyutils.validators import is_valid_dni, is_valid_email
 
 @dataclass
 class PdfItem:
-    name: Optional[str] = None
-    surname: Optional[str] = None
-    nif: Optional[str] = None
-    gender: Optional[str] = None
-    birth: Optional[str] = None
-    nationality: Optional[str] = None
-    category: Optional[str] = None
+    name: str | None = None
+    surname: str | None = None
+    nif: str | None = None
+    gender: str | None = None
+    birth: str | None = None
+    nationality: str | None = None
+    category: str | None = None
 
-    address: Optional[str] = None
-    address_number: Optional[str] = None
-    postal_code: Optional[str] = None
-    town: Optional[str] = None
-    state: Optional[str] = None
-    country: Optional[str] = None
-    phone: Optional[str] = None
-    email: Optional[str] = None
+    address: str | None = None
+    address_number: str | None = None
+    postal_code: str | None = None
+    town: str | None = None
+    state: str | None = None
+    country: str | None = None
+    phone: str | None = None
+    email: str | None = None
 
-    entity: Optional[str] = None
-    entity_town: Optional[str] = None
-    entity_state: Optional[str] = None
+    entity: str | None = None
+    entity_town: str | None = None
+    entity_state: str | None = None
 
-    sign_in: Optional[str] = None
-    sign_on_day: Optional[str] = None
-    sign_on_month: Optional[str] = None
-    sign_on_year: Optional[str] = None
+    sign_in: str | None = None
+    sign_on_day: str | None = None
+    sign_on_month: str | None = None
+    sign_on_year: str | None = None
 
-    parent_name: Optional[str] = None
-    parent_surname: Optional[str] = None
-    parent_dni: Optional[str] = None
-    parent_category: Optional[str] = None
-    is_rower: Optional[bool] = False
+    parent_name: str | None = None
+    parent_surname: str | None = None
+    parent_dni: str | None = None
+    parent_category: str | None = None
+    is_rower: bool | None = False
 
-    is_coach: Optional[bool] = False
-    is_directive: Optional[bool] = False
+    is_coach: bool | None = False
+    is_directive: bool | None = False
 
     @classmethod
     def preset(cls) -> "PdfItem":

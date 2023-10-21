@@ -1,6 +1,5 @@
 import locale
 import os
-from typing import List, Tuple
 
 import cv2
 import numpy as np
@@ -144,7 +143,7 @@ class InforemoImageProcessor(ImageProcessor, source=Datasource.INFOREMO):
 
         return img_vh
 
-    def _get_boxes(self, img_vh: NDArray) -> Tuple[List, Tuple[int, int]]:
+    def _get_boxes(self, img_vh: NDArray) -> tuple[list, tuple[int, int]]:
         """
         Detect and organize bounding boxes around cells within a tabular image.
 

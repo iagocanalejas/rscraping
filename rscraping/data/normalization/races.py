@@ -1,5 +1,4 @@
 import re
-from typing import List, Optional, Tuple
 
 from pyutils.strings import find_roman, remove_parenthesis, remove_roman, roman_to_int, whitespaces_clean
 from rscraping.data.functions import is_play_off
@@ -30,8 +29,8 @@ _KNOWN_RACE_SPONSORS = [
 ]
 
 
-def normalize_name_parts(normalized_name: str) -> List[Tuple[str, Optional[int]]]:
-    parts: List[Tuple[str, Optional[int]]] = []
+def normalize_name_parts(normalized_name: str) -> list[tuple[str, int | None]]:
+    parts: list[tuple[str, int | None]] = []
     normalized_name = remove_parenthesis(whitespaces_clean(normalized_name))
     name_parts = normalized_name.split(" - ") if not is_play_off(normalized_name) else [normalized_name]
 
@@ -81,14 +80,14 @@ def remove_day_indicator(name: str) -> str:
     return whitespaces_clean(name)
 
 
-def find_race_sponsor(name: str) -> Optional[str]:
+def find_race_sponsor(name: str) -> str | None:
     for sponsor in _KNOWN_RACE_SPONSORS:
         if sponsor in name:
             return sponsor
     return None
 
 
-def find_edition(name: str) -> Optional[int]:
+def find_edition(name: str) -> int | None:
     name = re.sub(r"[\'\".:]", " ", name)
     roman_options = [e for e in [find_roman(w) for w in name.split()] if e is not None]
     return roman_to_int(roman_options[0]) if roman_options else None

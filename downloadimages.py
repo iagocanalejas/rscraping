@@ -5,7 +5,6 @@ import logging
 import os
 import sys
 import time
-from typing import List, Optional
 
 import requests
 from parsel import Selector
@@ -22,7 +21,7 @@ logger.addHandler(logging.StreamHandler(sys.stdout))
 
 
 # this only works with traineras.es
-def main(rower_id: str, club_name: str, year: Optional[str] = None, output: str = "./out"):
+def main(rower_id: str, club_name: str, year: str | None = None, output: str = "./out"):
     client = Client(source=Datasource.TRAINERAS)  # type: ignore
     parser: TrainerasHtmlParser = client._html_parser  # type: ignore
 
@@ -32,7 +31,7 @@ def main(rower_id: str, club_name: str, year: Optional[str] = None, output: str 
 
         t_date = find_date(selector.xpath(f"/html/body/div[1]/main/div/div/div/div[{1}]/h2/text()").get(""))
         t_date = t_date.strftime("%d%m%Y") if t_date else None
-        participants: List[Selector] = parser.get_participants(selector, day=1)
+        participants: list[Selector] = parser.get_participants(selector, day=1)
         for participant in participants:
             if (
                 club_name.upper() not in parser.get_club_name(participant)
@@ -44,7 +43,7 @@ def main(rower_id: str, club_name: str, year: Optional[str] = None, output: str 
         time.sleep(20)
 
 
-def retrieve_images(url: str, t_date: Optional[str], output: str):
+def retrieve_images(url: str, t_date: str | None, output: str):
     content = requests.get(url=url, headers=HTTP_HEADERS).content.decode("utf-8")
     selector = Selector(content)
 

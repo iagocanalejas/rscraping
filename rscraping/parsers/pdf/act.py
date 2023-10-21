@@ -1,5 +1,4 @@
 import sys
-from typing import List, Optional, Tuple
 
 from fitz import Page
 
@@ -19,7 +18,7 @@ class ACTPdfParser(PdfParser):
     _TRASH = ["FIRMA Y SELLO", "PROPIOS:", "CANTERANOS:", "NO PROPIOS:", "CAPITÁN", "CAPITANA"]
     _CONDITION = list(flatten([SYNONYMS["HOMEGROWN"], SYNONYMS["OWN"], SYNONYMS["NOT_OWN"]]))
 
-    def parse_lineup(self, page: Page) -> Optional[Lineup]:
+    def parse_lineup(self, page: Page) -> Lineup | None:
         text = [e for e in page.get_text().split("\n") if e]
         if len(text) == 0:
             return None
@@ -46,14 +45,14 @@ class ACTPdfParser(PdfParser):
         )
 
     @staticmethod
-    def _parse_name(parts: List[str]) -> Tuple[str, str]:
+    def _parse_name(parts: list[str]) -> tuple[str, str]:
         race_part = next(e for e in parts if "Puntuable" in e)
         club_index = next(idx for idx, value in enumerate(parts) if "Puntos" in value) + 2
         race = race_part.split("- Puntuable")[0].split("/")[1]
         club = parts[club_index]
         return normalize_race_name(race), normalize_club_name(club)
 
-    def _parse_rowers(self, rowers: List[str]) -> Tuple[str, str, List[str], List[str]]:
+    def _parse_rowers(self, rowers: list[str]) -> tuple[str, str, list[str], list[str]]:
         rowers = [r for r in rowers if not any(t for t in self._TRASH if t in r.upper())]
 
         coach, delegate = self._get_coach_and_delegate(rowers)
@@ -67,7 +66,7 @@ class ACTPdfParser(PdfParser):
 
         return coach, delegate, substitutes, valid_rowers
 
-    def _build_names_between_indexes(self, rowers: List[str], indexes: List[int]) -> List[str]:
+    def _build_names_between_indexes(self, rowers: list[str], indexes: list[int]) -> list[str]:
         items = []
         for i in range(0, len(indexes) - 1):
             name_parts = rowers[indexes[i] + 1 : indexes[i + 1]]
@@ -75,7 +74,7 @@ class ACTPdfParser(PdfParser):
             items.append(whitespaces_clean(" ".join(name_parts)))
         return items
 
-    def _get_substitutes_tokens_indexes(self, rowers: List[str]) -> List[int]:
+    def _get_substitutes_tokens_indexes(self, rowers: list[str]) -> list[int]:
         def is_substitute_index(rower: str) -> bool:
             return rower.upper() in SYNONYMS["ROWER"] or rower.upper() in SYNONYMS["COXWAIN"]
 
@@ -90,13 +89,13 @@ class ACTPdfParser(PdfParser):
 
         return indexes
 
-    def _get_coach_and_delegate(self, rowers: List[str]) -> Tuple[str, str]:
+    def _get_coach_and_delegate(self, rowers: list[str]) -> tuple[str, str]:
         # rowers are always sorted like ['Entrenador', 'IÑAKI', 'ERRASTI', 'Delegado', 'HASIER', 'Suplentes', ...]
         coach = whitespaces_clean(" ".join(rowers[rowers.index("Entrenador") + 1 : rowers.index("Delegado")]))
         delegate = whitespaces_clean(" ".join(rowers[rowers.index("Delegado") + 1 : rowers.index("Suplentes")]))
         return coach, delegate
 
-    def _get_coxswain_and_bow(self, page: Page, rowers: List[str]) -> Tuple[str, str]:
+    def _get_coxswain_and_bow(self, page: Page, rowers: list[str]) -> tuple[str, str]:
         """
         Find the coxswain and bow rowers based on their vertical positions on the page.
 
@@ -134,7 +133,7 @@ class ACTPdfParser(PdfParser):
                 coxswain = rower
         return coxswain, bow
 
-    def _get_starboard_and_lardboard(self, page: Page, rowers: List[str]) -> Tuple[List[str], List[str]]:
+    def _get_starboard_and_lardboard(self, page: Page, rowers: list[str]) -> tuple[list[str], list[str]]:
         # sorts the list of rowers from left to right, the first half is lardboard, the other half are starboard
         rowers.sort(key=lambda x: page.search_for(x)[0][0])
         mid = len(rowers) // 2
