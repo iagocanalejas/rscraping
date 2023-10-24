@@ -20,13 +20,45 @@ _MISSPELLINGS = [
 ]
 
 _KNOWN_RACE_SPONSORS = [
-    "ONURA HOMES",
-    "YURRITA GROUP",
-    "WOFCO",
-    "SALGADO",
     "CEFYCAL",
     "CONCELLO DE BOIRO",
+    "FANDICOSTA",
+    "ONURA HOMES",
+    "SALGADO",
+    "WOFCO",
+    "YURRITA GROUP",
+    "YURRITA",
 ]
+
+_KO_NAMES = {
+    "ALGORTAKO": ["ALGORTA"],
+    "AREATAKO": ["AREATA"],
+    "BERMEOKO": ["BERMEO"],
+    "ELANTXOBEKO": ["ELANTXOBE"],
+    "ERANDIOKO": ["ERANDIO"],
+    "GETARIAKO": ["GETARIA"],
+    "GETXOKO": ["GETXO"],
+    "HERNANIKO": ["HERNANI"],
+    "HIBAIKAKO": ["HIBAIKA"],
+    "HONDARRIBIKO": ["HONDARRIBI", "HONDARRIBIA"],
+    "MUNDAKAKO": ["MUNDAKA"],
+    "MUTRIKUKO": ["MUTRIKU"],
+    "ONDARROAKO": ["ONDARROA"],
+    "PASAIAKO": ["PASAIA"],
+    "PLENTZIAKO": ["PLENTZIA"],
+    "SANTURTZIKO": ["SANTURTZI"],
+    "TOLOSALDEAKO": ["TOLOSALDEA"],
+    "TRINTXERPEKO": ["TRINTXERPE"],
+    "TXINGUDIKO": ["TXINGUDI"],
+    "ZARAUZKO": ["ZARAUZ"],
+    "ZUMAIAKO": ["ZUMAIA"],
+}
+
+
+_NORMALIZED_RACES = {
+    "DONIBANE ZIBURUKO ESTROPADAK": [["SAN", "JUAN", "LUZ"]],
+    "KEPA DEUN ARRANTZALEEN KOFRADÍA IKURRIÑA": [["COFRADÍA", "SAN", "PEDRO"], ["COFRADIA", "SAN", "PEDRO"]],
+}
 
 
 def normalize_name_parts(normalized_name: str) -> list[tuple[str, int | None]]:
@@ -51,6 +83,8 @@ def normalize_race_name(name: str) -> str:
     name = amend_race_name(name)
     name = remove_league_indicator(name)
     name = remove_race_sponsor(name)
+    name = normalize_known_race_names(name)
+    name = normalize_ko_race_names(name)
 
     return whitespaces_clean(name)
 
@@ -111,3 +145,20 @@ def amend_race_name(name: str) -> str:
     for a, b in _MISSPELLINGS:
         name = name.replace(a, b)
     return whitespaces_clean(name)
+
+
+def normalize_known_race_names(name: str) -> str:
+    for synonym, values in _NORMALIZED_RACES.items():
+        for value in values:
+            if name in " ".join(value) or all(v in name for v in value):
+                return synonym
+    return name
+
+
+def normalize_ko_race_names(name: str) -> str:
+    for k, values in _KO_NAMES.items():
+        if any(v in name for v in values) and k not in name:
+            for v in values:
+                name = name.replace(v, k)
+            return name
+    return name

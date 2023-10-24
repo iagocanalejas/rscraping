@@ -7,8 +7,8 @@ from parsel import Selector
 
 from pyutils.strings import find_date, whitespaces_clean
 from rscraping.data.constants import (
+    CATEGORY_VETERAN,
     GENDER_MALE,
-    PARTICIPANT_CATEGORY_VETERAN,
     RACE_CONVENTIONAL,
     RACE_TRAINERA,
 )
@@ -71,7 +71,7 @@ class ABEHtmlParser(HtmlParser):
             race.participants.append(
                 Participant(
                     gender=GENDER_MALE,
-                    category=PARTICIPANT_CATEGORY_VETERAN,
+                    category=CATEGORY_VETERAN,
                     club_name=self.get_club_name(row),
                     lane=None,
                     series=None,

@@ -26,7 +26,7 @@ def main(rower_id: str, club_name: str, year: str | None = None, output: str = "
     parser: TrainerasHtmlParser = client._html_parser  # type: ignore
 
     for race_id in client.get_race_ids_by_rower(rower_id, year=year):
-        content = requests.get(url=client.get_race_details_url(race_id), headers=HTTP_HEADERS).content.decode("utf-8")
+        content = requests.get(url=client.get_race_details_url(race_id), headers=HTTP_HEADERS()).content.decode("utf-8")
         selector = Selector(content)
 
         t_date = find_date(selector.xpath(f"/html/body/div[1]/main/div/div/div/div[{1}]/h2/text()").get(""))
@@ -44,12 +44,12 @@ def main(rower_id: str, club_name: str, year: str | None = None, output: str = "
 
 
 def retrieve_images(url: str, t_date: str | None, output: str):
-    content = requests.get(url=url, headers=HTTP_HEADERS).content.decode("utf-8")
+    content = requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8")
     selector = Selector(content)
 
     logger.info(f"downloading images for {t_date}")
     for id, img in enumerate(selector.xpath('//*[@id="fotografias"]/a/img/@src').getall()):
-        content = requests.get(url=img, headers=HTTP_HEADERS).content
+        content = requests.get(url=img, headers=HTTP_HEADERS()).content
         extension = img.split(".")[-1]
         with open(f"./{output}/{t_date}_{id}.{extension}", "wb") as file:
             file.write(content)

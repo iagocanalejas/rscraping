@@ -6,11 +6,11 @@ from parsel import Selector
 
 from pyutils.strings import find_date, whitespaces_clean
 from rscraping.data.constants import (
+    CATEGORY_ABSOLUT,
+    CATEGORY_SCHOOL,
+    CATEGORY_VETERAN,
     GENDER_FEMALE,
     GENDER_MALE,
-    PARTICIPANT_CATEGORY_ABSOLUT,
-    PARTICIPANT_CATEGORY_SCHOOL,
-    PARTICIPANT_CATEGORY_VETERAN,
     RACE_CONVENTIONAL,
     RACE_TIME_TRIAL,
     RACE_TRAINERA,
@@ -112,15 +112,20 @@ class TrainerasHtmlParser(HtmlParser):
         return race
 
     @override
-    def parse_race_ids(self, selector: Selector, is_female: bool, **_) -> Generator[str, Any, Any]:
-        def has_gender(value: str) -> bool:
-            return value in self._FEMALE if is_female else value not in self._FEMALE
+    def parse_race_ids(
+        self, selector: Selector, is_female: bool, race_type: str | None = None, **_
+    ) -> Generator[str, Any, Any]:
+        if race_type and race_type not in [CATEGORY_ABSOLUT, CATEGORY_VETERAN, CATEGORY_SCHOOL]:
+            raise ValueError(f"invalid {race_type=}")
 
-        rows = selector.xpath("/html/body/div[1]/div[2]/table/tbody/tr").getall()
+        rows = [Selector(r) for r in selector.xpath("/html/body/div[1]/div[2]/table/tbody/tr").getall()]
         return (
-            Selector(row).xpath("//*/td[1]/a/@href").get("").split("/")[-1]
+            row.xpath("//*/td[1]/a/@href").get("").split("/")[-1]
             for row in rows
-            if has_gender(Selector(row).xpath("//*/td[2]/text()").get(""))
+            if (
+                self._has_gender(is_female, row.xpath("//*/td[2]/text()").get(""))
+                and self._has_type(race_type, row.xpath("//*/td[2]/text()").get(""))
+            )
         )
 
     def parse_rower_race_ids(self, selector: Selector, year: str | None = None, **_) -> Generator[str, Any, Any]:
@@ -135,11 +140,24 @@ class TrainerasHtmlParser(HtmlParser):
         )
 
     @override
-    def parse_race_names(self, selector: Selector, **_) -> Generator[RaceName, Any, Any]:
-        hrefs = selector.xpath("/html/body/div[1]/div[2]/table/tbody/tr/td[1]/a").getall()
-        selectors = [Selector(h) for h in hrefs]
-        pairs = [(s.xpath("//*/@href").get("").split("/")[-1], s.xpath("//*/text()").get("")) for s in selectors]
-        return (RaceName(p[0], whitespaces_clean(p[1]).upper()) for p in pairs)
+    def parse_race_names(
+        self, selector: Selector, is_female: bool, race_type: str | None = None, **_
+    ) -> Generator[RaceName, Any, Any]:
+        if race_type and race_type not in [CATEGORY_ABSOLUT, CATEGORY_VETERAN, CATEGORY_SCHOOL]:
+            raise ValueError(f"invalid {race_type=}")
+
+        rows = [Selector(r) for r in selector.xpath("/html/body/div[1]/div[2]/table/tbody/tr").getall()]
+        return (
+            RaceName(
+                row.xpath("//*/td[1]/a/@href").get("").split("/")[-1],
+                whitespaces_clean(row.xpath("//*/td[1]/a/text()").get("")).upper(),
+            )
+            for row in rows
+            if (
+                self._has_gender(is_female, row.xpath("//*/td[2]/text()").get(""))
+                and self._has_type(race_type, row.xpath("//*/td[2]/text()").get(""))
+            )
+        )
 
     @override
     def parse_lineup(self, selector: Selector, **_) -> Lineup:
@@ -198,10 +216,10 @@ class TrainerasHtmlParser(HtmlParser):
         subtitle = selector.xpath("/html/body/div[1]/main/div/div/div/div[1]/h2/text()").get("").upper()
         category = whitespaces_clean(subtitle.split("-")[-1])
         if category in self._VETERAN:
-            return PARTICIPANT_CATEGORY_VETERAN
+            return CATEGORY_VETERAN
         if category in self._SCHOOL:
-            return PARTICIPANT_CATEGORY_SCHOOL
-        return PARTICIPANT_CATEGORY_ABSOLUT
+            return CATEGORY_SCHOOL
+        return CATEGORY_ABSOLUT
 
     def get_town(self, selector: Selector, day: int) -> str:
         parts = selector.xpath(f"/html/body/div[1]/main/div/div/div/div[{day}]/h2/text()").get("")
@@ -264,3 +282,20 @@ class TrainerasHtmlParser(HtmlParser):
 
     def get_lineup_images(self, selector: Selector) -> list[str]:
         return selector.xpath('//*[@id="fotografias"]/a/img/@src').getall()
+
+    ####################################################
+    #                     PRIVATE                      #
+    ####################################################
+    def _has_gender(self, is_female: bool, value: str) -> bool:
+        return value in self._FEMALE if is_female else value not in self._FEMALE
+
+    def _has_type(self, race_type: str | None, value: str) -> bool:
+        if not race_type:
+            return True
+        if race_type == CATEGORY_ABSOLUT:
+            return value not in self._VETERAN and value not in self._SCHOOL
+        if race_type == CATEGORY_VETERAN:
+            return value in self._VETERAN
+        if race_type == CATEGORY_SCHOOL:
+            return value in self._SCHOOL
+        return False

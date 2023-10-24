@@ -8,9 +8,9 @@ from parsel import Selector
 
 from pyutils.strings import whitespaces_clean
 from rscraping.data.constants import (
+    CATEGORY_ABSOLUT,
     GENDER_FEMALE,
     GENDER_MALE,
-    PARTICIPANT_CATEGORY_ABSOLUT,
     RACE_CONVENTIONAL,
     RACE_TIME_TRIAL,
     RACE_TRAINERA,
@@ -95,7 +95,7 @@ class LGTHtmlParser(HtmlParser):
             race.participants.append(
                 Participant(
                     gender=gender,
-                    category=PARTICIPANT_CATEGORY_ABSOLUT,
+                    category=CATEGORY_ABSOLUT,
                     club_name=self.get_club_name(row),
                     lane=self.get_lane(row),
                     series=self.get_series(results_selector, row),

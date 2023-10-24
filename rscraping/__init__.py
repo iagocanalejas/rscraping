@@ -1,5 +1,5 @@
 import os
-from typing import Any, List, Optional
+from typing import Any
 from collections.abc import Generator
 
 from pyutils.strings import normalize_synonyms, remove_conjunctions, remove_symbols
@@ -41,12 +41,12 @@ def find_race(
     the function will proceed without adding lineup information.
     """
 
-    client = Client(source=datasource, is_female=is_female)  # type: ignore
-    race = client.get_race_by_id(race_id, is_female=is_female, day=day)
+    client = Client(source=datasource)  # type: ignore
+    race = client.get_race_by_id(race_id, day=day, is_female=is_female)
 
     if race is not None and with_lineup:
         try:
-            lineups = find_lineup(race_id, datasource, is_female=is_female)
+            lineups = client.get_lineup_by_race_id(race_id, is_female=is_female)
             for participant in race.participants:
                 lineup = [lin for lin in lineups if lin.club == participant.participant]
                 participant.lineup = lineup[0] if len(lineup) == 1 else None
@@ -97,8 +97,8 @@ def parse_race_image(
 
 
 def find_lineup(race_id: str, datasource: Datasource, is_female: bool) -> Generator[Lineup, Any, Any]:
-    client = Client(source=datasource, is_female=is_female)  # type: ignore
-    return client.get_lineup_by_race_id(race_id)
+    client = Client(source=datasource)  # type: ignore
+    return client.get_lineup_by_race_id(race_id, is_female=is_female)
 
 
 def lemmatize(phrase: str, lang: str = "es") -> list[str]:

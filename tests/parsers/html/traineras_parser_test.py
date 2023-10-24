@@ -3,7 +3,7 @@ import unittest
 
 from parsel import Selector
 
-from rscraping.data.constants import GENDER_MALE
+from rscraping.data.constants import CATEGORY_VETERAN, GENDER_MALE
 from rscraping.data.models import Lineup, Participant, Race, RaceName
 from rscraping.parsers.html.traineras import MultiDayRaceException, TrainerasHtmlParser
 
@@ -45,9 +45,16 @@ class TestTrainerasParser(unittest.TestCase):
 
     def test_parse_race_ids(self):
         with open(os.path.join(self.fixtures, "traineras_results.html")) as file:
-            ids = self.parser.parse_race_ids(Selector(file.read()), is_female=False)
+            data = Selector(file.read())
 
+        ids = self.parser.parse_race_ids(data, is_female=False)
         self.assertEqual(list(ids), ["5455", "5457", "5458", "5535", "5536"])
+
+        ids = self.parser.parse_race_ids(data, is_female=False, race_type=CATEGORY_VETERAN)
+        self.assertEqual(list(ids), ["5457", "5536"])
+
+        ids = self.parser.parse_race_ids(data, is_female=True)
+        self.assertEqual(list(ids), ["5456"])
 
     def test_parse_rower_race_ids(self):
         with open(os.path.join(self.fixtures, "traineras_rower.html")) as file:
@@ -56,9 +63,16 @@ class TestTrainerasParser(unittest.TestCase):
 
     def test_parse_race_names(self):
         with open(os.path.join(self.fixtures, "traineras_results.html")) as file:
-            race_names = self.parser.parse_race_names(Selector(file.read()))
+            data = file.read()
 
-        self.assertEqual(list(race_names), self._RACE_NAMES)
+        race_names = self.parser.parse_race_names(Selector(data), is_female=False)
+        self.assertEqual(list(race_names), self._MALE_RACE_NAMES)
+
+        race_names = self.parser.parse_race_names(Selector(data), is_female=False, race_type=CATEGORY_VETERAN)
+        self.assertEqual(list(race_names), self._VETERAN_RACE_NAMES)
+
+        race_names = self.parser.parse_race_names(Selector(data), is_female=True)
+        self.assertEqual(list(race_names), self._FEMALE_RACE_NAMES)
 
     def test_parse_lineup(self):
         with open(os.path.join(self.fixtures, "traineras_lineup.html")) as file:
@@ -110,6 +124,7 @@ class TestTrainerasParser(unittest.TestCase):
         race_lanes=4,
         cancelled=False,
     )
+
     _PARTICIPANTS = [
         Participant(
             gender="MALE",
@@ -138,13 +153,20 @@ class TestTrainerasParser(unittest.TestCase):
             disqualified=False,
         ),
     ]
-    _RACE_NAMES = [
-        RaceName(race_id="5455", name="MEMORIAL PEPE O RUSO"),
-        RaceName(race_id="5456", name="MEMORIAL PEPE O RUSO"),
-        RaceName(race_id="5457", name="MEMORIAL PEPE O RUSO"),
-        RaceName(race_id="5458", name="MEMORIAL PEPE O RUSO"),
-        RaceName(race_id="5535", name="MEMORIAL AURORA TRUEBA"),
-        RaceName(race_id="5536", name="MEMORIAL AURORA TRUEBA"),
+
+    _MALE_RACE_NAMES = [
+        RaceName(race_id="5455", name="MEMORIAL PEPE O RUSO SM"),
+        RaceName(race_id="5457", name="MEMORIAL PEPE O RUSO VM"),
+        RaceName(race_id="5458", name="MEMORIAL PEPE O RUSO M"),
+        RaceName(race_id="5535", name="MEMORIAL AURORA TRUEBA SM"),
+        RaceName(race_id="5536", name="MEMORIAL AURORA TRUEBA VM"),
+    ]
+    _VETERAN_RACE_NAMES = [
+        RaceName(race_id="5457", name="MEMORIAL PEPE O RUSO VM"),
+        RaceName(race_id="5536", name="MEMORIAL AURORA TRUEBA VM"),
+    ]
+    _FEMALE_RACE_NAMES = [
+        RaceName(race_id="5456", name="MEMORIAL PEPE O RUSO SF"),
     ]
 
     _LINEUP = Lineup(

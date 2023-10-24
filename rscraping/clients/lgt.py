@@ -101,13 +101,13 @@ class LGTClient(Client, source=Datasource.LGT):
     def get_results_selector(race_id: str) -> Selector:
         url = "https://www.ligalgt.com/ajax/principal/ver_resultados.php"
         data = {"liga_id": 1, "regata_id": race_id}
-        return Selector(requests.post(url=url, headers=HTTP_HEADERS, data=data).content.decode("utf-8"))
+        return Selector(requests.post(url=url, headers=HTTP_HEADERS(), data=data).content.decode("utf-8"))
 
     @staticmethod
     def get_calendar_selector() -> Selector:
         url = "https://www.ligalgt.com/ajax/principal/regatas.php"
         data = {"lng": "es"}
-        return Selector(requests.post(url=url, headers=HTTP_HEADERS, data=data).content.decode("utf-8"))
+        return Selector(requests.post(url=url, headers=HTTP_HEADERS(), data=data).content.decode("utf-8"))
 
     @override
     def get_race_by_id(self, race_id: str, **kwargs) -> Race | None:
@@ -118,7 +118,7 @@ class LGTClient(Client, source=Datasource.LGT):
         return super().get_race_by_id(race_id, **kwargs)
 
     @override
-    def get_race_ids_by_year(self, year: int, **_) -> Generator[str, Any, Any]:
+    def get_race_ids_by_year(self, year: int, is_female: bool, **_) -> Generator[str, Any, Any]:
         """
         As this datasource doesn't give us an easy way of retrieving the races for a given year we need to bruteforce
         it, this method will do a binary search for the 'upper' and 'lower' bounds of a season.
@@ -137,7 +137,7 @@ class LGTClient(Client, source=Datasource.LGT):
                 yield from race_ids
                 return
 
-        self.validate_year_or_raise_exception(year)
+        self.validate_year_or_raise_exception(year, is_female=is_female)
         since = self.MALE_START
 
         # asume 30 races per year for lower bound and 50 for the upper bound
@@ -171,7 +171,7 @@ class LGTClient(Client, source=Datasource.LGT):
         return (str(r) for r in range(lower_race_id, (upper_race_id + 1)) if r not in self._excluded_ids)
 
     @override
-    def get_race_names_by_year(self, year: int, **_) -> Generator[RaceName, Any, Any]:
+    def get_race_names_by_year(self, year: int, is_female: bool, **_) -> Generator[RaceName, Any, Any]:
         today = date.today().year
         if today == year:
             race_names = self._html_parser.parse_race_names(selector=self.get_calendar_selector())
@@ -179,12 +179,12 @@ class LGTClient(Client, source=Datasource.LGT):
                 yield from race_names
                 return
 
-        for id in self.get_race_ids_by_year(year):
+        for id in self.get_race_ids_by_year(year, is_female=is_female):
             if id in self._excluded_ids:
                 pass
 
             url = self.get_race_details_url(id)
-            selector = Selector(requests.get(url=url, headers=HTTP_HEADERS).content.decode("utf-8"))
+            selector = Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8"))
             if self._html_parser.is_valid_race(selector):
                 name = self._html_parser.get_name(selector)
                 yield RaceName(id, whitespaces_clean(name).upper())
@@ -195,7 +195,7 @@ class LGTClient(Client, source=Datasource.LGT):
             return
 
         url = self.get_lineup_url(race_id)
-        raw_pdf = requests.get(url=url, headers=HTTP_HEADERS).content
+        raw_pdf = requests.get(url=url, headers=HTTP_HEADERS()).content
 
         with fitz.open("pdf", raw_pdf) as pdf:
             for page_num in range(pdf.page_count):
@@ -219,7 +219,7 @@ class LGTClient(Client, source=Datasource.LGT):
 
         url = self.get_race_details_url(race_id)
 
-        selector = Selector(requests.get(url=url, headers=HTTP_HEADERS).text)
+        selector = Selector(requests.get(url=url, headers=HTTP_HEADERS()).text)
         if not self._html_parser.is_valid_race(selector):
             self._RACE_YEARS[race_id] = None
             return None

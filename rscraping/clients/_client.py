@@ -14,7 +14,6 @@ from rscraping.parsers.pdf import PdfParser
 
 class Client(ABC):
     _registry = {}
-    _is_female = False
     _html_parser: HtmlParser
     _pdf_parser: PdfParser
 
@@ -28,23 +27,22 @@ class Client(ABC):
         if source:
             cls._registry[source] = cls
 
-    def __new__(cls, source: Datasource, is_female: bool = False, **_) -> "Client":
+    def __new__(cls, source: Datasource, **_) -> "Client":
         subclass = cls._registry[source]
         final_obj = object.__new__(subclass)
-        final_obj._is_female = is_female
 
         return final_obj
 
-    def validate_year_or_raise_exception(self, year: int):
-        since = self.FEMALE_START if self._is_female else self.MALE_START
+    def validate_year_or_raise_exception(self, year: int, is_female: bool):
+        since = self.FEMALE_START if is_female else self.MALE_START
         today = date.today().year
         if year < since or year > today:
             raise ValueError(f"invalid 'year', available values are [{since}, {today}]")
 
-    def get_race_by_id(self, race_id: str, **kwargs) -> Race | None:
-        url = self.get_race_details_url(race_id, is_female=self._is_female)
+    def get_race_by_id(self, race_id: str, is_female: bool, **kwargs) -> Race | None:
+        url = self.get_race_details_url(race_id, is_female=is_female)
         race = self._html_parser.parse_race(
-            selector=Selector(requests.get(url=url, headers=HTTP_HEADERS).content.decode("utf-8")),
+            selector=Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8")),
             race_id=race_id,
             **kwargs,
         )
@@ -52,21 +50,21 @@ class Client(ABC):
             race.url = url
         return race
 
-    def get_race_ids_by_year(self, year: int, **kwargs) -> Generator[str, Any, Any]:
-        self.validate_year_or_raise_exception(year)
+    def get_race_ids_by_year(self, year: int, is_female: bool, **kwargs) -> Generator[str, Any, Any]:
+        self.validate_year_or_raise_exception(year, is_female=is_female)
 
-        url = self.get_races_url(year, is_female=self._is_female)
+        url = self.get_races_url(year, is_female=is_female)
         yield from self._html_parser.parse_race_ids(
-            selector=Selector(requests.get(url=url, headers=HTTP_HEADERS).text),
+            selector=Selector(requests.get(url=url, headers=HTTP_HEADERS()).text),
             **kwargs,
         )
 
-    def get_race_names_by_year(self, year: int, **kwargs) -> Generator[RaceName, Any, Any]:
-        self.validate_year_or_raise_exception(year)
+    def get_race_names_by_year(self, year: int, is_female: bool, **kwargs) -> Generator[RaceName, Any, Any]:
+        self.validate_year_or_raise_exception(year, is_female=is_female)
 
-        url = self.get_races_url(year, is_female=self._is_female)
+        url = self.get_races_url(year, is_female=is_female)
         yield from self._html_parser.parse_race_names(
-            selector=Selector(requests.get(url=url, headers=HTTP_HEADERS).content.decode("utf-8")),
+            selector=Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8")),
             **kwargs,
         )
 

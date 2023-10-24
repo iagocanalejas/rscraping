@@ -43,7 +43,7 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
     def get_pages(self, year: int) -> Generator[Selector, Any, Any]:
         def selector(year: int, page: int) -> Selector:
             return Selector(
-                requests.get(url=self.get_races_url(year, page=page), headers=HTTP_HEADERS).content.decode("utf-8")
+                requests.get(url=self.get_races_url(year, page=page), headers=HTTP_HEADERS()).content.decode("utf-8")
             )
 
         page = 1
@@ -53,28 +53,30 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
             page += 1
 
     @override
-    def get_race_ids_by_year(self, year: int, **_) -> Generator[str, Any, Any]:
-        self.validate_year_or_raise_exception(year)
+    def get_race_ids_by_year(self, year: int, is_female: bool, race_type: str | None, **_) -> Generator[str, Any, Any]:
+        self.validate_year_or_raise_exception(year, is_female=is_female)
         for page in self.get_pages(year):
-            yield from self._html_parser.parse_race_ids(page, is_female=self._is_female)
+            yield from self._html_parser.parse_race_ids(page, is_female=is_female, race_type=race_type)
 
     def get_race_ids_by_rower(self, rower_id: str, year: str | None = None, **_) -> Generator[str, Any, Any]:
-        content = requests.get(url=self.get_rower_url(rower_id), headers=HTTP_HEADERS).content.decode("utf-8")
+        content = requests.get(url=self.get_rower_url(rower_id), headers=HTTP_HEADERS()).content.decode("utf-8")
         yield from self._html_parser.parse_rower_race_ids(Selector(content), year=year)
 
     @override
-    def get_race_names_by_year(self, year: int, **_) -> Generator[RaceName, Any, Any]:
-        self.validate_year_or_raise_exception(year)
+    def get_race_names_by_year(
+        self, year: int, is_female: bool, race_type: str | None, **_
+    ) -> Generator[RaceName, Any, Any]:
+        self.validate_year_or_raise_exception(year, is_female=is_female)
         for page in self.get_pages(year):
-            yield from self._html_parser.parse_race_names(page)
+            yield from self._html_parser.parse_race_names(page, is_female=is_female, race_type=race_type)
 
     @override
     def get_lineup_by_race_id(self, race_id: str, **_) -> Generator[Lineup, Any, Any]:
-        content = requests.get(url=self.get_race_details_url(race_id), headers=HTTP_HEADERS).content.decode("utf-8")
+        content = requests.get(url=self.get_race_details_url(race_id), headers=HTTP_HEADERS()).content.decode("utf-8")
         participants = self._html_parser.get_participants(Selector(content), day=1)
         for participant in participants:
             url = participant.xpath("//*/td[9]/a/@href").get("")
             if not url:
                 continue
-            lineup = requests.get(url=url, headers=HTTP_HEADERS).content.decode("utf-8")
+            lineup = requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8")
             yield self._html_parser.parse_lineup(Selector(lineup))

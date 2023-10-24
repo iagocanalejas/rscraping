@@ -44,9 +44,9 @@ class ACTClient(Client, source=Datasource.ACT):
         return f"https://www.euskolabelliga.com{female}/resultados/tripulacionespdf.php?r={race_id}"
 
     @override
-    def get_lineup_by_race_id(self, race_id: str, **_) -> Generator[Lineup, Any, Any]:
-        url = self.get_lineup_url(race_id, self._is_female)
-        raw_pdf = requests.get(url=url, headers=HTTP_HEADERS).content
+    def get_lineup_by_race_id(self, race_id: str, is_female: bool, **_) -> Generator[Lineup, Any, Any]:
+        url = self.get_lineup_url(race_id, is_female)
+        raw_pdf = requests.get(url=url, headers=HTTP_HEADERS()).content
 
         with fitz.open("pdf", raw_pdf) as pdf:
             for page_num in range(pdf.page_count):

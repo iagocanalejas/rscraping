@@ -119,7 +119,8 @@ def normalize_club_name(name: str) -> str:
 
 
 def deacronym_club_name(name: str) -> str:
-    name = re.sub(r"P\.? ?D\.?", "PASAIA DONIBANE", name)
+    if any(w in ["P", "D", "PD"] for w in name.split()):
+        name = re.sub(r"P\.? ?D\.?", "PASAIA DONIBANE", name)
     return whitespaces_clean(name)
 
 

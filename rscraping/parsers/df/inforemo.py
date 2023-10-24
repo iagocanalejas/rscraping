@@ -9,11 +9,11 @@ from pandas import DataFrame, Series
 
 from pyutils.strings import find_date, remove_symbols, whitespaces_clean
 from rscraping.data.constants import (
+    CATEGORY_ABSOLUT,
+    CATEGORY_VETERAN,
     GENDER_FEMALE,
     GENDER_MALE,
     GENDER_MIX,
-    PARTICIPANT_CATEGORY_ABSOLUT,
-    PARTICIPANT_CATEGORY_VETERAN,
     RACE_CONVENTIONAL,
     RACE_TIME_TRIAL,
     RACE_TRAINERA,
@@ -196,8 +196,8 @@ class InforemoDataFrameParser(DataFrameParser, source=Datasource.INFOREMO):
     def get_category(self, data: Series) -> str:
         modality = data[2]
         if any(e in modality for e in ["VETERANO", "VETERANA"]):
-            return PARTICIPANT_CATEGORY_VETERAN
-        return PARTICIPANT_CATEGORY_ABSOLUT
+            return CATEGORY_VETERAN
+        return CATEGORY_ABSOLUT
 
     def get_race_lanes(self, df: DataFrame) -> int:
         return max(self.get_lane(p) for (_, p) in df.iterrows())
