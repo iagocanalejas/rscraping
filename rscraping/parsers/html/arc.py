@@ -189,7 +189,7 @@ class ARCHtmlParser(HtmlParser):
     def get_day(self, selector: Selector) -> int:
         name = self.get_name(selector)
         if is_play_off(name):  # exception case
-            return 1 if "1" in name else 2
+            return 1 if "1" in name or "I" in name.split() else 2
         matches = re.findall(r"\d+ª día|\(\d+ª? JORNADA\)", name)
         return int(re.findall(r"\d+", matches[0])[0].strip()) if matches else 1
 

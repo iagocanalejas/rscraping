@@ -44,6 +44,7 @@ class Client(ABC):
         race = self._html_parser.parse_race(
             selector=Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8")),
             race_id=race_id,
+            is_female=is_female,
             **kwargs,
         )
         if race:
@@ -56,6 +57,7 @@ class Client(ABC):
         url = self.get_races_url(year, is_female=is_female)
         yield from self._html_parser.parse_race_ids(
             selector=Selector(requests.get(url=url, headers=HTTP_HEADERS()).text),
+            is_female=is_female,
             **kwargs,
         )
 
@@ -65,6 +67,7 @@ class Client(ABC):
         url = self.get_races_url(year, is_female=is_female)
         yield from self._html_parser.parse_race_names(
             selector=Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8")),
+            is_female=is_female,
             **kwargs,
         )
 
