@@ -1,4 +1,5 @@
 import logging
+import os
 import re
 from collections.abc import Generator
 from typing import Any, override
@@ -19,14 +20,14 @@ from rscraping.data.normalization.times import normalize_lap_time
 
 from ._parser import HtmlParser
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(os.path.dirname(os.path.realpath(__file__)))
 
 
 class ABEHtmlParser(HtmlParser):
     DATASOURCE = Datasource.ABE
 
     @override
-    def parse_race(self, selector: Selector, race_id: str, **_) -> Race | None:
+    def parse_race(self, selector: Selector, *, race_id: str, **_) -> Race | None:
         name = self.get_name(selector)
         if not name:
             logger.error(f"{self.DATASOURCE}: no race found for {race_id=}")
@@ -103,7 +104,7 @@ class ABEHtmlParser(HtmlParser):
         return (RaceName(p[0], whitespaces_clean(p[1]).upper()) for p in pairs)
 
     @override
-    def parse_lineup(self, **_):
+    def parse_lineup(self, *_, **__):
         raise NotImplementedError
 
     ####################################################

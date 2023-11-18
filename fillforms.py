@@ -3,7 +3,6 @@
 import argparse
 import logging
 import os
-import sys
 from datetime import datetime
 
 from rscraping.builder import (
@@ -14,9 +13,7 @@ from rscraping.builder import (
     fill_xogade_form,
 )
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-logger.addHandler(logging.StreamHandler(sys.stdout))
+logger = logging.getLogger(__name__)
 
 
 def main(

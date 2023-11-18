@@ -71,16 +71,17 @@ class LGTClient(Client, source=Datasource.LGT):
         147,
         151,
     ]  # weird races
-    _html_parser: LGTHtmlParser
-    _pdf_parser: LGTPdfParser
 
     DATASOURCE = Datasource.LGT
     MALE_START = FEMALE_START = 2020
 
-    def __init__(self, **_) -> None:
-        super().__init__()
-        self._html_parser = LGTHtmlParser()
-        self._pdf_parser = LGTPdfParser()
+    @property
+    def _html_parser(self) -> LGTHtmlParser:
+        return LGTHtmlParser()
+
+    @property
+    def _pdf_parser(self) -> LGTPdfParser:
+        return LGTPdfParser()
 
     @override
     @staticmethod
@@ -89,7 +90,7 @@ class LGTClient(Client, source=Datasource.LGT):
 
     @override
     @staticmethod
-    def get_races_url(**_) -> str:
+    def get_races_url(*_, **__) -> str:
         raise NotImplementedError
 
     @override
@@ -110,7 +111,7 @@ class LGTClient(Client, source=Datasource.LGT):
         return Selector(requests.post(url=url, headers=HTTP_HEADERS(), data=data).content.decode("utf-8"))
 
     @override
-    def get_race_by_id(self, race_id: str, **kwargs) -> Race | None:
+    def get_race_by_id(self, race_id: str, *_, **kwargs) -> Race | None:
         if race_id in self._excluded_ids:
             return None
 
@@ -120,14 +121,21 @@ class LGTClient(Client, source=Datasource.LGT):
     @override
     def get_race_ids_by_year(self, year: int, is_female: bool, **_) -> Generator[str, Any, Any]:
         """
+        Find the race IDs for a given year and gender.
+
         As this datasource doesn't give us an easy way of retrieving the races for a given year we need to bruteforce
         it, this method will do a binary search for the 'upper' and 'lower' bounds of a season.
 
-        For the current year tryies to find the IDs in the calendar page.
-
         We also need to ignore a hole ton of useless IDs (_excluded_ids) that are not used or have invalid information.
 
-        Returns a list of unchecked IDs, note that this list can contain invalid values as this method does not check
+        NOTE: For the current year tryies to find the IDs in the calendar page.
+
+        Args:
+            year (int): The year for which to generate race IDs.
+            is_female (bool): Flag indicating whether it's a female race.
+            **kwargs: Additional keyword arguments.
+
+        Yields: str: Unchecked race IDs, note that *this list can contain invalid IDs* as this method does not check
         each one of them.
         """
         today = date.today().year
@@ -137,7 +145,7 @@ class LGTClient(Client, source=Datasource.LGT):
                 yield from race_ids
                 return
 
-        self.validate_year_or_raise_exception(year, is_female=is_female)
+        self.validate_year(year, is_female=is_female)
         since = self.MALE_START
 
         # asume 30 races per year for lower bound and 50 for the upper bound
@@ -172,6 +180,17 @@ class LGTClient(Client, source=Datasource.LGT):
 
     @override
     def get_race_names_by_year(self, year: int, is_female: bool, **_) -> Generator[RaceName, Any, Any]:
+        """
+        Find the race names for a given year and gender. Uses the unchecked IDs found in get_race_ids_by_year to
+        find them.
+
+        Args:
+            year (int): The year for which to generate race names.
+            is_female (bool): Flag indicating whether it's a female race.
+            **kwargs: Additional keyword arguments.
+
+        Yields: RaceName: Race names.
+        """
         today = date.today().year
         if today == year:
             race_names = self._html_parser.parse_race_names(selector=self.get_calendar_selector())
@@ -204,7 +223,7 @@ class LGTClient(Client, source=Datasource.LGT):
                     yield lineup
 
     @override
-    def get_race_ids_by_rower(self, **_):
+    def get_race_ids_by_rower(self, *_, **__):
         raise NotImplementedError
 
     ####################################################

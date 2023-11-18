@@ -24,7 +24,9 @@ class Datasource(StrEnum):
         return value is not None and value.lower() in [cls.INFOREMO]
 
     @classmethod
-    def _missing_(cls, value: str) -> Optional["Datasource"]:
+    def _missing_(cls, value) -> Optional["Datasource"]:
+        if not isinstance(value, str):
+            return None
         value = value.lower()
         for member in cls:
             if member.value == value:

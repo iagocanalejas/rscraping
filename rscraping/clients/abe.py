@@ -7,14 +7,12 @@ from ._client import Client
 
 
 class ABEClient(Client, source=Datasource.ABE):
-    _html_parser: ABEHtmlParser
-
     DATASOURCE = Datasource.ABE
     MALE_START = FEMALE_START = 2023
 
-    def __init__(self, **_) -> None:
-        super().__init__()
-        self._html_parser = ABEHtmlParser()
+    @property
+    def _html_parser(self) -> ABEHtmlParser:
+        return ABEHtmlParser()
 
     @override
     @staticmethod
@@ -28,13 +26,13 @@ class ABEClient(Client, source=Datasource.ABE):
 
     @override
     @staticmethod
-    def get_lineup_url(**_):
+    def get_lineup_url(*_, **__):
         raise NotImplementedError
 
     @override
-    def get_race_ids_by_rower(self, **_):
+    def get_race_ids_by_rower(self, *_, **__):
         raise NotImplementedError
 
     @override
-    def get_lineup_by_race_id(self, **_):
+    def get_lineup_by_race_id(self, *_, **__):
         raise NotImplementedError

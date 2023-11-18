@@ -1,4 +1,3 @@
-import logging
 import re
 from collections.abc import Generator
 from datetime import date, datetime
@@ -24,8 +23,6 @@ from rscraping.data.normalization.races import normalize_name_parts, normalize_r
 from rscraping.data.normalization.times import normalize_lap_time, normalize_spanish_months
 
 from ._parser import DataFrameParser
-
-logger = logging.getLogger(__name__)
 
 
 class InforemoDataFrameParser(DataFrameParser, source=Datasource.INFOREMO):

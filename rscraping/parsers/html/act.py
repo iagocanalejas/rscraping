@@ -1,4 +1,5 @@
 import logging
+import os
 import re
 from collections.abc import Generator
 from typing import Any, override
@@ -28,14 +29,14 @@ from rscraping.data.normalization.towns import normalize_town
 
 from ._parser import HtmlParser
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(os.path.dirname(os.path.realpath(__file__)))
 
 
 class ACTHtmlParser(HtmlParser):
     DATASOURCE = Datasource.ACT
 
     @override
-    def parse_race(self, selector: Selector, race_id: str, is_female: bool, **_) -> Race | None:
+    def parse_race(self, selector: Selector, *, race_id: str, is_female: bool, **_) -> Race | None:
         name = self.get_name(selector)
         if not name:
             logger.error(f"{self.DATASOURCE}: no race found for {race_id=}")
@@ -113,7 +114,7 @@ class ACTHtmlParser(HtmlParser):
         return (RaceName(p[0], whitespaces_clean(p[1]).upper()) for p in pairs)
 
     @override
-    def parse_lineup(self, **_):
+    def parse_lineup(self, *_, **__):
         raise NotImplementedError
 
     ####################################################
@@ -206,9 +207,7 @@ class ACTHtmlParser(HtmlParser):
     #                  NORMALIZATION                   #
     ####################################################
     @staticmethod
-    def _hardcoded_name_edition(
-        name: str, is_female: bool, year: int, edition: int | None
-    ) -> tuple[str, int | None]:
+    def _hardcoded_name_edition(name: str, is_female: bool, year: int, edition: int | None) -> tuple[str, int | None]:
         if "ASTILLERO" in name:
             name, edition = "BANDERA AYUNTAMIENTO DE ASTILLERO", (year - 1970)
 

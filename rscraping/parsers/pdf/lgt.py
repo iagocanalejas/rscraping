@@ -1,4 +1,3 @@
-import logging
 import re
 
 from fitz import Page
@@ -10,8 +9,6 @@ from rscraping.data.normalization.clubs import normalize_club_name
 from rscraping.data.normalization.races import normalize_race_name
 
 from ._parser import PdfParser
-
-logger = logging.getLogger(__name__)
 
 
 class LGTPdfParser(PdfParser):

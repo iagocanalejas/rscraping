@@ -1,4 +1,5 @@
 import logging
+import os
 import re
 from collections.abc import Generator
 from datetime import date, datetime
@@ -29,14 +30,14 @@ from rscraping.data.normalization.towns import normalize_town
 
 from ._parser import HtmlParser
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(os.path.dirname(os.path.realpath(__file__)))
 
 
 class ARCHtmlParser(HtmlParser):
     DATASOURCE = Datasource.ARC
 
     @override
-    def parse_race(self, selector: Selector, race_id: str, is_female: bool, **_) -> Race | None:
+    def parse_race(self, selector: Selector, *, race_id: str, is_female: bool, **_) -> Race | None:
         name = self.get_name(selector)
         if not name:
             logger.error(f"{self.DATASOURCE}: no race found for {race_id=}")

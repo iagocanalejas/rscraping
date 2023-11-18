@@ -3,7 +3,6 @@
 import argparse
 import logging
 import os
-import sys
 import time
 
 import requests
@@ -15,9 +14,7 @@ from rscraping.data.constants import HTTP_HEADERS
 from rscraping.data.models import Datasource
 from rscraping.parsers.html.traineras import TrainerasHtmlParser
 
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
-logger.addHandler(logging.StreamHandler(sys.stdout))
+logger = logging.getLogger(__name__)
 
 
 # this only works with traineras.es

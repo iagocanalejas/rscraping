@@ -50,7 +50,7 @@ class TestTrainerasParser(unittest.TestCase):
         ids = self.parser.parse_race_ids(data, is_female=False)
         self.assertEqual(list(ids), ["5455", "5457", "5458", "5535", "5536"])
 
-        ids = self.parser.parse_race_ids(data, is_female=False, race_type=CATEGORY_VETERAN)
+        ids = self.parser.parse_race_ids(data, is_female=False, category=CATEGORY_VETERAN)
         self.assertEqual(list(ids), ["5457", "5536"])
 
         ids = self.parser.parse_race_ids(data, is_female=True)
@@ -68,7 +68,7 @@ class TestTrainerasParser(unittest.TestCase):
         race_names = self.parser.parse_race_names(Selector(data), is_female=False)
         self.assertEqual(list(race_names), self._MALE_RACE_NAMES)
 
-        race_names = self.parser.parse_race_names(Selector(data), is_female=False, race_type=CATEGORY_VETERAN)
+        race_names = self.parser.parse_race_names(Selector(data), is_female=False, category=CATEGORY_VETERAN)
         self.assertEqual(list(race_names), self._VETERAN_RACE_NAMES)
 
         race_names = self.parser.parse_race_names(Selector(data), is_female=True)

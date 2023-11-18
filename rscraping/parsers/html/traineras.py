@@ -1,4 +1,5 @@
 import logging
+import os
 from collections.abc import Generator
 from typing import Any, override
 
@@ -23,7 +24,7 @@ from rscraping.data.normalization.towns import normalize_town
 
 from ._parser import HtmlParser
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(os.path.dirname(os.path.realpath(__file__)))
 
 
 class MultiDayRaceException(Exception):
@@ -42,9 +43,10 @@ class TrainerasHtmlParser(HtmlParser):
     _FEMALE = ["SF", "VF", "JF", "F"]
     _VETERAN = ["VF", "VM"]
     _SCHOOL = ["M", "JM", "JF", "CM", "CF"]
+    _FILTERS = ["MEMORIAL", "CONTRARRELOJ", "DESCENSO", "ASCENSO", "CAMPEONATO", "TERESA HERRERA", "CONCHA"]
 
     @override
-    def parse_race(self, selector: Selector, race_id: str, day: int | None = None, **_) -> Race | None:
+    def parse_race(self, selector: Selector, *, race_id: str, day: int | None = None, **_) -> Race | None:
         if len(selector.xpath("/html/body/div[1]/main/div[1]/div/div/div[2]/table[*]").getall()) > 1 and not day:
             raise MultiDayRaceException()
         day = day if day else 1
@@ -113,10 +115,16 @@ class TrainerasHtmlParser(HtmlParser):
 
     @override
     def parse_race_ids(
-        self, selector: Selector, is_female: bool, race_type: str | None = None, **_
+        self,
+        selector: Selector,
+        *,
+        is_female: bool,
+        category: str | None = None,
+        include_league_races: bool = False,
+        **_,
     ) -> Generator[str, Any, Any]:
-        if race_type and race_type not in [CATEGORY_ABSOLUT, CATEGORY_VETERAN, CATEGORY_SCHOOL]:
-            raise ValueError(f"invalid {race_type=}")
+        if category and category not in [CATEGORY_ABSOLUT, CATEGORY_VETERAN, CATEGORY_SCHOOL]:
+            raise ValueError(f"invalid {category=}")
 
         rows = [Selector(r) for r in selector.xpath("/html/body/div[1]/div[2]/table/tbody/tr").getall()]
         return (
@@ -124,7 +132,12 @@ class TrainerasHtmlParser(HtmlParser):
             for row in rows
             if (
                 self._has_gender(is_female, row.xpath("//*/td[2]/text()").get(""))
-                and self._has_type(race_type, row.xpath("//*/td[2]/text()").get(""))
+                and self._has_type(category, row.xpath("//*/td[2]/text()").get(""))
+                and (
+                    include_league_races
+                    or category != CATEGORY_ABSOLUT
+                    or any(t in row.xpath("//*/td[1]/a/text()").get("") for t in self._FILTERS)
+                )
             )
         )
 
@@ -141,10 +154,16 @@ class TrainerasHtmlParser(HtmlParser):
 
     @override
     def parse_race_names(
-        self, selector: Selector, is_female: bool, race_type: str | None = None, **_
+        self,
+        selector: Selector,
+        *,
+        is_female: bool,
+        category: str | None = None,
+        include_league_races: bool = False,
+        **_,
     ) -> Generator[RaceName, Any, Any]:
-        if race_type and race_type not in [CATEGORY_ABSOLUT, CATEGORY_VETERAN, CATEGORY_SCHOOL]:
-            raise ValueError(f"invalid {race_type=}")
+        if category and category not in [CATEGORY_ABSOLUT, CATEGORY_VETERAN, CATEGORY_SCHOOL]:
+            raise ValueError(f"invalid {category=}")
 
         rows = [Selector(r) for r in selector.xpath("/html/body/div[1]/div[2]/table/tbody/tr").getall()]
         return (
@@ -155,7 +174,12 @@ class TrainerasHtmlParser(HtmlParser):
             for row in rows
             if (
                 self._has_gender(is_female, row.xpath("//*/td[2]/text()").get(""))
-                and self._has_type(race_type, row.xpath("//*/td[2]/text()").get(""))
+                and self._has_type(category, row.xpath("//*/td[2]/text()").get(""))
+                and (
+                    include_league_races
+                    or category != CATEGORY_ABSOLUT
+                    or any(t in row.xpath("//*/td[1]/a/text()").get("") for t in self._FILTERS)
+                )
             )
         )
 
@@ -289,13 +313,13 @@ class TrainerasHtmlParser(HtmlParser):
     def _has_gender(self, is_female: bool, value: str) -> bool:
         return value in self._FEMALE if is_female else value not in self._FEMALE
 
-    def _has_type(self, race_type: str | None, value: str) -> bool:
-        if not race_type:
+    def _has_type(self, category: str | None, value: str) -> bool:
+        if not category:
             return True
-        if race_type == CATEGORY_ABSOLUT:
+        if category == CATEGORY_ABSOLUT:
             return value not in self._VETERAN and value not in self._SCHOOL
-        if race_type == CATEGORY_VETERAN:
+        if category == CATEGORY_VETERAN:
             return value in self._VETERAN
-        if race_type == CATEGORY_SCHOOL:
+        if category == CATEGORY_SCHOOL:
             return value in self._SCHOOL
         return False

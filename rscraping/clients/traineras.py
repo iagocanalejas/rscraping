@@ -12,14 +12,12 @@ from ._client import Client
 
 
 class TrainerasClient(Client, source=Datasource.TRAINERAS):
-    _html_parser: TrainerasHtmlParser
-
     DATASOURCE = Datasource.TRAINERAS
     MALE_START = FEMALE_START = 1960
 
-    def __init__(self, **_) -> None:
-        super().__init__()
-        self._html_parser = TrainerasHtmlParser()
+    @property
+    def _html_parser(self) -> TrainerasHtmlParser:
+        return TrainerasHtmlParser()
 
     @override
     @staticmethod
@@ -36,39 +34,25 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
         return f"https://traineras.es/personas/{rower_id}"
 
     @override
-    @staticmethod
-    def get_lineup_url(lineup_id: str, **_):
-        return f"https://traineras.es/alineaciones/{lineup_id}"
-
-    def get_pages(self, year: int) -> Generator[Selector, Any, Any]:
-        def selector(year: int, page: int) -> Selector:
-            return Selector(
-                requests.get(url=self.get_races_url(year, page=page), headers=HTTP_HEADERS()).content.decode("utf-8")
-            )
-
-        page = 1
-        first_page = selector(year, page)
-        while page <= self._html_parser.get_number_of_pages(first_page):
-            yield (selector(year, page) if page != 1 else first_page)
-            page += 1
+    def get_race_ids_by_year(
+        self, year: int, is_female: bool, *, category: str | None, **_
+    ) -> Generator[str, Any, Any]:
+        self.validate_year(year, is_female=is_female)
+        for page in self.get_pages(year):
+            yield from self._html_parser.parse_race_ids(page, is_female=is_female, category=category)
 
     @override
-    def get_race_ids_by_year(self, year: int, is_female: bool, race_type: str | None, **_) -> Generator[str, Any, Any]:
-        self.validate_year_or_raise_exception(year, is_female=is_female)
-        for page in self.get_pages(year):
-            yield from self._html_parser.parse_race_ids(page, is_female=is_female, race_type=race_type)
-
     def get_race_ids_by_rower(self, rower_id: str, year: str | None = None, **_) -> Generator[str, Any, Any]:
         content = requests.get(url=self.get_rower_url(rower_id), headers=HTTP_HEADERS()).content.decode("utf-8")
         yield from self._html_parser.parse_rower_race_ids(Selector(content), year=year)
 
     @override
     def get_race_names_by_year(
-        self, year: int, is_female: bool, race_type: str | None, **_
+        self, year: int, is_female: bool, *, category: str | None, **_
     ) -> Generator[RaceName, Any, Any]:
-        self.validate_year_or_raise_exception(year, is_female=is_female)
+        self.validate_year(year, is_female=is_female)
         for page in self.get_pages(year):
-            yield from self._html_parser.parse_race_names(page, is_female=is_female, race_type=race_type)
+            yield from self._html_parser.parse_race_names(page, is_female=is_female, category=category)
 
     @override
     def get_lineup_by_race_id(self, race_id: str, **_) -> Generator[Lineup, Any, Any]:
@@ -80,3 +64,23 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
                 continue
             lineup = requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8")
             yield self._html_parser.parse_lineup(Selector(lineup))
+
+    def get_pages(self, year: int) -> Generator[Selector, Any, Any]:
+        """
+        Generate Selector objects for each page of races in a specific year.
+
+        Args:
+            year (int): The year for which to generate race pages.
+
+        Yields: Selector: Selector objects for each page.
+        """
+
+        def get_page_selector(page: int) -> Selector:
+            url = self.get_races_url(year, page=page)
+            content = requests.get(url, headers=HTTP_HEADERS()).content.decode("utf-8")
+            return Selector(content)
+
+        first_page = get_page_selector(1)
+        total_pages = self._html_parser.get_number_of_pages(first_page)
+        for page_number in range(2, total_pages + 1):
+            yield get_page_selector(page_number)

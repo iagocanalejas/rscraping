@@ -95,7 +95,7 @@ class ACTPdfParser(PdfParser):
         delegate = whitespaces_clean(" ".join(rowers[rowers.index("Delegado") + 1 : rowers.index("Suplentes")]))
         return coach, delegate
 
-    def _get_coxswain_and_bow(self, page: Page, rowers: list[str]) -> tuple[str, str]:
+    def _get_coxswain_and_bow(self, page: Page, rowers: list[str]) -> tuple[str | None, str | None]:
         """
         Find the coxswain and bow rowers based on their vertical positions on the page.
 

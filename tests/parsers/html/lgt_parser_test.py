@@ -20,7 +20,7 @@ class TestLGTParser(unittest.TestCase):
         ):
             race = self.parser.parse_race(
                 Selector(file.read()),
-                Selector(results.read()),
+                results_selector=Selector(results.read()),
                 race_id="1234",
             )
         if not race:

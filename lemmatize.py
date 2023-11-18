@@ -3,13 +3,10 @@
 import argparse
 import logging
 import os
-import sys
 
 from rscraping import lemmatize
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-logger.addHandler(logging.StreamHandler(sys.stdout))
+logger = logging.getLogger(__name__)
 
 
 def _parse_arguments():

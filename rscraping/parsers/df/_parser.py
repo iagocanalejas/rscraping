@@ -1,4 +1,3 @@
-import logging
 from abc import ABC, abstractmethod
 from collections.abc import Generator
 from typing import Any
@@ -6,8 +5,6 @@ from typing import Any
 from pandas import DataFrame
 
 from rscraping.data.models import Datasource, Race
-
-logger = logging.getLogger(__name__)
 
 
 class DataFrameParser(ABC):

@@ -3,15 +3,12 @@
 import argparse
 import logging
 import os
-import sys
 
 from rscraping import find_race
 from rscraping.data.functions import save_csv
 from rscraping.data.models import Datasource
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-logger.addHandler(logging.StreamHandler(sys.stdout))
+logger = logging.getLogger(__name__)
 
 
 def _parse_arguments():

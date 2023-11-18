@@ -1,9 +1,6 @@
-import logging
 import re
 
 from pyutils.strings import remove_parenthesis, whitespaces_clean
-
-logger = logging.getLogger(__name__)
 
 # list of normalizations to specific to be implemented
 _ENTITY_TITLES_SHORT = [
