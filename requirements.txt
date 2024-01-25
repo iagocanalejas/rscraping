@@ -1,4 +1,3 @@
-fillpdf==0.7.2
 inquirer==3.2.1
 matplotlib==3.8.2
 numpy==1.26.3

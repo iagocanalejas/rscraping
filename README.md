@@ -58,20 +58,3 @@ Create a list of lemmas for the given phrase.
 ```sh
 python lemmatize.py <phrase>
 ```
-
-## Build PDF
-
-Build all required files for a rower.
-
-```sh
-python fillforms.py <options>
-    # -on: SignOn date to use in the documents (DD/MM/YYYY).
-    # -t, --type: Specifies the list of files to be generate (['all']). ['national', 'image', 'fegar', 'xogade', 'all']
-    # -p, --parent: Specifies if the rower requires parents data. (False)
-    # -i, --images: Folder containing the images for fegar generator.
-    # --coach: Create the files for a coach.
-    # --directive: Create the files for a delegate.
-    # --no-preset: Asks to input more information.
-    # --no-entity: Asks to input entity information.
-    # --debug: Logs and autofilled data.
-```
