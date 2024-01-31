@@ -78,7 +78,7 @@ class Client(ABC):
             race.url = url
         return race
 
-    def get_race_ids_by_year(self, year: int, is_female: bool, **kwargs) -> Generator[str, Any, Any]:
+    def get_race_ids_by_year(self, year: int, is_female: bool | None = None, **kwargs) -> Generator[str, Any, Any]:
         """
         Find the race IDs for a given year and gender.
 
@@ -89,16 +89,18 @@ class Client(ABC):
 
         Yields: str: Race IDs.
         """
-        self.validate_year(year, is_female=is_female)
+        self.validate_year(year, is_female=bool(is_female))
 
-        url = self.get_races_url(year, is_female=is_female)
+        url = self.get_races_url(year, is_female=bool(is_female))
         yield from self._html_parser.parse_race_ids(
             selector=Selector(requests.get(url=url, headers=HTTP_HEADERS()).text),
             is_female=is_female,
             **kwargs,
         )
 
-    def get_race_names_by_year(self, year: int, is_female: bool, **kwargs) -> Generator[RaceName, Any, Any]:
+    def get_race_names_by_year(
+        self, year: int, is_female: bool | None = None, **kwargs
+    ) -> Generator[RaceName, Any, Any]:
         """
         Find the race names for a given year and gender.
 
@@ -109,9 +111,9 @@ class Client(ABC):
 
         Yields: RaceName: Race names.
         """
-        self.validate_year(year, is_female=is_female)
+        self.validate_year(year, is_female=bool(is_female))
 
-        url = self.get_races_url(year, is_female=is_female)
+        url = self.get_races_url(year, is_female=bool(is_female))
         yield from self._html_parser.parse_race_names(
             selector=Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8")),
             is_female=is_female,

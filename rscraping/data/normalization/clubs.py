@@ -2,7 +2,7 @@ import re
 
 from pyutils.strings import remove_parenthesis, whitespaces_clean
 
-# list of normalizations to specific to be implemented
+# list of normalizations to specific to be generalized
 _ENTITY_TITLES_SHORT = [
     "CR",
     "SD",

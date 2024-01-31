@@ -119,7 +119,7 @@ class LGTClient(Client, source=Datasource.LGT):
         return super().get_race_by_id(race_id, **kwargs)
 
     @override
-    def get_race_ids_by_year(self, year: int, is_female: bool, **_) -> Generator[str, Any, Any]:
+    def get_race_ids_by_year(self, year: int, is_female: bool | None, **_) -> Generator[str, Any, Any]:
         """
         Find the race IDs for a given year and gender.
 
@@ -145,7 +145,7 @@ class LGTClient(Client, source=Datasource.LGT):
                 yield from race_ids
                 return
 
-        self.validate_year(year, is_female=is_female)
+        self.validate_year(year, is_female=bool(is_female))
         since = self.MALE_START
 
         # asume 30 races per year for lower bound and 50 for the upper bound
@@ -179,7 +179,7 @@ class LGTClient(Client, source=Datasource.LGT):
         return (str(r) for r in range(lower_race_id, (upper_race_id + 1)) if r not in self._excluded_ids)
 
     @override
-    def get_race_names_by_year(self, year: int, is_female: bool, **_) -> Generator[RaceName, Any, Any]:
+    def get_race_names_by_year(self, year: int, is_female: bool | None, **_) -> Generator[RaceName, Any, Any]:
         """
         Find the race names for a given year and gender. Uses the unchecked IDs found in get_race_ids_by_year to
         find them.

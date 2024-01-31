@@ -35,9 +35,9 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
 
     @override
     def get_race_ids_by_year(
-        self, year: int, is_female: bool, *, category: str | None, **_
+        self, year: int, is_female: bool | None = None, *, category: str | None, **_
     ) -> Generator[str, Any, Any]:
-        self.validate_year(year, is_female=is_female)
+        self.validate_year(year, is_female=bool(is_female))
         for page in self.get_pages(year):
             yield from self._html_parser.parse_race_ids(page, is_female=is_female, category=category)
 
@@ -48,9 +48,9 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
 
     @override
     def get_race_names_by_year(
-        self, year: int, is_female: bool, *, category: str | None, **_
+        self, year: int, is_female: bool | None = None, *, category: str | None, **_
     ) -> Generator[RaceName, Any, Any]:
-        self.validate_year(year, is_female=is_female)
+        self.validate_year(year, is_female=bool(is_female))
         for page in self.get_pages(year):
             yield from self._html_parser.parse_race_names(page, is_female=is_female, category=category)
 

@@ -118,7 +118,7 @@ class TrainerasHtmlParser(HtmlParser):
         self,
         selector: Selector,
         *,
-        is_female: bool,
+        is_female: bool | None = None,
         category: str | None = None,
         include_league_races: bool = False,
         **_,
@@ -157,7 +157,7 @@ class TrainerasHtmlParser(HtmlParser):
         self,
         selector: Selector,
         *,
-        is_female: bool,
+        is_female: bool | None = None,
         category: str | None = None,
         include_league_races: bool = False,
         **_,
@@ -310,8 +310,8 @@ class TrainerasHtmlParser(HtmlParser):
     ####################################################
     #                     PRIVATE                      #
     ####################################################
-    def _has_gender(self, is_female: bool, value: str) -> bool:
-        return value in self._FEMALE if is_female else value not in self._FEMALE
+    def _has_gender(self, is_female: bool | None, value: str) -> bool:
+        return is_female is None or (value in self._FEMALE if is_female else value not in self._FEMALE)
 
     def _has_type(self, category: str | None, value: str) -> bool:
         if not category:
