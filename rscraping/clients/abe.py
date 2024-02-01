@@ -23,16 +23,3 @@ class ABEClient(Client, source=Datasource.ABE):
     @staticmethod
     def get_races_url(year: int, **_) -> str:
         return f"https://lasalveliga.com/es/regatas-{year - 1}/"
-
-    @override
-    @staticmethod
-    def get_lineup_url(*_, **__):
-        raise NotImplementedError
-
-    @override
-    def get_race_ids_by_rower(self, *_, **__):
-        raise NotImplementedError
-
-    @override
-    def get_lineup_by_race_id(self, *_, **__):
-        raise NotImplementedError

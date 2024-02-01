@@ -2,7 +2,7 @@ from collections.abc import Generator
 from typing import Any, override
 
 import requests
-from parsel import Selector
+from parsel.selector import Selector
 
 from rscraping.data.constants import HTTP_HEADERS
 from rscraping.data.models import Datasource, Lineup
@@ -48,7 +48,3 @@ class ARCClient(Client, source=Datasource.ARC):
             url = self.get_lineup_url(race_id, club_id=club_id, is_female=is_female)
             selector = Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8"))
             yield self._html_parser.parse_lineup(selector=selector)
-
-    @override
-    def get_race_ids_by_rower(self, *_, **__):
-        raise NotImplementedError

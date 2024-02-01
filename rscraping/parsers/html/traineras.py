@@ -3,7 +3,7 @@ import os
 from collections.abc import Generator
 from typing import Any, override
 
-from parsel import Selector
+from parsel.selector import Selector
 
 from pyutils.strings import find_date, whitespaces_clean
 from rscraping.data.constants import (

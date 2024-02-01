@@ -4,7 +4,7 @@ from typing import Any, override
 
 import requests
 from fitz import fitz
-from parsel import Selector
+from parsel.selector import Selector
 
 from pyutils.strings import whitespaces_clean
 from rscraping.data.constants import HTTP_HEADERS
@@ -90,11 +90,6 @@ class LGTClient(Client, source=Datasource.LGT):
 
     @override
     @staticmethod
-    def get_races_url(*_, **__) -> str:
-        raise NotImplementedError
-
-    @override
-    @staticmethod
     def get_lineup_url(race_id: str, **_) -> str:
         return f"https://www.ligalgt.com/pdf/alinacion.php?regata_id={race_id}"
 
@@ -119,7 +114,7 @@ class LGTClient(Client, source=Datasource.LGT):
         return super().get_race_by_id(race_id, **kwargs)
 
     @override
-    def get_race_ids_by_year(self, year: int, is_female: bool | None, **_) -> Generator[str, Any, Any]:
+    def get_race_ids_by_year(self, year: int, is_female: bool | None = None, **_) -> Generator[str, Any, Any]:
         """
         Find the race IDs for a given year and gender.
 
@@ -179,7 +174,7 @@ class LGTClient(Client, source=Datasource.LGT):
         return (str(r) for r in range(lower_race_id, (upper_race_id + 1)) if r not in self._excluded_ids)
 
     @override
-    def get_race_names_by_year(self, year: int, is_female: bool | None, **_) -> Generator[RaceName, Any, Any]:
+    def get_race_names_by_year(self, year: int, is_female: bool | None = None, **_) -> Generator[RaceName, Any, Any]:
         """
         Find the race names for a given year and gender. Uses the unchecked IDs found in get_race_ids_by_year to
         find them.
@@ -221,10 +216,6 @@ class LGTClient(Client, source=Datasource.LGT):
                 lineup = self._pdf_parser.parse_lineup(page=pdf[page_num])
                 if lineup:
                     yield lineup
-
-    @override
-    def get_race_ids_by_rower(self, *_, **__):
-        raise NotImplementedError
 
     ####################################################
     #                      UTILS                       #

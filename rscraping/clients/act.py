@@ -53,7 +53,3 @@ class ACTClient(Client, source=Datasource.ACT):
                 lineup = self._pdf_parser.parse_lineup(page=pdf[page_num])
                 if lineup:
                     yield lineup
-
-    @override
-    def get_race_ids_by_rower(self, *_, **__):
-        raise NotImplementedError

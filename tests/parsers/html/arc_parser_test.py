@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from parsel import Selector
+from parsel.selector import Selector
 
 from rscraping.data.constants import GENDER_MALE
 from rscraping.data.models import Lineup, Participant, Race, RaceName

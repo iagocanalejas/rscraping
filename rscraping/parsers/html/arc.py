@@ -5,7 +5,7 @@ from collections.abc import Generator
 from datetime import date, datetime
 from typing import Any, override
 
-from parsel import Selector
+from parsel.selector import Selector
 
 from pyutils.strings import remove_parenthesis, whitespaces_clean
 from rscraping.data.constants import (

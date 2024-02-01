@@ -2,7 +2,7 @@ from collections.abc import Generator
 from typing import Any, override
 
 import requests
-from parsel import Selector
+from parsel.selector import Selector
 
 from rscraping.data.constants import HTTP_HEADERS
 from rscraping.data.models import Datasource, Lineup, RaceName
@@ -16,6 +16,7 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
     MALE_START = FEMALE_START = 1960
 
     @property
+    @override
     def _html_parser(self) -> TrainerasHtmlParser:
         return TrainerasHtmlParser()
 
@@ -48,7 +49,7 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
 
     @override
     def get_race_names_by_year(
-        self, year: int, is_female: bool | None = None, *, category: str | None, **_
+        self, year: int, is_female: bool | None = None, *, category: str | None = None, **_
     ) -> Generator[RaceName, Any, Any]:
         self.validate_year(year, is_female=bool(is_female))
         for page in self.get_pages(year):

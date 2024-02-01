@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from parsel import Selector
+from parsel.selector import Selector
 
 from rscraping.data.models import Participant, Race, RaceName
 from rscraping.parsers.html.act import ACTHtmlParser

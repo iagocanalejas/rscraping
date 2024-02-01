@@ -6,7 +6,7 @@ import os
 import time
 
 import requests
-from parsel import Selector
+from parsel.selector import Selector
 
 from pyutils.strings import find_date
 from rscraping.clients import Client
