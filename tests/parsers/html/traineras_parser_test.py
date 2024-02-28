@@ -3,8 +3,8 @@ import unittest
 
 from parsel.selector import Selector
 
-from rscraping.data.constants import CATEGORY_VETERAN, GENDER_MALE
-from rscraping.data.models import Lineup, Participant, Race, RaceName
+from rscraping.data.constants import CATEGORY_ABSOLUT, CATEGORY_VETERAN, GENDER_MALE, RACE_CONVENTIONAL, RACE_TRAINERA
+from rscraping.data.models import Datasource, Lineup, Participant, Race, RaceName
 from rscraping.parsers.html.traineras import MultiDayRaceException, TrainerasHtmlParser
 
 
@@ -108,8 +108,8 @@ class TestTrainerasParser(unittest.TestCase):
         name="BANDERA CIUDAD DE LA CORUÑA",
         date="09/07/2022",
         day=2,
-        modality="TRAINERA",
-        type="CONVENTIONAL",
+        modality=RACE_TRAINERA,
+        type=RACE_CONVENTIONAL,
         league=None,
         town="A CORUÑA",
         organizer=None,
@@ -118,7 +118,7 @@ class TestTrainerasParser(unittest.TestCase):
         race_id="1234",
         url=None,
         gender=GENDER_MALE,
-        datasource="traineras",
+        datasource=Datasource.TRAINERAS.value,
         participants=[],
         race_laps=4,
         race_lanes=4,
@@ -127,8 +127,8 @@ class TestTrainerasParser(unittest.TestCase):
 
     _PARTICIPANTS = [
         Participant(
-            gender="MALE",
-            category="ABSOLUT",
+            gender=GENDER_MALE,
+            category=CATEGORY_ABSOLUT,
             club_name="URDAIBAI A.E.",
             lane=1,
             series=3,
@@ -140,8 +140,8 @@ class TestTrainerasParser(unittest.TestCase):
             disqualified=False,
         ),
         Participant(
-            gender="MALE",
-            category="ABSOLUT",
+            gender=GENDER_MALE,
+            category=CATEGORY_ABSOLUT,
             club_name="C.R.O. ORIO A.E.",
             lane=4,
             series=3,

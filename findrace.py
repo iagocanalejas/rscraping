@@ -39,7 +39,7 @@ def main(race_id: str, datasource: str, is_female: bool, with_lineups: bool, sav
         day=day,
     )
     if not race:
-        raise ValueError(f"not found race for race_id={args.race_id}")
+        raise ValueError(f"not found race for race_id={race_id}")
 
     print(race.to_json())
     if save:

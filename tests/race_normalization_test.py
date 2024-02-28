@@ -1,6 +1,6 @@
 import unittest
 
-from rscraping.data.normalization.races import normalize_name_parts, normalize_race_name
+from rscraping.data.normalization.races import normalize_name_parts, normalize_race_name, remove_day_indicator
 
 
 class TestRaceNameNormalization(unittest.TestCase):
@@ -18,6 +18,7 @@ class TestRaceNameNormalization(unittest.TestCase):
             "HONDARRIBIKO XXXVI BANDERA - MAPFRE SARI NAGUSIA",
             "ORIOKO XXXIII ESTROPADA - ORIO KANPINA XI BANDERA",
             "GETXOKO ESTROPADEN XLV IKURRIÑA - JOSE ANTONIO AGIRRE LEHENDAKARIAREN XIX OMENALDIA",
+            "PLAY-OFF LGT",
         ]
 
         for idx, race_name in enumerate(self.NAMES):
@@ -34,3 +35,9 @@ class TestRaceNameNormalization(unittest.TestCase):
         races = [normalize_race_name(n) for n in self.NAMES]
         for idx, race_name in enumerate(races):
             self.assertEqual(normalize_name_parts(race_name), results[idx])
+
+    def test_day_indicator_normalization(self):
+        pairs = [("PLAY-OFF LGT XORNADA 2 (ARES)", "PLAY-OFF LGT (ARES)")]
+
+        for name, normalized in pairs:
+            self.assertEqual(remove_day_indicator(name), normalized)

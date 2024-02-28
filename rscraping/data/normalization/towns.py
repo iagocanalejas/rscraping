@@ -1,4 +1,6 @@
-from pyutils.strings import whitespaces_clean
+import re
+
+from pyutils.strings import remove_parenthesis, whitespaces_clean
 
 _NORMALIZED_TOWNS = {
     "VILAGARCÍA": ["VILAXOAN", "VILAXOÁN"],
@@ -16,6 +18,14 @@ _PROVINCES = [
 
 
 def normalize_town(town: str) -> str:
+    """
+    Normalize a town name to a standard format
+
+    1. Uppercase
+    2. Remove "PORTO DE"
+    2. Remove province
+    3. Specific known town normalizations
+    """
     town = whitespaces_clean(town.upper().replace("PORTO DE ", ""))
 
     town = remove_province(town)
@@ -40,3 +50,27 @@ def amend_town(town: str) -> str:
             town = k
             break
     return whitespaces_clean(town)
+
+
+def extract_town(name: str) -> str | None:
+    """
+    Extract the town from the name
+
+    1. Try to extract the town from the parenthesis
+    2. Try to extract the town from the 'CONCELLO DE' part
+    """
+
+    def validate_town(town: str) -> str | None:
+        if town not in ["CLASIFICATORIA"]:
+            return town
+        return None
+
+    town = None
+    matches = re.findall(r"\((.*?)\)", name)
+    if matches:
+        town = validate_town(whitespaces_clean(matches[0]).upper())
+
+    if not town and "CONCELLO DE" in name:
+        town = validate_town(whitespaces_clean(remove_parenthesis(name.split("CONCELLO DE ")[1])).upper())
+
+    return town

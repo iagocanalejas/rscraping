@@ -1,13 +1,17 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from collections.abc import Generator
-from typing import Any
+from typing import Any, Protocol
 
 from pandas import DataFrame
 
 from rscraping.data.models import Datasource, Race
 
 
-class DataFrameParser(ABC):
+class DataFrameParserProtocol(Protocol):
+    def parse_races_from(self, data: DataFrame, *_, **kwargs) -> Generator[Race, Any, Any]: ...
+
+
+class DataFrameParser(DataFrameParserProtocol, ABC):
     DATASOURCE: Datasource
     _registry = {}
 
@@ -21,11 +25,3 @@ class DataFrameParser(ABC):
         final_obj = object.__new__(subclass)
 
         return final_obj
-
-    ####################################################
-    #                 ABSTRACT METHODS                 #
-    ####################################################
-
-    @abstractmethod
-    def parse_races_from(self, file_name: str, header: str, tabular: DataFrame, **kwargs) -> Generator[Race, Any, Any]:
-        raise NotImplementedError

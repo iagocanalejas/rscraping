@@ -3,7 +3,8 @@ import unittest
 
 from parsel.selector import Selector
 
-from rscraping.data.models import Participant, Race, RaceName
+from rscraping.data.constants import CATEGORY_VETERAN, GENDER_MALE, RACE_CONVENTIONAL, RACE_TRAINERA
+from rscraping.data.models import Datasource, Participant, Race, RaceName
 from rscraping.parsers.html import ABEHtmlParser
 
 
@@ -44,8 +45,8 @@ class TestABEParser(unittest.TestCase):
         name="XIII BANDERA CRV PONTEJOS (3/6/2023)",
         date="03/06/2023",
         day=1,
-        modality="TRAINERA",
-        type="CONVENTIONAL",
+        modality=RACE_TRAINERA,
+        type=RACE_CONVENTIONAL,
         league="ARRAUNLARI BETERANOEN ELKARTEA",
         town=None,
         organizer=None,
@@ -53,8 +54,8 @@ class TestABEParser(unittest.TestCase):
         normalized_names=[("BANDERA CRV PONTEJOS", 13)],
         race_id="1234",
         url=None,
-        datasource="abe",
-        gender="MALE",
+        datasource=Datasource.ABE.value,
+        gender=GENDER_MALE,
         participants=[],
         race_laps=None,
         race_lanes=None,
@@ -62,8 +63,8 @@ class TestABEParser(unittest.TestCase):
     )
     _PARTICIPANTS = [
         Participant(
-            gender="MALE",
-            category="VETERAN",
+            gender=GENDER_MALE,
+            category=CATEGORY_VETERAN,
             club_name="FORTUNA",
             lane=None,
             series=None,
@@ -76,8 +77,8 @@ class TestABEParser(unittest.TestCase):
             lineup=None,
         ),
         Participant(
-            gender="MALE",
-            category="VETERAN",
+            gender=GENDER_MALE,
+            category=CATEGORY_VETERAN,
             club_name="PONTEJOS",
             lane=None,
             series=None,
@@ -90,8 +91,8 @@ class TestABEParser(unittest.TestCase):
             lineup=None,
         ),
         Participant(
-            gender="MALE",
-            category="VETERAN",
+            gender=GENDER_MALE,
+            category=CATEGORY_VETERAN,
             club_name="BADOK 13",
             lane=None,
             series=None,

@@ -5,6 +5,7 @@ from typing import Any
 
 import inquirer
 from pandas import DataFrame, Series
+from pandas.core.series import NDFrame
 
 from pyutils.strings import find_date, remove_symbols, whitespaces_clean
 from rscraping.data.constants import (
@@ -35,12 +36,7 @@ class InforemoDataFrameParser(DataFrameParser, source=Datasource.INFOREMO):
     }
 
     def parse_races_from(
-        self,
-        file_name: str,
-        header: str,
-        tabular: DataFrame,
-        manual_input: bool = False,
-        **_,
+        self, data: DataFrame, *_, file_name: str, header: str, manual_input: bool = False, **__
     ) -> Generator[Race, Any, Any]:
         name = self._try_find_race_name(header, manual_input=manual_input)
         t_date = self._try_find_race_date(header, manual_input=manual_input)
@@ -49,13 +45,13 @@ class InforemoDataFrameParser(DataFrameParser, source=Datasource.INFOREMO):
         if not t_date:
             raise ValueError(f"{self.DATASOURCE}: no date found")
 
-        df = self._clean_dataframe(tabular)
+        df = self._clean_dataframe(data)
 
         race_laps = self.get_race_laps(df)
 
         identifiers = df[2].unique()
         for identifier in [i for i in identifiers if i]:
-            participants: DataFrame = df[df[2] == identifier]
+            participants: NDFrame = df[df[2] == identifier]
 
             genders = [self.get_gender(p) for (_, p) in participants.iterrows()]
             gender = (
@@ -91,7 +87,7 @@ class InforemoDataFrameParser(DataFrameParser, source=Datasource.INFOREMO):
 
             yield race
 
-    def _get_race_participants(self, participants: DataFrame, race: Race) -> list[Participant]:
+    def _get_race_participants(self, participants: NDFrame, race: Race) -> list[Participant]:
         items: list[Participant] = []
         for _, participant in participants.iterrows():
             club_name = self.get_club_name(participant)
@@ -196,7 +192,7 @@ class InforemoDataFrameParser(DataFrameParser, source=Datasource.INFOREMO):
             return CATEGORY_VETERAN
         return CATEGORY_ABSOLUT
 
-    def get_race_lanes(self, df: DataFrame) -> int:
+    def get_race_lanes(self, df: NDFrame) -> int:
         return max(self.get_lane(p) for (_, p) in df.iterrows())
 
     def get_race_laps(self, df: DataFrame) -> int:

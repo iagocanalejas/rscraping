@@ -3,8 +3,8 @@ import unittest
 
 from parsel.selector import Selector
 
-from rscraping.data.constants import GENDER_MALE
-from rscraping.data.models import Participant, Race, RaceName
+from rscraping.data.constants import CATEGORY_ABSOLUT, GENDER_MALE, RACE_CONVENTIONAL, RACE_TRAINERA
+from rscraping.data.models import Datasource, Participant, Race, RaceName
 from rscraping.parsers.html.lgt import LGTHtmlParser
 
 
@@ -48,8 +48,8 @@ class TestLGTParser(unittest.TestCase):
         name="IX BANDEIRA VIRXE DO CARME",
         date="25/07/2020",
         day=1,
-        modality="TRAINERA",
-        type="CONVENTIONAL",
+        modality=RACE_TRAINERA,
+        type=RACE_CONVENTIONAL,
         league="LIGA A",
         town="",
         organizer=None,
@@ -57,7 +57,7 @@ class TestLGTParser(unittest.TestCase):
         normalized_names=[("BANDEIRA VIRXE DO CARME", 9)],
         race_id="1234",
         url=None,
-        datasource="lgt",
+        datasource=Datasource.LGT.value,
         gender=GENDER_MALE,
         participants=[],
         race_laps=4,
@@ -66,8 +66,8 @@ class TestLGTParser(unittest.TestCase):
     )
     _PARTICIPANTS = [
         Participant(
-            gender="MALE",
-            category="ABSOLUT",
+            gender=GENDER_MALE,
+            category=CATEGORY_ABSOLUT,
             club_name="CR MUROS",
             lane=4,
             series=1,
@@ -79,8 +79,8 @@ class TestLGTParser(unittest.TestCase):
             disqualified=False,
         ),
         Participant(
-            gender="MALE",
-            category="ABSOLUT",
+            gender=GENDER_MALE,
+            category=CATEGORY_ABSOLUT,
             club_name="CR CABO DA CRUZ",
             lane=2,
             series=2,
@@ -92,8 +92,8 @@ class TestLGTParser(unittest.TestCase):
             disqualified=False,
         ),
         Participant(
-            gender="MALE",
-            category="ABSOLUT",
+            gender=GENDER_MALE,
+            category=CATEGORY_ABSOLUT,
             club_name="SD TIRÁN - PEREIRA",
             lane=4,
             series=2,

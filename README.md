@@ -14,6 +14,19 @@ python findrace.py <datasource> <race_id> <options>
 python findrace.py act 1678276379 --female
 ```
 
+## Process CSV
+
+Processes a CSV file to retrieve the race or races information.
+
+```sh
+python processcsv.py <sheet_id> <race_id?> <options>
+    # --female=<bool>: Specifies if we need to search in the female pages.
+    # --sheet_name=<bool>: Name of the sheet to be processed.
+    # --save=<bool>: Saves the output to a csv file.
+
+python findrace.py act 1678276379 --female
+```
+
 ## Download Images
 
 Downloads lineup images for a given rower in a given club (Only supports traineras.es).

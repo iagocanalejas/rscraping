@@ -99,6 +99,17 @@ _KNOWN_SPONSORS = [
 
 
 def normalize_club_name(name: str) -> str:
+    """
+    Normalize a club name to a standard format
+
+    1. Uppercase
+    2. Remove parenthesis
+    3. Remove acronyms
+    4. Remove dots
+    5. Remove club titles
+    6. Remove club sponsors
+    7. Specific known club normalizations
+    """
     name = whitespaces_clean(remove_parenthesis(name.upper()))
     name = deacronym_club_name(name)
 

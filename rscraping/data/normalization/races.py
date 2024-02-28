@@ -63,6 +63,14 @@ _NORMALIZED_RACES = {
 
 
 def normalize_name_parts(normalized_name: str) -> list[tuple[str, int | None]]:
+    """
+    Normalize the name to a list of (name, edition)
+
+    1. Remove parenthesis
+    2. Split by " - " if not a play off
+    3. Find the edition
+    4. Remove roman numbers
+    """
     parts: list[tuple[str, int | None]] = []
     normalized_name = remove_parenthesis(whitespaces_clean(normalized_name))
     name_parts = normalized_name.split(" - ") if not is_play_off(normalized_name) else [normalized_name]
@@ -76,6 +84,18 @@ def normalize_name_parts(normalized_name: str) -> list[tuple[str, int | None]]:
 
 
 def normalize_race_name(name: str) -> str:
+    """
+    Normalize race name to a standard format
+
+    1. Uppercase
+    2. Remove acronyms
+    3. Remove symbols
+    4. Fix some known misspellings
+    5. Remove league indicator
+    6. Remove race sponsor
+    7. Specific known race normalizations
+    8. Specific known error names
+    """
     name = whitespaces_clean(name).upper()
     name = deacronym_race_name(name)  # need to be executed before "." removal
 
@@ -90,14 +110,20 @@ def normalize_race_name(name: str) -> str:
     return whitespaces_clean(name)
 
 
-def remove_league_indicator(name: str) -> str:
-    words = name.split()
-    filtered_words = [w for w in words if w not in {"B", "F"}]
+def find_edition(name: str) -> int | None:
+    name = re.sub(r"[\'\".:]", " ", name)
+    roman_options = [e for e in [find_roman(w) for w in name.split()] if e is not None]
+    return roman_to_int(roman_options[0]) if roman_options else None
 
-    if name.endswith(" A"):
-        filtered_words = filtered_words[:-1]
 
-    return whitespaces_clean(" ".join(filtered_words))
+def find_race_sponsor(name: str) -> str | None:
+    """
+    Find the race sponsor in our known list
+    """
+    for sponsor in _KNOWN_RACE_SPONSORS:
+        if sponsor in name:
+            return sponsor
+    return None
 
 
 def remove_race_sponsor(name: str) -> str:
@@ -109,23 +135,28 @@ def remove_race_sponsor(name: str) -> str:
 
 
 def remove_day_indicator(name: str) -> str:
+    """
+    Remove the day indicator from the name
+
+    1. Remove "J" and the number
+    2. Remove "JORNADA" and the number
+    3. Remove "día" and the number
+    3. Remove "XORNADA" and the number
+    """
     name = re.sub(r"\(?(\dJ|J\d)\)?", "", name)  # found in some ACT races
-    name = re.sub(r"\d+ª día|\(\d+ª? JORNADA\)", "", name)  # found in some ARC races
+    name = re.sub(r"\d+ª día|\d+ª DÍA|\(\d+ª? JORNADA\)", "", name)  # found in some ARC races
     name = re.sub(r"(XORNADA )\d+|\d+( XORNADA)", "", name)  # found in some LGT races
     return whitespaces_clean(name)
 
 
-def find_race_sponsor(name: str) -> str | None:
-    for sponsor in _KNOWN_RACE_SPONSORS:
-        if sponsor in name:
-            return sponsor
-    return None
+def remove_league_indicator(name: str) -> str:
+    words = name.split()
+    filtered_words = [w for w in words if w not in {"B", "F"}]
 
+    if name.endswith(" A"):
+        filtered_words = filtered_words[:-1]
 
-def find_edition(name: str) -> int | None:
-    name = re.sub(r"[\'\".:]", " ", name)
-    roman_options = [e for e in [find_roman(w) for w in name.split()] if e is not None]
-    return roman_to_int(roman_options[0]) if roman_options else None
+    return whitespaces_clean(" ".join(filtered_words))
 
 
 def deacronym_race_name(name: str) -> str:

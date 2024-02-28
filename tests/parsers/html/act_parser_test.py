@@ -3,7 +3,8 @@ import unittest
 
 from parsel.selector import Selector
 
-from rscraping.data.models import Participant, Race, RaceName
+from rscraping.data.constants import CATEGORY_ABSOLUT, GENDER_MALE, RACE_CONVENTIONAL, RACE_TRAINERA
+from rscraping.data.models import Datasource, Participant, Race, RaceName
 from rscraping.parsers.html.act import ACTHtmlParser
 
 
@@ -44,8 +45,8 @@ class TestACTParser(unittest.TestCase):
         name="ORIOKO XXXIII. ESTROPADA - ORIO KANPINA XI. BANDERA (16-07-2023)",
         date="16/07/2023",
         day=1,
-        modality="TRAINERA",
-        type="CONVENTIONAL",
+        modality=RACE_TRAINERA,
+        type=RACE_CONVENTIONAL,
         league="EUSKO LABEL LIGA",
         town="ZIERBENA",
         organizer=None,
@@ -53,8 +54,8 @@ class TestACTParser(unittest.TestCase):
         normalized_names=[("ORIOKO ESTROPADAK", 33), ("ORIO KANPINA BANDERA", 11)],
         race_id="1234",
         url=None,
-        datasource="act",
-        gender="MALE",
+        datasource=Datasource.ACT.value,
+        gender=GENDER_MALE,
         participants=[],
         race_laps=4,
         race_lanes=4,
@@ -62,8 +63,8 @@ class TestACTParser(unittest.TestCase):
     )
     _PARTICIPANTS = [
         Participant(
-            gender="MALE",
-            category="ABSOLUT",
+            gender=GENDER_MALE,
+            category=CATEGORY_ABSOLUT,
             club_name="GETARIA",
             lane=3,
             series=1,
@@ -75,8 +76,8 @@ class TestACTParser(unittest.TestCase):
             disqualified=False,
         ),
         Participant(
-            gender="MALE",
-            category="ABSOLUT",
+            gender=GENDER_MALE,
+            category=CATEGORY_ABSOLUT,
             club_name="ZIERBENA BAHIAS DE BIZKAIA",
             lane=4,
             series=2,
@@ -88,8 +89,8 @@ class TestACTParser(unittest.TestCase):
             disqualified=False,
         ),
         Participant(
-            gender="MALE",
-            category="ABSOLUT",
+            gender=GENDER_MALE,
+            category=CATEGORY_ABSOLUT,
             club_name="MATRIX HONDARRIBIA",
             lane=2,
             series=3,

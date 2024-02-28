@@ -13,11 +13,14 @@ class TestACTParser(unittest.TestCase):
         self.fixtures = os.path.join(os.getcwd(), "fixtures", "pdf")
 
     def test_parse_race(self):
+        lineup = None
         with fitz.open(os.path.join(self.fixtures, "act_lineup.pdf")) as pdf:
             for page_num in range(pdf.page_count):
                 page = pdf[page_num]
                 lineup = self.parser.parse_lineup(page)
 
+        if not lineup:
+            raise ValueError("unable to parse lineup")
         self.assertEqual(lineup, self._LINEUP)
 
     _LINEUP = Lineup(

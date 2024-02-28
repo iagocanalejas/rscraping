@@ -8,6 +8,11 @@ __LEAGUES_MAP = {
 
 
 def normalize_league_name(name: str) -> str:
+    """
+    Normalize the league name to a standard name
+
+    1. Specific known league normalizations
+    """
     for k, v in __LEAGUES_MAP.items():
         if name in v:
             name = k

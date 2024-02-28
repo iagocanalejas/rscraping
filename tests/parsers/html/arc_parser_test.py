@@ -3,8 +3,8 @@ import unittest
 
 from parsel.selector import Selector
 
-from rscraping.data.constants import GENDER_MALE
-from rscraping.data.models import Lineup, Participant, Race, RaceName
+from rscraping.data.constants import CATEGORY_ABSOLUT, GENDER_MALE, RACE_TIME_TRIAL, RACE_TRAINERA
+from rscraping.data.models import Datasource, Lineup, Participant, Race, RaceName
 from rscraping.parsers.html.arc import ARCHtmlParser
 
 
@@ -57,8 +57,8 @@ class TestARCParser(unittest.TestCase):
         name="XVII BANDERA RIA DEL ASON",
         date="22/08/2009",
         day=1,
-        modality="TRAINERA",
-        type="TIME_TRIAL",
+        modality=RACE_TRAINERA,
+        type=RACE_TIME_TRIAL,
         league="ASOCIACIÓN DE REMO DEL CANTÁBRICO 2",
         town="COLINDRES",
         organizer=None,
@@ -67,7 +67,7 @@ class TestARCParser(unittest.TestCase):
         race_id="1234",
         url=None,
         gender=GENDER_MALE,
-        datasource="arc",
+        datasource=Datasource.ARC.value,
         participants=[],
         race_laps=4,
         race_lanes=7,
@@ -75,8 +75,8 @@ class TestARCParser(unittest.TestCase):
     )
     _PARTICIPANTS = [
         Participant(
-            gender="MALE",
-            category="ABSOLUT",
+            gender=GENDER_MALE,
+            category=CATEGORY_ABSOLUT,
             club_name="RASPAS A.E.",
             lane=1,
             series=1,
@@ -88,8 +88,8 @@ class TestARCParser(unittest.TestCase):
             disqualified=False,
         ),
         Participant(
-            gender="MALE",
-            category="ABSOLUT",
+            gender=GENDER_MALE,
+            category=CATEGORY_ABSOLUT,
             club_name="NATURHOUSE - MUNDAKA",
             lane=1,
             series=2,

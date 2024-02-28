@@ -14,6 +14,7 @@ class Datasource(StrEnum):
     ABE = auto()
     TRAINERAS = auto()
     INFOREMO = auto()
+    GDRIVE = auto()
 
     @classmethod
     def has_value(cls, value: str) -> bool:
