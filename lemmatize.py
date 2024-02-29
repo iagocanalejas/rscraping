@@ -5,6 +5,7 @@ import logging
 import os
 
 from rscraping import lemmatize
+from rscraping.data.functions import sys_print_items
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +17,7 @@ def _parse_arguments():
 
 
 def main(phrase: str):
-    print(lemmatize(phrase))
+    sys_print_items(lemmatize(phrase))
 
 
 if __name__ == "__main__":

@@ -1,5 +1,7 @@
 import csv
 import os
+import sys
+from typing import Any
 
 from pyutils.strings import remove_symbols
 from rscraping.data.models import Lineup, Race
@@ -37,3 +39,14 @@ def save_csv(lineups: list[Race] | list[Lineup], file_name: str):
         writer.writerow(lineups[0].__dict__.keys())  # write headers
         for item in lineups:
             writer.writerow(item.__dict__.values())
+
+
+def sys_print_items(items: list[Any]):
+    items_len = len(items)
+    sys.stdout.write("[")
+    for i, race in enumerate(items):
+        sys.stdout.write(str(race))
+        if i != items_len - 1:
+            sys.stdout.write(",")
+    sys.stdout.write("]\n")
+    sys.stdout.flush()

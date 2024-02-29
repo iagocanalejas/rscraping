@@ -54,9 +54,12 @@ class Lineup:
     bow: str | None
     images: list[str]
 
+    def __str__(self) -> str:
+        return self.to_json()
+
     def to_json(self) -> str:
         d = {k: v for k, v in self.__dict__.items()}
-        return json.dumps(d, indent=4, skipkeys=True, ensure_ascii=False)
+        return json.dumps(d)
 
 
 @dataclass
@@ -88,7 +91,7 @@ class Race:
     cancelled: bool = False
 
     def __str__(self) -> str:
-        return f"{self.race_id}:{" ".join(n for n, _ in self.normalized_names)}"
+        return self.to_json()
 
     def to_dict(self) -> dict:
         d = {k: v for k, v in self.__dict__.items()}
@@ -96,7 +99,7 @@ class Race:
         return d
 
     def to_json(self) -> str:
-        return json.dumps(self.to_dict(), indent=4, skipkeys=True, ensure_ascii=False)
+        return json.dumps(self.to_dict())
 
     @staticmethod
     def from_json(json_str: str) -> "Race":
@@ -132,7 +135,7 @@ class Participant:
     lineup: Optional["Lineup"] = None
 
     def __str__(self) -> str:
-        return f"{self.participant}"
+        return self.to_json()
 
     def to_dict(self) -> dict:
         d = {k: v for k, v in self.__dict__.items() if k not in ["race"]}
@@ -140,7 +143,7 @@ class Participant:
         return d
 
     def to_json(self) -> str:
-        return json.dumps(self.to_dict(), indent=4, skipkeys=True, ensure_ascii=False)
+        return json.dumps(self.to_dict())
 
     @staticmethod
     def from_json(json_str: str) -> "Participant":

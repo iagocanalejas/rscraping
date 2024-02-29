@@ -5,7 +5,7 @@ import logging
 import os
 
 from rscraping import find_race
-from rscraping.data.functions import save_csv
+from rscraping.data.functions import save_csv, sys_print_items
 from rscraping.data.models import Datasource
 
 logger = logging.getLogger(__name__)
@@ -41,9 +41,10 @@ def main(race_id: str, datasource: str, is_female: bool, with_lineups: bool, sav
     if not race:
         raise ValueError(f"not found race for race_id={race_id}")
 
-    print(race.to_json())
     if save:
         save_csv([race], file_name=f"race_{race_id}_{datasource.upper()}")
+
+    sys_print_items([race])
 
 
 if __name__ == "__main__":

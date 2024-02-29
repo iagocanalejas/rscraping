@@ -5,7 +5,7 @@ import logging
 import os
 
 from rscraping import parse_race_image
-from rscraping.data.functions import expand_path, save_csv
+from rscraping.data.functions import expand_path, save_csv, sys_print_items
 from rscraping.data.models import Datasource, Race
 
 logger = logging.getLogger(__name__)
@@ -36,11 +36,10 @@ def main(paths: list[str], datasource: str, header_size: int = 3, allow_plot: bo
             )
         )
 
-    for race in parsed_items:
-        print(race.to_json())
-
     if save:
         save_csv(parsed_items, file_name=f"img_races_{datasource.upper()}")
+
+    sys_print_items(parsed_items)
 
 
 if __name__ == "__main__":

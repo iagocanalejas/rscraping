@@ -3,9 +3,10 @@
 import argparse
 import logging
 import os
+import sys
 
 from rscraping import find_csv_race, parse_race_csv
-from rscraping.data.functions import save_csv
+from rscraping.data.functions import save_csv, sys_print_items
 from rscraping.data.models import Datasource
 
 logger = logging.getLogger(__name__)
@@ -32,16 +33,18 @@ def main(sheet_id: str, is_female: bool, race_id: str | None = None, sheet_name:
         if not race:
             raise ValueError(f"not found race for race_id={race_id}")
 
-        print(race.to_json())
         if save:
             save_csv([race], file_name=f"race_{race_id}_{Datasource.GDRIVE.value.upper()}")
-        return
 
-    races = parse_race_csv(sheet_id, is_female=is_female, sheet_name=sheet_name)
-    for r in races:
-        print(r.to_json())
+        sys_print_items([race])
+        sys.exit(0)
+
+    races = list(parse_race_csv(sheet_id, is_female=is_female, sheet_name=sheet_name))
+
     if save:
-        save_csv(list(races), file_name=f"race_{race_id}_{Datasource.GDRIVE.value.upper()}")
+        save_csv(races, file_name=f"race_{race_id}_{Datasource.GDRIVE.value.upper()}")
+
+    sys_print_items(races)
 
 
 if __name__ == "__main__":
