@@ -1,9 +1,10 @@
-from collections.abc import Callable, Generator, Hashable, Mapping
+from collections.abc import Callable, Generator
 from datetime import date
 from typing import Any, override
 
 import pandas as pd
 
+from pyutils.shortcuts import only_one_not_none
 from pyutils.strings import roman_to_int
 from rscraping.data.models import Datasource, Lineup, Race, RaceName
 from rscraping.parsers.df import (
@@ -32,7 +33,7 @@ class GoogleDriveClient(ClientProtocol):
     FEMALE_START = 2015
     MALE_START = 2011
 
-    _df_types: Mapping[Hashable, Callable] = {
+    _df_types: dict[Any, Callable] = {
         "N": lambda x: int(x) if x else None,
         COLUMN_CLUB: lambda x: str(x) if x else None,
         COLUMN_DATE: lambda x: pd.to_datetime(x, format="%d/%m/%Y").date() if x and x != "-" else None,
@@ -69,21 +70,53 @@ class GoogleDriveClient(ClientProtocol):
 
     @override
     def get_race_by_id(
-        self, race_id: str, *_, sheet_id: str, sheet_name: str | None = None, is_female: bool = False, **kwargs
+        self,
+        race_id: str,
+        *_,
+        sheet_id: str | None = None,
+        file_path: str | None = None,
+        sheet_name: str | None = None,
+        is_female: bool = False,
+        **kwargs,
     ) -> Race | None:
-        df = self._load_dataframe(self.get_race_details_url(sheet_id=sheet_id, sheet_name=sheet_name))
+        if not only_one_not_none(sheet_id, file_path):
+            raise ValueError("sheet_id and file_path are mutually exclusive")
+
+        df = self._load_dataframe(sheet_id=sheet_id, file_path=file_path, sheet_name=sheet_name)
         race_row = df.iloc[int(race_id) - 1]
 
         return self._parser.parse_race_serie(race_row, is_female=is_female)
 
     def get_races(
-        self, sheet_id: str, sheet_name: str | None = None, is_female: bool = False, **kwargs
+        self,
+        sheet_id: str | None = None,
+        file_path: str | None = None,
+        sheet_name: str | None = None,
+        is_female: bool = False,
+        **kwargs,
     ) -> Generator[Race, Any, Any]:
-        df = self._load_dataframe(self.get_race_details_url(sheet_id=sheet_id, sheet_name=sheet_name))
+        if not only_one_not_none(sheet_id, file_path):
+            raise ValueError("sheet_id and file_path are mutually exclusive")
+
+        df = self._load_dataframe(sheet_id=sheet_id, file_path=file_path, sheet_name=sheet_name)
         return self._parser.parse_races_from(df, is_female=is_female)
 
-    def _load_dataframe(self, url: str) -> pd.DataFrame:
-        df = pd.read_csv(url, header=0, index_col=0, converters=self._df_types).fillna("")
+    def _load_dataframe(
+        self, sheet_id: str | None = None, file_path: str | None = None, sheet_name: str | None = None
+    ) -> pd.DataFrame:
+        df = None
+
+        if sheet_id:
+            url = self.get_race_details_url(sheet_id=sheet_id, sheet_name=sheet_name)
+            df = pd.read_csv(url, header=0, index_col=0, converters=self._df_types).fillna("")
+
+        if file_path:
+            if file_path.endswith(".csv"):
+                df = pd.read_csv(file_path, header=0, index_col=0, converters=self._df_types).fillna("")
+            if file_path.endswith(".xlsx"):
+                df = pd.read_excel(file_path, header=0, index_col=0, converters=self._df_types).fillna("")
+
+        assert isinstance(df, pd.DataFrame)
 
         # remove unused dataframe parts
         # 1. remove rows with NaN index

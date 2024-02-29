@@ -3,6 +3,7 @@ from typing import Any
 from collections.abc import Generator
 
 from pyutils.strings import normalize_synonyms, remove_conjunctions, remove_symbols
+from pyutils.shortcuts import only_one_not_none
 from rscraping.clients import Client
 from rscraping.clients.gdrive import GoogleDriveClient
 from rscraping.data.constants import SYNONYMS
@@ -56,13 +57,16 @@ def find_race(
     return race
 
 
-def find_csv_race(race_id: str, sheet_id: str, is_female: bool, sheet_name: str | None = None) -> Race | None:
+def find_csv_race(
+    race_id: str, sheet_id: str | None, file_path: str | None, is_female: bool, sheet_name: str | None = None
+) -> Race | None:
     """
-    Find a race inside a Google Sheet by its ID.
+    Find a race inside a Google Sheet by its ID or in a file.
 
     Parameters:
     - race_id (str): The ID of the race to find.
-    - sheet_id (str): The ID of the Google Sheet to search in.
+    - sheet_id (Optional[str]): The ID of the Google Sheet to search in.
+    - file_path (Optional[str]): The path to the local file to search in.
     - is_female (bool): Whether the race is for females (True) or not (False).
     - sheet_name (Optional[str]): The name of the sheet to search in (optional).
 
@@ -72,23 +76,29 @@ def find_csv_race(race_id: str, sheet_id: str, is_female: bool, sheet_name: str 
     This function retrieves the race information using a Google Drive sheet.
     """
     client = GoogleDriveClient()
-    return client.get_race_by_id(race_id, sheet_id=sheet_id, sheet_name=sheet_name, is_female=is_female)
+    return client.get_race_by_id(
+        race_id, sheet_id=sheet_id, file_path=file_path, sheet_name=sheet_name, is_female=is_female
+    )
 
 
-def parse_race_csv(sheet_id: str, is_female: bool, sheet_name: str | None = None) -> Generator[Race, Any, Any]:
+def parse_race_csv(
+    *_, sheet_id: str | None, file_path: str | None, is_female: bool, sheet_name: str | None
+) -> Generator[Race, Any, Any]:
     """
-    Parse race information from a Google Sheet using provided parameters.
+    Parse race information from a Google Sheet or file using provided parameters.
 
     Parameters:
-    - sheet_id (str): The ID of the Google Sheet to parse.
+    - sheet_id (Optional[str]): The ID of the Google Sheet to parse.
+    - file_path (Optional[str]): The path to the local file to search in.
     - is_female (bool): Whether the race is for females (True) or not (False).
     - sheet_name (Optional[str]): The name of the sheet to parse (optional).
 
     Returns:
     - Generator[Race, Any, Any]: A generator that yields Race objects as they are parsed.
     """
+
     client = GoogleDriveClient()
-    return client.get_races(sheet_id=sheet_id, sheet_name=sheet_name, is_female=is_female)
+    return client.get_races(sheet_id=sheet_id, file_path=file_path, sheet_name=sheet_name, is_female=is_female)
 
 
 def parse_race_image(
