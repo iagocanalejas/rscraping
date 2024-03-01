@@ -5,12 +5,12 @@ import pandas as pd
 
 from rscraping.data.constants import CATEGORY_ABSOLUT, GENDER_MALE, RACE_CONVENTIONAL, RACE_TIME_TRIAL, RACE_TRAINERA
 from rscraping.data.models import Datasource, Participant, Race
-from rscraping.parsers.df.gdrive import GoogleDriveDataFrameParser
+from rscraping.parsers.df import TabularDataFrameParser
 
 
-class TestGoogleDriveParser(unittest.TestCase):
+class TestTabularDataParser(unittest.TestCase):
     def setUp(self):
-        self.parser = GoogleDriveDataFrameParser()
+        self.parser = TabularDataFrameParser()
         self.fixtures = os.path.join(os.getcwd(), "fixtures", "df")
 
     def test_parse_race_series(self):
@@ -57,7 +57,7 @@ class TestGoogleDriveParser(unittest.TestCase):
         normalized_names=[("REGATA CARITAS VILAXOAN", None)],
         race_id="1",
         url=None,
-        datasource=Datasource.GDRIVE.value,
+        datasource=Datasource.TABULAR.value,
         gender=GENDER_MALE,
         participants=[],
         race_laps=None,
@@ -93,7 +93,7 @@ class TestGoogleDriveParser(unittest.TestCase):
             normalized_names=[("REGATA CARITAS VILAXOAN", None)],
             race_id="1",
             url=None,
-            datasource=Datasource.GDRIVE.value,
+            datasource=Datasource.TABULAR.value,
             gender=GENDER_MALE,
             participants=[],
             race_laps=None,
@@ -113,7 +113,7 @@ class TestGoogleDriveParser(unittest.TestCase):
             normalized_names=[("TROFEO TERESA HERRERA", None)],
             race_id="2",
             url=None,
-            datasource=Datasource.GDRIVE.value,
+            datasource=Datasource.TABULAR.value,
             gender=GENDER_MALE,
             participants=[],
             race_laps=None,
@@ -133,7 +133,7 @@ class TestGoogleDriveParser(unittest.TestCase):
             normalized_names=[("BANDEIRA MASCULINA DEPUTACIÓN DA CORUÑA", None)],
             race_id="3",
             url=None,
-            datasource=Datasource.GDRIVE.value,
+            datasource=Datasource.TABULAR.value,
             gender=GENDER_MALE,
             participants=[],
             race_laps=None,
@@ -153,7 +153,7 @@ class TestGoogleDriveParser(unittest.TestCase):
             normalized_names=[("BANDEIRA CONGELADOS PERILLO", None)],
             race_id="4",
             url=None,
-            datasource=Datasource.GDRIVE.value,
+            datasource=Datasource.TABULAR.value,
             gender=GENDER_MALE,
             participants=[],
             race_laps=None,

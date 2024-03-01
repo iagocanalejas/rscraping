@@ -1,4 +1,5 @@
 from collections.abc import Callable, Generator
+from dataclasses import dataclass
 from datetime import date
 from typing import Any, override
 
@@ -20,23 +21,31 @@ from rscraping.parsers.df import (
     COLUMN_ORGANIZER,
     COLUMN_TIME,
     COLUMN_TYPE,
-    GoogleDriveDataFrameParser,
+    TabularDataFrameParser,
 )
 from rscraping.parsers.html import HtmlParser
 from rscraping.parsers.pdf import PdfParser
 
-from ._client import ClientProtocol
+from ._client import Client
 
 
-class GoogleDriveClient(ClientProtocol):
-    DATASOURCE = Datasource.GDRIVE
+@dataclass
+class TabularClientConfig:
+    file_path: str | None = None
+    sheet_id: str | None = None
+    sheet_name: str | None = None
+
+
+class TabularDataClient(Client, source=Datasource.TABULAR):
+    DATASOURCE = Datasource.TABULAR
     FEMALE_START = 2015
     MALE_START = 2011
 
+    _df: pd.DataFrame
     _df_types: dict[Any, Callable] = {
         "N": lambda x: int(x) if x else None,
         COLUMN_CLUB: lambda x: str(x) if x else None,
-        COLUMN_DATE: lambda x: pd.to_datetime(x, format="%d/%m/%Y").date() if x and x != "-" else None,
+        COLUMN_DATE: lambda x: pd.to_datetime(x, format="%d/%m/%Y") if x and x != "-" else None,
         COLUMN_LEAGUE: lambda x: str(x) if x and x != "-" else None,
         COLUMN_EDITION: lambda x: roman_to_int(x) if x and x != "-" else None,
         COLUMN_NAME: lambda x: str(x) if x else None,
@@ -50,15 +59,8 @@ class GoogleDriveClient(ClientProtocol):
     }
 
     @property
-    def _parser(self) -> GoogleDriveDataFrameParser:
-        return GoogleDriveDataFrameParser()
-
-    @override
-    def validate_year(self, year: int, is_female: bool):
-        since = self.FEMALE_START if is_female else self.MALE_START
-        today = date.today().year
-        if year < since or year > today:
-            raise ValueError(f"invalid 'year', available values are [{since}, {today}]")
+    def _parser(self) -> TabularDataFrameParser:
+        return TabularDataFrameParser()
 
     @override
     @staticmethod
@@ -68,53 +70,53 @@ class GoogleDriveClient(ClientProtocol):
             url += f"&sheet={sheet_name}"
         return url
 
-    @override
-    def get_race_by_id(
-        self,
-        race_id: str,
-        *_,
-        sheet_id: str | None = None,
-        file_path: str | None = None,
-        sheet_name: str | None = None,
-        is_female: bool = False,
-        **kwargs,
-    ) -> Race | None:
-        if not only_one_not_none(sheet_id, file_path):
+    def __init__(self, *_, config: TabularClientConfig, **kwargs) -> None:
+        if not only_one_not_none(config.file_path, config.sheet_id):
             raise ValueError("sheet_id and file_path are mutually exclusive")
+        self._df = self._load_dataframe(config)
+        super().__init__(**kwargs)
 
-        df = self._load_dataframe(sheet_id=sheet_id, file_path=file_path, sheet_name=sheet_name)
-        race_row = df.iloc[int(race_id) - 1]
+    @override
+    def validate_year(self, year: int, is_female: bool):
+        since = self.FEMALE_START if is_female else self.MALE_START
+        today = date.today().year
+        if year < since or year > today:
+            raise ValueError(f"invalid 'year', available values are [{since}, {today}]")
 
+    @override
+    def get_race_by_id(self, race_id: str, *_, is_female: bool = False, **kwargs) -> Race | None:
+        race_row = self._df.iloc[int(race_id) - 1]
         return self._parser.parse_race_serie(race_row, is_female=is_female)
 
-    def get_races(
-        self,
-        sheet_id: str | None = None,
-        file_path: str | None = None,
-        sheet_name: str | None = None,
-        is_female: bool = False,
-        **kwargs,
-    ) -> Generator[Race, Any, Any]:
-        if not only_one_not_none(sheet_id, file_path):
-            raise ValueError("sheet_id and file_path are mutually exclusive")
+    def get_races(self, is_female: bool = False, **kwargs) -> Generator[Race, Any, Any]:
+        return self._parser.parse_races_from(self._df, is_female=is_female)
 
-        df = self._load_dataframe(sheet_id=sheet_id, file_path=file_path, sheet_name=sheet_name)
-        return self._parser.parse_races_from(df, is_female=is_female)
+    def get_race_ids_by_year(self, year: int, *_, **kwargs) -> Generator[str, Any, Any]:
+        df = self._df[self._df[COLUMN_DATE].dt.year == year]
+        for _, row in df.iterrows():
+            yield str(row.name)
 
-    def _load_dataframe(
-        self, sheet_id: str | None = None, file_path: str | None = None, sheet_name: str | None = None
-    ) -> pd.DataFrame:
+    def get_race_names_by_year(self, year: int, *_, **kwargs) -> Generator[RaceName, Any, Any]:
+        df = self._df[self._df[COLUMN_DATE].dt.year == year]
+        for _, row in df.iterrows():
+            yield RaceName(race_id=str(row.name), name=str(row[COLUMN_NAME]))
+
+    ################################################
+    ############## PRIVATE METHODS #################
+    ################################################
+
+    def _load_dataframe(self, config: TabularClientConfig) -> pd.DataFrame:
         df = None
 
-        if sheet_id:
-            url = self.get_race_details_url(sheet_id=sheet_id, sheet_name=sheet_name)
+        if config.sheet_id:
+            url = self.get_race_details_url(sheet_id=config.sheet_id, sheet_name=config.sheet_name)
             df = pd.read_csv(url, header=0, index_col=0, converters=self._df_types).fillna("")
 
-        if file_path:
-            if file_path.endswith(".csv"):
-                df = pd.read_csv(file_path, header=0, index_col=0, converters=self._df_types).fillna("")
-            if file_path.endswith(".xlsx"):
-                df = pd.read_excel(file_path, header=0, index_col=0, converters=self._df_types).fillna("")
+        if config.file_path:
+            if config.file_path.endswith(".csv"):
+                df = pd.read_csv(config.file_path, header=0, index_col=0, converters=self._df_types).fillna("")
+            if config.file_path.endswith(".xlsx"):
+                df = pd.read_excel(config.file_path, header=0, index_col=0, converters=self._df_types).fillna("")
 
         assert isinstance(df, pd.DataFrame)
 
@@ -137,14 +139,6 @@ class GoogleDriveClient(ClientProtocol):
 
     @property
     def _pdf_parser(self) -> PdfParser:
-        raise NotImplementedError
-
-    def get_race_ids_by_year(self, year: int, is_female: bool | None = None, **kwargs) -> Generator[str, Any, Any]:
-        raise NotImplementedError
-
-    def get_race_names_by_year(
-        self, year: int, is_female: bool | None = None, **kwargs
-    ) -> Generator[RaceName, Any, Any]:
         raise NotImplementedError
 
     def get_race_ids_by_rower(self, rower_id: str, **kwargs) -> Generator[str, Any, Any]:

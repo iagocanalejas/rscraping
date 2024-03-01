@@ -37,7 +37,7 @@ COLUMN_NUMBER_LANES = "N Boyas"
 COLUMN_NUMBER_LAPS = "N Largos"
 
 
-class GoogleDriveDataFrameParser(DataFrameParserProtocol):
+class TabularDataFrameParser(DataFrameParserProtocol):
     def parse_race_serie(self, row: Series, is_female: bool = False) -> Race | None:
         if not isinstance(row, Series):
             return None
@@ -61,7 +61,7 @@ class GoogleDriveDataFrameParser(DataFrameParserProtocol):
             race_id=str(int(row.name)),  # pyright: ignore
             url=None,
             gender=GENDER_FEMALE if is_female else GENDER_MALE,
-            datasource=Datasource.GDRIVE.value,
+            datasource=Datasource.TABULAR.value,
             cancelled=False,
             race_laps=int_or_none(str(row[COLUMN_NUMBER_LAPS])),
             race_lanes=int_or_none(str(row[COLUMN_NUMBER_LANES])),

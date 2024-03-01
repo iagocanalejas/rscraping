@@ -16,10 +16,7 @@ def _parse_arguments():
     parser.add_argument("datasource", type=str, help="Datasource from where to retrieve.")
     parser.add_argument("race_id", type=str, help="Race to find.")
     parser.add_argument(
-        "--female",
-        action="store_true",
-        default=False,
-        help="Specifies if we need to search in the female pages.",
+        "--female", action="store_true", default=False, help="Specifies if we need to search in the female pages."
     )
     parser.add_argument("--save", action="store_true", default=False, help="Saves the output to a csv file.")
     return parser.parse_args()

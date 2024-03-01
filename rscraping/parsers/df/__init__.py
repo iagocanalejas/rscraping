@@ -1,7 +1,7 @@
 from ._parser import DataFrameParser, DataFrameParserProtocol  # pyright: ignore
 from .inforemo import InforemoDataFrameParser  # pyright: ignore
-from .gdrive import (
-    GoogleDriveDataFrameParser,
+from .tabular import (
+    TabularDataFrameParser,
     COLUMN_CLUB,
     COLUMN_ORGANIZER,
     COLUMN_TYPE,

@@ -4,4 +4,4 @@ from .act import ACTClient  # pyright: ignore
 from .arc import ARCClient  # pyright: ignore
 from .lgt import LGTClient  # pyright: ignore
 from .traineras import TrainerasClient  # pyright: ignore
-from .gdrive import GoogleDriveClient  # pyright: ignore
+from .tabular import TabularClientConfig, TabularDataClient  # pyright: ignore
