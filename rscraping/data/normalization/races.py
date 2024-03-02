@@ -25,8 +25,6 @@ _KNOWN_RACE_SPONSORS = [
     "CEFYCAL",
     "FANDICOSTA",
     "ONURA HOMES",
-    "SALGADO CONGELADOS",
-    "SALGADO",
     "WOFCO",
     "YURRITA GROUP",
     "YURRITA",
@@ -62,6 +60,7 @@ _NORMALIZED_RACES = {
     "KEPA DEUN ARRANTZALEEN KOFRADÍA IKURRIÑA": [["COFRADÍA", "SAN", "PEDRO"], ["COFRADIA", "SAN", "PEDRO"]],
     "MEMORIAL LAGAR": [["MEMORIAL", "MIGUEL", "LORES"]],
     "MEMORIAL RULY": [["MEMORIAL", "RAUL", "REY"]],
+    "BANDEIRA CONGELADOS SALGADO": [["SALGADO"]],
 }
 
 
@@ -155,6 +154,8 @@ def find_race_sponsor(name: str) -> str | None:
     for sponsor in _KNOWN_RACE_SPONSORS:
         if sponsor in name:
             return sponsor
+    if "SALGADO" in name:  # HACK: the race name is the sponsor name so we cannot replace it
+        return "SALGADO CONGELADOS"
     return None
 
 
