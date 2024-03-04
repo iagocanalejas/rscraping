@@ -15,6 +15,12 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
     DATASOURCE = Datasource.TRAINERAS
     MALE_START = FEMALE_START = 1960
 
+    _category: str | None = None
+
+    def __init__(self, category: str | None = None, **kwargs) -> None:
+        self._category = category
+        super().__init__(**kwargs)
+
     @property
     @override
     def _html_parser(self) -> TrainerasHtmlParser:
@@ -35,12 +41,10 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
         return f"https://traineras.es/personas/{rower_id}"
 
     @override
-    def get_race_ids_by_year(
-        self, year: int, is_female: bool | None = None, *, category: str | None, **_
-    ) -> Generator[str, Any, Any]:
-        self.validate_year(year, is_female=bool(is_female))
+    def get_race_ids_by_year(self, year: int, **_) -> Generator[str, Any, Any]:
+        self.validate_year(year)
         for page in self.get_pages(year):
-            yield from self._html_parser.parse_race_ids(page, is_female=is_female, category=category)
+            yield from self._html_parser.parse_race_ids(page, is_female=self._is_female, category=self._category)
 
     @override
     def get_race_ids_by_rower(self, rower_id: str, year: str | None = None, **_) -> Generator[str, Any, Any]:
@@ -48,12 +52,10 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
         yield from self._html_parser.parse_rower_race_ids(Selector(content), year=year)
 
     @override
-    def get_race_names_by_year(
-        self, year: int, is_female: bool | None = None, *, category: str | None = None, **_
-    ) -> Generator[RaceName, Any, Any]:
-        self.validate_year(year, is_female=bool(is_female))
+    def get_race_names_by_year(self, year: int, **_) -> Generator[RaceName, Any, Any]:
+        self.validate_year(year)
         for page in self.get_pages(year):
-            yield from self._html_parser.parse_race_names(page, is_female=is_female, category=category)
+            yield from self._html_parser.parse_race_names(page, is_female=self._is_female, category=self._category)
 
     @override
     def get_lineup_by_race_id(self, race_id: str, **_) -> Generator[Lineup, Any, Any]:

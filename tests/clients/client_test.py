@@ -10,6 +10,7 @@ from rscraping.clients import (
     TabularDataClient,
     TrainerasClient,
 )
+from rscraping.data.constants import CATEGORY_VETERAN
 from rscraping.data.models import Datasource
 
 
@@ -20,6 +21,15 @@ class TestClient(unittest.TestCase):
         self.assertTrue(isinstance(Client(source=Datasource.ARC), ARCClient))
         self.assertTrue(isinstance(Client(source=Datasource.ABE), ABEClient))
         self.assertTrue(isinstance(Client(source=Datasource.LGT), LGTClient))
+
+    def test_client_initialization_with_config(self):
+        self.assertTrue(isinstance(Client(source=Datasource.ACT, is_female=True), ACTClient))
+        self.assertTrue(isinstance(Client(source=Datasource.ARC, is_female=True), ARCClient))
+        self.assertTrue(isinstance(Client(source=Datasource.ABE, is_female=True), ABEClient))
+        self.assertTrue(isinstance(Client(source=Datasource.LGT, is_female=True), LGTClient))
+
+        client = Client(source=Datasource.TRAINERAS, is_female=True, category=CATEGORY_VETERAN)
+        self.assertTrue(isinstance(client, TrainerasClient))
 
         with self.assertRaises(ValueError):
             config = TabularClientConfig(file_path="1", sheet_id="1")

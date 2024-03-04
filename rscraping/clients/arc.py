@@ -39,12 +39,12 @@ class ARCClient(Client, source=Datasource.ARC):
         return f"http://www.{host}.com/es/regata/{race_id}/unknown/equipo/{club_id}/unknown"
 
     @override
-    def get_lineup_by_race_id(self, race_id: str, *, is_female: bool, **_) -> Generator[Lineup, Any, Any]:
-        url = f"http://www.{'ligaete' if is_female else 'liga-arc'}.com/es/regata/{race_id}/unknown/equipos"
+    def get_lineup_by_race_id(self, race_id: str, **__) -> Generator[Lineup, Any, Any]:
+        url = f"http://www.{'ligaete' if self._is_female else 'liga-arc'}.com/es/regata/{race_id}/unknown/equipos"
         selector = Selector(requests.get(url=url, headers=HTTP_HEADERS()).text)
         club_ids = self._html_parser.parse_club_ids(selector=selector)
 
         for club_id in club_ids:
-            url = self.get_lineup_url(race_id, club_id=club_id, is_female=is_female)
+            url = self.get_lineup_url(race_id, club_id=club_id, is_female=self._is_female)
             selector = Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8"))
             yield self._html_parser.parse_lineup(selector=selector)

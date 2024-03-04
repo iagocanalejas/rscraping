@@ -35,10 +35,10 @@ def main(
     file_path = sheet_id_or_file_path if os.path.isfile(sheet_id_or_file_path) else None
 
     config = TabularClientConfig(file_path=file_path, sheet_id=sheet_id, sheet_name=sheet_name)
-    client: TabularDataClient = Client(source=Datasource.TABULAR, config=config)  # type: ignore
+    client: TabularDataClient = Client(source=Datasource.TABULAR, config=config, is_female=is_female)  # type: ignore
 
     if race_id:
-        race = client.get_race_by_id(race_id, is_female=is_female)
+        race = client.get_race_by_id(race_id)
         if not race:
             raise ValueError(f"not found race for race_id={race_id}")
 
@@ -48,7 +48,7 @@ def main(
         sys_print_items([race])
         sys.exit(0)
 
-    races = list(client.get_races(is_female=is_female))
+    races = list(client.get_races())
 
     if save:
         save_csv(races, file_name=f"race_{race_id}_{Datasource.TABULAR.value.upper()}")

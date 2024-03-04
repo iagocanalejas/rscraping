@@ -77,19 +77,19 @@ class TabularDataClient(Client, source=Datasource.TABULAR):
         super().__init__(**kwargs)
 
     @override
-    def validate_year(self, year: int, is_female: bool):
-        since = self.FEMALE_START if is_female else self.MALE_START
+    def validate_year(self, year: int):
+        since = self.FEMALE_START if self._is_female else self.MALE_START
         today = date.today().year
         if year < since or year > today:
             raise ValueError(f"invalid 'year', available values are [{since}, {today}]")
 
     @override
-    def get_race_by_id(self, race_id: str, *_, is_female: bool = False, **kwargs) -> Race | None:
+    def get_race_by_id(self, race_id: str, *_, **kwargs) -> Race | None:
         race_row = self._df.iloc[int(race_id) - 1]
-        return self._parser.parse_race_serie(race_row, is_female=is_female)
+        return self._parser.parse_race_serie(race_row, is_female=self._is_female)
 
-    def get_races(self, is_female: bool = False, **kwargs) -> Generator[Race, Any, Any]:
-        return self._parser.parse_races_from(self._df, is_female=is_female)
+    def get_races(self, **kwargs) -> Generator[Race, Any, Any]:
+        return self._parser.parse_races_from(self._df, is_female=self._is_female)
 
     def get_race_ids_by_year(self, year: int, *_, **kwargs) -> Generator[str, Any, Any]:
         df = self._df[self._df[COLUMN_DATE].dt.year == year]

@@ -114,7 +114,7 @@ class LGTClient(Client, source=Datasource.LGT):
         return super().get_race_by_id(race_id, **kwargs)
 
     @override
-    def get_race_ids_by_year(self, year: int, is_female: bool | None = None, **_) -> Generator[str, Any, Any]:
+    def get_race_ids_by_year(self, year: int, **_) -> Generator[str, Any, Any]:
         """
         Find the race IDs for a given year and gender.
 
@@ -127,7 +127,6 @@ class LGTClient(Client, source=Datasource.LGT):
 
         Args:
             year (int): The year for which to generate race IDs.
-            is_female (bool): Flag indicating whether it's a female race.
             **kwargs: Additional keyword arguments.
 
         Yields: str: Unchecked race IDs, note that *this list can contain invalid IDs* as this method does not check
@@ -140,7 +139,7 @@ class LGTClient(Client, source=Datasource.LGT):
                 yield from race_ids
                 return
 
-        self.validate_year(year, is_female=bool(is_female))
+        self.validate_year(year)
         since = self.MALE_START
 
         # asume 30 races per year for lower bound and 50 for the upper bound
@@ -174,14 +173,13 @@ class LGTClient(Client, source=Datasource.LGT):
         return (str(r) for r in range(lower_race_id, (upper_race_id + 1)) if r not in self._excluded_ids)
 
     @override
-    def get_race_names_by_year(self, year: int, is_female: bool | None = None, **_) -> Generator[RaceName, Any, Any]:
+    def get_race_names_by_year(self, year: int, **_) -> Generator[RaceName, Any, Any]:
         """
         Find the race names for a given year and gender. Uses the unchecked IDs found in get_race_ids_by_year to
         find them.
 
         Args:
             year (int): The year for which to generate race names.
-            is_female (bool): Flag indicating whether it's a female race.
             **kwargs: Additional keyword arguments.
 
         Yields: RaceName: Race names.
@@ -193,7 +191,7 @@ class LGTClient(Client, source=Datasource.LGT):
                 yield from race_names
                 return
 
-        for id in self.get_race_ids_by_year(year, is_female=is_female):
+        for id in self.get_race_ids_by_year(year, is_female=self._is_female):
             if id in self._excluded_ids:
                 pass
 

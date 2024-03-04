@@ -16,59 +16,55 @@ class ClientProtocol(Protocol):
     FEMALE_START: int
     MALE_START: int
 
+    _is_female: bool = False
+
     @property
     def _html_parser(self) -> HtmlParser: ...
 
     @property
     def _pdf_parser(self) -> PdfParser: ...
 
-    def validate_year(self, year: int, is_female: bool):
+    def validate_year(self, year: int):
         """
         Validate the given year for validity in datasource, raising a ValueError if it's outside the valid range.
 
         Args:
             year (int): The year to validate.
-            is_female (bool): Flag indicating whether it's a female race.
 
         Raises: ValueError: If the year is outside the valid range.
         """
         ...
 
-    def get_race_by_id(self, race_id: str, is_female: bool, **kwargs) -> Race | None:
+    def get_race_by_id(self, race_id: str, **kwargs) -> Race | None:
         """
         Retrieve race details by ID, parsing data from the corresponding URL.
 
         Args:
             race_id (str): The ID of the race.
-            is_female (bool): Flag indicating whether it's a female race.
             **kwargs: Additional keyword arguments.
 
         Returns: Race | None: The parsed race details or None if the race is not found.
         """
         ...
 
-    def get_race_ids_by_year(self, year: int, is_female: bool | None = None, **kwargs) -> Generator[str, Any, Any]:
+    def get_race_ids_by_year(self, year: int, **kwargs) -> Generator[str, Any, Any]:
         """
         Find the race IDs for a given year and gender.
 
         Args:
             year (int): The year for which to generate race IDs.
-            is_female (bool): Flag indicating whether it's a female race.
             **kwargs: Additional keyword arguments.
 
         Yields: str: Race IDs.
         """
         ...
 
-    def get_race_names_by_year(
-        self, year: int, is_female: bool | None = None, **kwargs
-    ) -> Generator[RaceName, Any, Any]:
+    def get_race_names_by_year(self, year: int, **kwargs) -> Generator[RaceName, Any, Any]:
         """
         Find the race names for a given year and gender.
 
         Args:
             year (int): The year for which to generate race names.
-            is_female (bool): Flag indicating whether it's a female race.
             **kwargs: Additional keyword arguments.
 
         Yields: RaceName: Race names.
@@ -123,6 +119,7 @@ class ClientProtocol(Protocol):
 
 class Client(ClientProtocol):
     _registry = {}
+    _is_female: bool = False
 
     DATASOURCE: Datasource
     FEMALE_START: int
@@ -144,26 +141,27 @@ class Client(ClientProtocol):
         if source:
             cls._registry[source] = cls
 
-    def __new__(cls, source: Datasource, **_) -> "Client":
+    def __new__(cls, source: Datasource, is_female: bool = False, **_) -> "Client":
         subclass = cls._registry[source]
         final_obj = object.__new__(subclass)
+        final_obj._is_female = is_female
 
         return final_obj
 
     @override
-    def validate_year(self, year: int, is_female: bool):
-        since = self.FEMALE_START if is_female else self.MALE_START
+    def validate_year(self, year: int):
+        since = self.FEMALE_START if self._is_female else self.MALE_START
         today = date.today().year
         if year < since or year > today:
             raise ValueError(f"invalid 'year', available values are [{since}, {today}]")
 
     @override
-    def get_race_by_id(self, race_id: str, is_female: bool, **kwargs) -> Race | None:
-        url = self.get_race_details_url(race_id, is_female=is_female)
+    def get_race_by_id(self, race_id: str, **kwargs) -> Race | None:
+        url = self.get_race_details_url(race_id, is_female=self._is_female)
         race = self._html_parser.parse_race(
             selector=Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8")),
             race_id=race_id,
-            is_female=is_female,
+            is_female=self._is_female,
             **kwargs,
         )
         if race:
@@ -171,26 +169,24 @@ class Client(ClientProtocol):
         return race
 
     @override
-    def get_race_ids_by_year(self, year: int, is_female: bool | None = None, **kwargs) -> Generator[str, Any, Any]:
-        self.validate_year(year, is_female=bool(is_female))
+    def get_race_ids_by_year(self, year: int, **kwargs) -> Generator[str, Any, Any]:
+        self.validate_year(year)
 
-        url = self.get_races_url(year, is_female=bool(is_female))
+        url = self.get_races_url(year, is_female=self._is_female)
         yield from self._html_parser.parse_race_ids(
             selector=Selector(requests.get(url=url, headers=HTTP_HEADERS()).text),
-            is_female=is_female,
+            is_female=self._is_female,
             **kwargs,
         )
 
     @override
-    def get_race_names_by_year(
-        self, year: int, is_female: bool | None = None, **kwargs
-    ) -> Generator[RaceName, Any, Any]:
-        self.validate_year(year, is_female=bool(is_female))
+    def get_race_names_by_year(self, year: int, **kwargs) -> Generator[RaceName, Any, Any]:
+        self.validate_year(year)
 
-        url = self.get_races_url(year, is_female=bool(is_female))
+        url = self.get_races_url(year, is_female=self._is_female)
         yield from self._html_parser.parse_race_names(
             selector=Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8")),
-            is_female=is_female,
+            is_female=self._is_female,
             **kwargs,
         )
 
