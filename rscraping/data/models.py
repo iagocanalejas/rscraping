@@ -78,7 +78,7 @@ class Race:
     normalized_names: list[tuple[str, int | None]]
 
     # datasource data
-    race_id: str
+    race_ids: list[str]
     url: str | None
     datasource: str
     gender: str | None

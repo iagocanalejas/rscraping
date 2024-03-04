@@ -1,2 +1,2 @@
-from .image import ImageProcessor  # pyright: ignore
-from .inforemo import InforemoImageProcessor  # pyright: ignore
+from .image import ImageProcessor as ImageProcessor
+from .inforemo import InforemoImageProcessor as InforemoImageProcessor

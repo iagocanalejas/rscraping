@@ -52,7 +52,7 @@ class TestACTParser(unittest.TestCase):
         organizer=None,
         sponsor=None,
         normalized_names=[("ORIOKO ESTROPADAK", 33), ("ORIO KANPINA BANDERA", 11)],
-        race_id="1234",
+        race_ids=["1234"],
         url=None,
         datasource=Datasource.ACT.value,
         gender=GENDER_MALE,

@@ -66,7 +66,7 @@ class ARCHtmlParser(HtmlParser):
             town=self.get_town(selector),
             organizer=None,
             sponsor=find_race_sponsor(self.get_name(selector)),
-            race_id=race_id,
+            race_ids=[race_id],
             url=None,
             gender=gender,
             datasource=self.DATASOURCE.value,

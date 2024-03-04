@@ -1,6 +1,6 @@
-from ._parser import HtmlParser  # pyright: ignore
-from .abe import ABEHtmlParser  # pyright: ignore
-from .act import ACTHtmlParser  # pyright: ignore
-from .arc import ARCHtmlParser  # pyright: ignore
-from .lgt import LGTHtmlParser  # pyright: ignore
-from .traineras import TrainerasHtmlParser, MultiDayRaceException  # pyright: ignore
+from ._parser import HtmlParser as HtmlParser
+from .abe import ABEHtmlParser as ABEHtmlParser
+from .act import ACTHtmlParser as ACTHtmlParser
+from .arc import ARCHtmlParser as ARCHtmlParser
+from .lgt import LGTHtmlParser as LGTHtmlParser
+from .traineras import TrainerasHtmlParser as TrainerasHtmlParser, MultiDayRaceException as MultiDayRaceException

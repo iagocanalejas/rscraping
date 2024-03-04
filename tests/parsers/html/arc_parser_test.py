@@ -64,7 +64,7 @@ class TestARCParser(unittest.TestCase):
         organizer=None,
         sponsor=None,
         normalized_names=[("BANDERA RIA DEL ASON", 17)],
-        race_id="1234",
+        race_ids=["1234"],
         url=None,
         gender=GENDER_MALE,
         datasource=Datasource.ARC.value,

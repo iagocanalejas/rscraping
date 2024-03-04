@@ -58,7 +58,7 @@ class TabularDataFrameParser(DataFrameParserProtocol):
             town=extract_town(normalize_race_name(str(row[COLUMN_NAME]))),
             organizer=str(row[COLUMN_ORGANIZER]).upper() if str(row[COLUMN_ORGANIZER]) else None,
             sponsor=None,
-            race_id=str(int(row.name)),  # pyright: ignore
+            race_ids=[str(int(row.name))],  # pyright: ignore
             url=None,
             gender=GENDER_FEMALE if is_female else GENDER_MALE,
             datasource=Datasource.TABULAR.value,

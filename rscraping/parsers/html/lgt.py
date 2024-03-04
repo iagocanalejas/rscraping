@@ -76,7 +76,7 @@ class LGTHtmlParser(HtmlParser):
             town=self.get_town(selector),
             organizer=self.get_organizer(selector),
             sponsor=find_race_sponsor(self.get_name(selector)),
-            race_id=race_id,
+            race_ids=[race_id],
             url=None,
             datasource=self.DATASOURCE.value,
             gender=gender,

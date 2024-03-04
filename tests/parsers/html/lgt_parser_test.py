@@ -55,7 +55,7 @@ class TestLGTParser(unittest.TestCase):
         organizer=None,
         sponsor=None,
         normalized_names=[("BANDEIRA VIRXE DO CARME", 9)],
-        race_id="1234",
+        race_ids=["1234"],
         url=None,
         datasource=Datasource.LGT.value,
         gender=GENDER_MALE,
