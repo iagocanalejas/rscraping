@@ -36,7 +36,13 @@ class InforemoDataFrameParser(DataFrameParser, source=Datasource.INFOREMO):
     }
 
     def parse_races_from(
-        self, data: DataFrame, *_, file_name: str, header: str, manual_input: bool = False, **__
+        self,
+        data: DataFrame,
+        *_,
+        file_name: str,
+        header: str,
+        manual_input: bool = False,
+        **__,
     ) -> Generator[Race, Any, Any]:
         name = self._try_find_race_name(header, manual_input=manual_input)
         t_date = self._try_find_race_date(header, manual_input=manual_input)

@@ -8,7 +8,7 @@ from rscraping.data.models import Datasource, Lineup
 from rscraping.data.normalization.clubs import normalize_club_name
 from rscraping.data.normalization.races import normalize_race_name
 
-from ._parser import PdfParser
+from ._protocol import PdfParser
 
 
 class LGTPdfParser(PdfParser):

@@ -18,7 +18,7 @@ from rscraping.data.normalization.clubs import normalize_club_name
 from rscraping.data.normalization.races import find_race_sponsor, normalize_name_parts, normalize_race_name
 from rscraping.data.normalization.times import normalize_lap_time
 
-from ._parser import HtmlParser
+from ._protocol import HtmlParser
 
 logger = logging.getLogger(os.path.dirname(os.path.realpath(__file__)))
 

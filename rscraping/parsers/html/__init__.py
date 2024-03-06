@@ -1,4 +1,4 @@
-from ._parser import HtmlParser as HtmlParser
+from ._protocol import HtmlParser as HtmlParser
 from .abe import ABEHtmlParser as ABEHtmlParser
 from .act import ACTHtmlParser as ACTHtmlParser
 from .arc import ARCHtmlParser as ARCHtmlParser

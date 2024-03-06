@@ -1,14 +1,8 @@
 from abc import ABC
-from collections.abc import Generator
-from typing import Any, Protocol
 
-from pandas import DataFrame
+from rscraping.data.models import Datasource
 
-from rscraping.data.models import Datasource, Race
-
-
-class DataFrameParserProtocol(Protocol):
-    def parse_races_from(self, data: DataFrame, *_, **kwargs) -> Generator[Race, Any, Any]: ...
+from ._protocol import DataFrameParserProtocol
 
 
 class DataFrameParser(DataFrameParserProtocol, ABC):

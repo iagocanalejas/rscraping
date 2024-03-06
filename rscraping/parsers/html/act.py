@@ -27,7 +27,7 @@ from rscraping.data.normalization.races import (
 from rscraping.data.normalization.times import normalize_lap_time
 from rscraping.data.normalization.towns import normalize_town
 
-from ._parser import HtmlParser
+from ._protocol import HtmlParser
 
 logger = logging.getLogger(os.path.dirname(os.path.realpath(__file__)))
 

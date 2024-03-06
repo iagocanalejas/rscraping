@@ -58,7 +58,10 @@ def find_race(
 
 
 def parse_race_image(
-    path: str, datasource: Datasource, header_size: int = 3, allow_plot: bool = False
+    path: str,
+    datasource: Datasource,
+    header_size: int = 3,
+    allow_plot: bool = False,
 ) -> Generator[Race, Any, Any]:
     """
     Parse race information from an image file using provided data source and parameters.
