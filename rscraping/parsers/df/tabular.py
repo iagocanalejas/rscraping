@@ -38,7 +38,7 @@ COLUMN_NUMBER_LAPS = "N Largos"
 
 
 class TabularDataFrameParser(DataFrameParserProtocol):
-    def parse_race_serie(self, row: Series, is_female: bool = False) -> Race | None:
+    def parse_race_serie(self, row: Series, is_female: bool = False, url: str | None = None) -> Race | None:
         if not isinstance(row, Series):
             return None
 
@@ -59,7 +59,7 @@ class TabularDataFrameParser(DataFrameParserProtocol):
             organizer=str(row[COLUMN_ORGANIZER]).upper() if str(row[COLUMN_ORGANIZER]) else None,
             sponsor=None,
             race_ids=[str(int(row.name))],  # pyright: ignore
-            url=None,
+            url=url,
             gender=GENDER_FEMALE if is_female else GENDER_MALE,
             datasource=Datasource.TABULAR.value,
             cancelled=False,
@@ -76,7 +76,7 @@ class TabularDataFrameParser(DataFrameParserProtocol):
                 lane=int_or_none(str(row[COLUMN_LANE])),
                 series=None,
                 laps=[row[COLUMN_TIME].strftime("%M:%S.%f")] if row[COLUMN_TIME] else [],  # pyright: ignore
-                distance=5556,
+                distance=int(str(row[COLUMN_DISTANCE])) if row[COLUMN_DISTANCE] else 5556,  # pyright: ignore
                 handicap=None,
                 participant=normalize_club_name(str(row[COLUMN_CLUB])),
                 race=race,
@@ -86,8 +86,15 @@ class TabularDataFrameParser(DataFrameParserProtocol):
 
         return race
 
-    def parse_races_from(self, data: DataFrame, *_, is_female: bool = False, **__) -> Generator[Race, Any, Any]:
+    def parse_races_from(
+        self,
+        data: DataFrame,
+        *_,
+        is_female: bool = False,
+        url: str | None = None,
+        **__,
+    ) -> Generator[Race, Any, Any]:
         for _, row in data.iterrows():
-            race = self.parse_race_serie(row, is_female=is_female)
+            race = self.parse_race_serie(row, is_female=is_female, url=url)
             if race:
                 yield race

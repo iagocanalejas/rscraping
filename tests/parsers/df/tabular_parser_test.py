@@ -18,7 +18,7 @@ class TestTabularDataParser(unittest.TestCase):
         assert isinstance(df, pd.DataFrame)  # needed as 'read_hdf' is returning TableIterator
 
         race_row = df.iloc[0]
-        race = self.parser.parse_race_serie(race_row, is_female=False)
+        race = self.parser.parse_race_serie(race_row, is_female=False, url="test_url")
 
         if not race:
             self.assertIsNotNone(race)
@@ -35,7 +35,7 @@ class TestTabularDataParser(unittest.TestCase):
         df = pd.read_hdf(os.path.join(self.fixtures, "gdrive_tabular.h5"), key="data")
         assert isinstance(df, pd.DataFrame)
 
-        races = self.parser.parse_races_from(df, is_female=False)
+        races = self.parser.parse_races_from(df, is_female=False, url="test_url")
         for i, race in enumerate(races):
             participants = race.participants
             race.participants = []
@@ -56,7 +56,7 @@ class TestTabularDataParser(unittest.TestCase):
         sponsor=None,
         normalized_names=[("REGATA CARITAS VILAXOAN", None)],
         race_ids=["1"],
-        url=None,
+        url="test_url",
         datasource=Datasource.TABULAR.value,
         gender=GENDER_MALE,
         participants=[],
@@ -92,7 +92,7 @@ class TestTabularDataParser(unittest.TestCase):
             sponsor=None,
             normalized_names=[("REGATA CARITAS VILAXOAN", None)],
             race_ids=["1"],
-            url=None,
+            url="test_url",
             datasource=Datasource.TABULAR.value,
             gender=GENDER_MALE,
             participants=[],
@@ -112,7 +112,7 @@ class TestTabularDataParser(unittest.TestCase):
             sponsor=None,
             normalized_names=[("TROFEO TERESA HERRERA", None)],
             race_ids=["2"],
-            url=None,
+            url="test_url",
             datasource=Datasource.TABULAR.value,
             gender=GENDER_MALE,
             participants=[],
@@ -132,7 +132,7 @@ class TestTabularDataParser(unittest.TestCase):
             sponsor=None,
             normalized_names=[("BANDEIRA MASCULINA DEPUTACIÓN DA CORUÑA", None)],
             race_ids=["3"],
-            url=None,
+            url="test_url",
             datasource=Datasource.TABULAR.value,
             gender=GENDER_MALE,
             participants=[],
@@ -152,7 +152,7 @@ class TestTabularDataParser(unittest.TestCase):
             sponsor=None,
             normalized_names=[("BANDEIRA CONGELADOS PERILLO", None)],
             race_ids=["4"],
-            url=None,
+            url="test_url",
             datasource=Datasource.TABULAR.value,
             gender=GENDER_MALE,
             participants=[],
@@ -184,7 +184,7 @@ class TestTabularDataParser(unittest.TestCase):
             lane=None,
             series=None,
             laps=["23:52.280000"],
-            distance=5556,
+            distance=5628,
             handicap=None,
             participant="PUEBLA",
             disqualified=False,
@@ -198,7 +198,7 @@ class TestTabularDataParser(unittest.TestCase):
             lane=None,
             series=None,
             laps=["21:31.790000"],
-            distance=5556,
+            distance=5800,
             handicap=None,
             participant="PUEBLA",
             disqualified=False,
