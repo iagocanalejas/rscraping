@@ -59,6 +59,7 @@ _NORMALIZED_RACES = {
     "DONIBANE ZIBURUKO ESTROPADAK": [["SAN", "JUAN", "LUZ"]],
     "KEPA DEUN ARRANTZALEEN KOFRADÍA IKURRIÑA": [["COFRADÍA", "SAN", "PEDRO"], ["COFRADIA", "SAN", "PEDRO"]],
     "MEMORIAL LAGAR": [["MEMORIAL", "MIGUEL", "LORES"]],
+    "MEMORIAL RULY": [["MEMORIAL", "RAUL", "REY"]],
 }
 
 
@@ -168,13 +169,14 @@ def deacronym_race_name(name: str) -> str:
     name = re.sub(r"B\.? ", "BANDERA ", name)
     name = re.sub(r" SN ?", " SARI NAGUSIA ", name)
     name = re.sub(r"J\.? ?A\.? AGIRRE", "JOSE ANTONIO AGIRRE", name)
-    name = name.replace("BILBOKO BANDERA - BANDERA DE BILBAO", "BANDERA DE BILBAO")
 
     return whitespaces_clean(name)
 
 
 def amend_race_name(name: str) -> str:
     re.sub(r"(CONCELLO)( DE)?", "CONCELLO DE", name)
+    name = name.replace("BILBOKO BANDERA - BANDERA DE BILBAO", "BANDERA DE BILBAO")
+    name = name.replace("JESÚS TENORIO", "XESÚS TENORIO")
 
     name = name.replace("/", "-").replace("-", " - ")
     for a, b in _MISSPELLINGS:
