@@ -42,10 +42,12 @@ class TabularDataFrameParser(DataFrameParserProtocol):
         if not isinstance(row, Series):
             return None
 
-        normalized_names = normalize_name_parts(normalize_race_name(str(row[COLUMN_NAME])))
+        normalized_names = [
+            (remove_day_indicator(n), int_or_none(str(row[COLUMN_EDITION])))
+            for (n, _) in normalize_name_parts(normalize_race_name(str(row[COLUMN_NAME])))
+        ]
         if len(normalized_names) == 0:
             return None
-        normalized_names = [(remove_day_indicator(n), e) for (n, e) in normalized_names]
 
         race = Race(
             name=str(row[COLUMN_NAME]),
@@ -58,7 +60,7 @@ class TabularDataFrameParser(DataFrameParserProtocol):
             town=extract_town(normalize_race_name(str(row[COLUMN_NAME]))),
             organizer=str(row[COLUMN_ORGANIZER]).upper() if str(row[COLUMN_ORGANIZER]) else None,
             sponsor=None,
-            race_ids=[str(int(row.name))],  # pyright: ignore
+            race_ids=[row.name],  # pyright: ignore
             url=url,
             gender=GENDER_FEMALE if is_female else GENDER_MALE,
             datasource=Datasource.TABULAR.value,

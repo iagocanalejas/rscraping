@@ -44,19 +44,19 @@ class TabularDataClient(Client, source=Datasource.TABULAR):
     _url: str | None = None
     _df: pd.DataFrame
     _df_types: dict[Any, Callable] = {
-        "N": lambda x: int(x) if x else None,
+        "N": lambda x: str(x) if x else None,
         COLUMN_CLUB: lambda x: str(x) if x else None,
         COLUMN_DATE: lambda x: pd.to_datetime(x, format="%d/%m/%Y") if x and x != "-" else None,
         COLUMN_LEAGUE: lambda x: str(x) if x and x != "-" else None,
-        COLUMN_EDITION: lambda x: roman_to_int(x) if x and x != "-" else None,
+        COLUMN_EDITION: lambda x: str(roman_to_int(x)) if x and x != "-" else None,
         COLUMN_NAME: lambda x: str(x) if x else None,
         COLUMN_ORGANIZER: lambda x: str(x) if x else None,
-        COLUMN_DISTANCE: lambda x: str(int(x)) if x else None,  # HACK: required str cast to avoid ".0" suffix
+        COLUMN_DISTANCE: lambda x: str(x) if x else None,  # HACK: required str cast to avoid ".0" suffix
         COLUMN_TIME: lambda x: pd.to_datetime(x, format="%M:%S.%f").time() if x and x != "-" else None,
         COLUMN_TYPE: lambda x: str(x) if x else None,
-        COLUMN_NUMBER_LAPS: lambda x: int(x) if x else None,
-        COLUMN_NUMBER_LANES: lambda x: int(x) if x else None,
-        COLUMN_LANE: lambda x: int(x) if x else None,
+        COLUMN_NUMBER_LAPS: lambda x: str(x) if x else None,
+        COLUMN_NUMBER_LANES: lambda x: str(x) if x else None,
+        COLUMN_LANE: lambda x: str(x) if x else None,
     }
 
     @property
