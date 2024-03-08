@@ -110,7 +110,7 @@ class TestTabularDataParser(unittest.TestCase):
             town=None,
             organizer="FEDERACIÓN GALEGA DE REMO",
             sponsor=None,
-            normalized_names=[("TROFEO TERESA HERRERA", None)],
+            normalized_names=[("TROFEO TERESA HERRERA (CLASIFICATORIA)", None)],
             race_ids=["2"],
             url="test_url",
             datasource=Datasource.TABULAR.value,

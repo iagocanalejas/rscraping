@@ -67,12 +67,15 @@ def normalize_name_parts(normalized_name: str) -> list[tuple[str, int | None]]:
     Normalize the name to a list of (name, edition)
 
     1. Remove parenthesis
-    2. Split by " - " if not a play off
-    3. Find the edition
-    4. Remove roman numbers
+    2. Add "CLASIFICATORIA" if it is a clasifier
+    3. Split by " - " if not a play off
+    4. Find the edition
+    5. Remove roman numbers
     """
     parts: list[tuple[str, int | None]] = []
+    is_clasifier = "CLASIFICATORIA" in normalized_name
     normalized_name = remove_parenthesis(whitespaces_clean(normalized_name))
+    normalized_name = f"{normalized_name} ({'CLASIFICATORIA'})" if is_clasifier else normalized_name
     name_parts = normalized_name.split(" - ") if not is_play_off(normalized_name) else [normalized_name]
 
     for name in name_parts:
