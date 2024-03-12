@@ -19,7 +19,7 @@ def _parse_arguments():
     parser.add_argument(
         "--female", action="store_true", default=False, help="Specifies if we need to search in the female pages."
     )
-    parser.add_argument("--sheet_name", type=str, default=None, help="Sheet name.")
+    parser.add_argument("--sheet-name", type=str, default=None, help="Sheet name.")
     parser.add_argument("--save", action="store_true", default=False, help="Saves the output to a csv file.")
     return parser.parse_args()
 

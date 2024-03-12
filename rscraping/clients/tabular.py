@@ -68,7 +68,7 @@ class TabularDataClient(Client, source=Datasource.TABULAR):
     def get_race_details_url(*_, sheet_id: str, sheet_name: str | None = None, **kwargs) -> str:
         url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv"
         if sheet_name:
-            url += f"&sheet={sheet_name}"
+            url += f"&sheet={sheet_name.replace(' ', '+')}"
         return url
 
     def __init__(self, *_, config: TabularClientConfig, **kwargs) -> None:
