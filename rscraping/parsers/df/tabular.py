@@ -20,6 +20,7 @@ from rscraping.data.normalization import (
     normalize_race_name,
     remove_day_indicator,
 )
+from rscraping.data.normalization.races import find_race_sponsor
 
 from ._parser import DataFrameParserProtocol
 
@@ -59,7 +60,7 @@ class TabularDataFrameParser(DataFrameParserProtocol):
             league=str(row[COLUMN_LEAGUE]).upper() if str(row[COLUMN_LEAGUE]) else None,
             town=extract_town(normalize_race_name(str(row[COLUMN_NAME]))),
             organizer=str(row[COLUMN_ORGANIZER]).upper() if str(row[COLUMN_ORGANIZER]) else None,
-            sponsor=None,
+            sponsor=find_race_sponsor(str(row[COLUMN_NAME])),
             race_ids=[row.name],  # pyright: ignore
             url=url,
             gender=GENDER_FEMALE if is_female else GENDER_MALE,
