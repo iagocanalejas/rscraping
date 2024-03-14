@@ -54,6 +54,11 @@ class Client(ClientProtocol):
     @override
     def get_race_by_id(self, race_id: str, **kwargs) -> Race | None:
         url = self.get_race_details_url(race_id, is_female=self._is_female)
+        return self.get_race_by_url(url, race_id=race_id, **kwargs)
+
+    @override
+    def get_race_by_url(self, url: str, race_id: str, **kwargs):
+        self.validate_url(url)
         race = self._html_parser.parse_race(
             selector=Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8")),
             race_id=race_id,
@@ -89,6 +94,9 @@ class Client(ClientProtocol):
     ####################################################
     #                     ABSTRACT                     #
     ####################################################
+    @override
+    def validate_url(self, url: str):
+        raise NotImplementedError
 
     @override
     @staticmethod

@@ -6,6 +6,7 @@ from rscraping.parsers.html import ABEHtmlParser
 from ._client import Client
 
 
+# TODO: web is down maybe new web
 class ABEClient(Client, source=Datasource.ABE):
     DATASOURCE = Datasource.ABE
     MALE_START = FEMALE_START = 2023
@@ -23,3 +24,7 @@ class ABEClient(Client, source=Datasource.ABE):
     @staticmethod
     def get_races_url(year: int, **_) -> str:
         return f"https://lasalveliga.com/es/regatas-{year - 1}/"
+
+    @override
+    def validate_url(self, url: str):
+        raise NotImplementedError

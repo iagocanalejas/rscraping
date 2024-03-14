@@ -1,3 +1,4 @@
+import re
 from collections.abc import Generator
 from typing import Any, override
 
@@ -37,6 +38,19 @@ class ARCClient(Client, source=Datasource.ARC):
     def get_lineup_url(race_id: str, *, club_id: str, is_female: bool, **_) -> str:
         host = "ligaete" if is_female else "liga-arc"
         return f"http://www.{host}.com/es/regata/{race_id}/unknown/equipo/{club_id}/unknown"
+
+    @override
+    def validate_url(self, url: str):
+        pattern = re.compile(
+            r"^(https?:\/\/)?"  # Scheme (http, https, or empty)
+            r"(www\.(ligaete|liga-arc)\.com\/es\/regata\/)"  # Domain name
+            r"([\d]*\/)"  # race ID
+            r"(.*)$",  # rest of the shit the ARC uses
+            re.IGNORECASE,
+        )
+
+        if not pattern.match(url):
+            raise ValueError(f"invalid {url=}")
 
     @override
     def get_lineup_by_race_id(self, race_id: str, **__) -> Generator[Lineup, Any, Any]:

@@ -1,3 +1,4 @@
+import re
 from collections.abc import Callable, Generator
 from dataclasses import dataclass
 from datetime import date
@@ -34,6 +35,7 @@ class TabularClientConfig:
     file_path: str | None = None
     sheet_id: str | None = None
     sheet_name: str | None = None
+    sheet_url: str | None = None
 
 
 class TabularDataClient(Client, source=Datasource.TABULAR):
@@ -72,8 +74,8 @@ class TabularDataClient(Client, source=Datasource.TABULAR):
         return url
 
     def __init__(self, *_, config: TabularClientConfig, **kwargs) -> None:
-        if not only_one_not_none(config.file_path, config.sheet_id):
-            raise ValueError("sheet_id and file_path are mutually exclusive")
+        if not only_one_not_none(config.file_path, config.sheet_id, config.sheet_url):
+            raise ValueError("sheet_id, sheet_url and file_path are mutually exclusive")
         self._df = self._load_dataframe(config)
         super().__init__(**kwargs)
 
@@ -85,18 +87,38 @@ class TabularDataClient(Client, source=Datasource.TABULAR):
             raise ValueError(f"invalid 'year', available values are [{since}, {today}]")
 
     @override
+    def validate_url(self, url: str):
+        pattern = re.compile(
+            r"^(https?:\/\/)?"  # Scheme (http, https, or empty)
+            r"(docs\.google\.com\/spreadsheets\/d\/)"  # Domain name
+            r"([A-Za-z0-9-_]+)"  # Sheet ID
+            r"(\/gviz\/tq\?tqx=out:csv)"  # Rest of the URL
+            r"(&sheet=[A-Za-z0-9-_+]+)?$",  # race ID
+            re.IGNORECASE,
+        )
+
+        if not pattern.match(url):
+            raise ValueError(f"invalid {url=}")
+
+    @override
     def get_race_by_id(self, race_id: str, *_, **kwargs) -> Race | None:
         race_row = self._df.iloc[int(race_id) - 1]
         return self._parser.parse_race_serie(race_row, is_female=self._is_female, url=self._url)
 
+    @override
+    def get_race_by_url(self, *_, race_id: str, **kwargs) -> Race | None:
+        return self.get_race_by_id(race_id=race_id, **kwargs)
+
     def get_races(self, **kwargs) -> Generator[Race, Any, Any]:
         return self._parser.parse_races_from(self._df, is_female=self._is_female, url=self._url)
 
+    @override
     def get_race_ids_by_year(self, year: int, *_, **kwargs) -> Generator[str, Any, Any]:
         df = self._df[self._df[COLUMN_DATE].dt.year == year]
         for _, row in df.iterrows():
             yield str(row.name)
 
+    @override
     def get_race_names_by_year(self, year: int, *_, **kwargs) -> Generator[RaceName, Any, Any]:
         df = self._df[self._df[COLUMN_DATE].dt.year == year]
         for _, row in df.iterrows():
@@ -108,6 +130,11 @@ class TabularDataClient(Client, source=Datasource.TABULAR):
 
     def _load_dataframe(self, config: TabularClientConfig) -> pd.DataFrame:
         df = None
+
+        if config.sheet_url:
+            self.validate_url(config.sheet_url)
+            self._url = config.sheet_url
+            df = pd.read_csv(self._url, header=0, index_col=0, converters=self._df_types).fillna("")
 
         if config.sheet_id:
             self._url = self.get_race_details_url(sheet_id=config.sheet_id, sheet_name=config.sheet_name)

@@ -1,3 +1,4 @@
+import re
 from collections.abc import Generator
 from typing import Any, override
 
@@ -39,6 +40,18 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
     @staticmethod
     def get_rower_url(rower_id: str, **_) -> str:
         return f"https://traineras.es/personas/{rower_id}"
+
+    @override
+    def validate_url(self, url: str):
+        pattern = re.compile(
+            r"^(https?:\/\/)?"  # Scheme (http, https, or empty)
+            r"(traineras\.es\/clasificaciones\/)"  # Domain name
+            r"([\d]*\/?)$",  # race ID
+            re.IGNORECASE,
+        )
+
+        if not pattern.match(url):
+            raise ValueError(f"invalid {url=}")
 
     @override
     def get_race_ids_by_year(self, year: int, **_) -> Generator[str, Any, Any]:

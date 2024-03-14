@@ -1,3 +1,4 @@
+import re
 from collections.abc import Generator
 from typing import Any, override
 
@@ -42,6 +43,20 @@ class ACTClient(Client, source=Datasource.ACT):
     def get_lineup_url(race_id: str, *, is_female: bool, **_) -> str:
         female = "/femenina" if is_female else ""
         return f"https://www.euskolabelliga.com{female}/resultados/tripulacionespdf.php?r={race_id}"
+
+    @override
+    def validate_url(self, url: str):
+        pattern = re.compile(
+            r"^(https?:\/\/)?"  # Scheme (http, https, or empty)
+            r"(www\.euskolabelliga\.com)"  # Domain name
+            r"(\/femenina)?"  # Optional female
+            r"(\/resultados\/ver\.php\?r=)"  # Path
+            r"([\d]*\/?)$",  # race ID
+            re.IGNORECASE,
+        )
+
+        if not pattern.match(url):
+            raise ValueError(f"invalid {url=}")
 
     @override
     def get_lineup_by_race_id(self, race_id: str, **__) -> Generator[Lineup, Any, Any]:

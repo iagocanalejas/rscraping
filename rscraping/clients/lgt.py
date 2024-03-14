@@ -1,3 +1,4 @@
+import re
 from collections.abc import Generator
 from datetime import date
 from typing import Any, override
@@ -106,12 +107,31 @@ class LGTClient(Client, source=Datasource.LGT):
         return Selector(requests.post(url=url, headers=HTTP_HEADERS(), data=data).content.decode("utf-8"))
 
     @override
+    def validate_url(self, url: str):
+        pattern = re.compile(
+            r"^(https?:\/\/)?"  # Scheme (http, https, or empty)
+            r"(www\.ligalgt\.com\/principal\/regata\/)"  # Domain name
+            r"([\d]*\/?)$",  # race ID
+            re.IGNORECASE,
+        )
+
+        if not pattern.match(url):
+            raise ValueError(f"invalid {url=}")
+
+    @override
     def get_race_by_id(self, race_id: str, *_, **kwargs) -> Race | None:
         if race_id in self._excluded_ids:
             return None
 
         kwargs["results_selector"] = self.get_results_selector(race_id)
         return super().get_race_by_id(race_id, **kwargs)
+
+    def get_race_by_url(self, url: str, race_id: str, **kwargs):
+        if race_id in self._excluded_ids:
+            return None
+
+        kwargs["results_selector"] = self.get_results_selector(race_id)
+        return super().get_race_by_url(url, race_id, **kwargs)
 
     @override
     def get_race_ids_by_year(self, year: int, **_) -> Generator[str, Any, Any]:

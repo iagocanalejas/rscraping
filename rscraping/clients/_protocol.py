@@ -21,7 +21,7 @@ class ClientProtocol(Protocol):
 
     def validate_year(self, year: int):
         """
-        Validate the given year for validity in datasource, raising a ValueError if it's outside the valid range.
+        Checks the given year for validity in datasource, raising a ValueError if it's outside the valid range.
 
         Args:
             year (int): The year to validate.
@@ -30,11 +30,35 @@ class ClientProtocol(Protocol):
         """
         ...
 
+    def validate_url(self, url: str):
+        """
+        Checks the given url for validity in datasource, raising a ValueError if it's not valid.
+
+        Args:
+            url (int): The URL to validate.
+
+        Raises: ValueError: If the url is not valid.
+        """
+        ...
+
     def get_race_by_id(self, race_id: str, **kwargs) -> Race | None:
         """
         Retrieve race details by ID, parsing data from the corresponding URL.
 
         Args:
+            race_id (str): The ID of the race.
+            **kwargs: Additional keyword arguments.
+
+        Returns: Race | None: The parsed race details or None if the race is not found.
+        """
+        ...
+
+    def get_race_by_url(self, url: str, race_id: str, **kwargs) -> Race | None:
+        """
+        Retrieve race details by parsing data from the corresponding URL.
+
+        Args:
+            url (str): The URL of the race.
             race_id (str): The ID of the race.
             **kwargs: Additional keyword arguments.
 
