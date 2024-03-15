@@ -4,7 +4,7 @@ numpy==1.26.4
 opencv-python==4.9.0.80
 openpyxl==3.1.2
 pandas==2.2.1
-parsel==1.8.1
+parsel==1.9.0
 pyarrow==15.0.0
 PyMuPDF==1.23.26
 pytesseract==0.3.10

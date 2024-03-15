@@ -2,7 +2,7 @@ import os
 from typing import Any
 from collections.abc import Generator
 
-from pyutils.strings import normalize_synonyms, remove_conjunctions, remove_symbols
+from pyutils.strings import normalize_synonyms, remove_conjunctions, remove_symbols, unaccent
 from rscraping.data.constants import SYNONYMS
 from rscraping.data.models import Datasource, Lineup, Race
 from simplemma.simplemma import text_lemmatizer
@@ -103,6 +103,16 @@ def find_lineup(race_id: str, datasource: Datasource, is_female: bool) -> Genera
 
 
 def lemmatize(phrase: str, lang: str = "es") -> list[str]:
+    """
+    Lemmatize a phrase using the simplemma library. The phrase is preprocessed before lemmatization.
+    Synonyms are normalized, conjunctions are removed, symbols are removed, and accents are removed.
+
+    Parameters:
+    - phrase (str): The phrase to lemmatize.
+    - lang (str): The language of the phrase (default: "es").
+
+    Returns: list[str]: A list of lemmatized words from the phrase.
+    """
     phrase = normalize_synonyms(phrase, SYNONYMS)
-    phrase = remove_symbols(remove_conjunctions(phrase))
+    phrase = unaccent(remove_symbols(remove_conjunctions(phrase)))
     return list(set(text_lemmatizer(phrase, lang=lang)))

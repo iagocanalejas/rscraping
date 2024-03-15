@@ -178,6 +178,7 @@ def amend_race_name(name: str) -> str:
     re.sub(r"(CONCELLO)( DE)?", "CONCELLO DE", name)
     name = name.replace("BILBOKO BANDERA - BANDERA DE BILBAO", "BANDERA DE BILBAO")
     name = name.replace("JESÚS TENORIO", "XESÚS TENORIO")
+    name = name.replace("CCD CESANTES", "CESANTES")
 
     name = name.replace("/", "-").replace("-", " - ")
     for a, b in _MISSPELLINGS:
