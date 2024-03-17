@@ -151,9 +151,9 @@ class TabularDataClient(Client, source=Datasource.TABULAR):
         # remove unused dataframe parts
         # 1. remove rows with NaN index
         # 2. keep only the first 15 columns
-        # 3. remove columns "Temp." and "Puesto"
+        # 3. remove column "Puesto"
         # 4. remove rows with empty "Nome" column
-        df = df[df.index.notnull()].iloc[:, :15].drop(columns=["Temp.", "Puesto"]).loc[df[COLUMN_NAME] != ""]
+        df = df[df.index.notnull()].iloc[:, :15].drop(columns=["Puesto"]).loc[df[COLUMN_NAME] != ""]
 
         return df
 

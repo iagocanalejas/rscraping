@@ -30,6 +30,8 @@ def _parse_arguments():
 def main(race_id: str, datasource: str, is_female: bool, with_lineups: bool, save: bool, day: int | None):
     if not Datasource.has_value(datasource):
         raise ValueError(f"invalid datasource={datasource}")
+    if datasource == Datasource.TABULAR.value:
+        raise ValueError(f"datasource={datasource} is not supported in this script")
 
     race = find_race(
         race_id=race_id,
