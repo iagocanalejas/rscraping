@@ -7,7 +7,12 @@ _NORMALIZED_TOWNS = {
     "DONOSTI": ["SAN SEBATIÁN", "SAN SEBASTIAN", "DONOSTIA"],
     "PASAIA": ["PASAI DONIBANE", "PASAI SAN JUAN", "PASAI SAN PEDRO", "SAN JUAN", "SAN PEDRO"],
     "REDONDELA": ["CHAPELA", "CESANTES"],
+    "FERROL": ["CABANA"],
+    "A CORUÑA": ["ORZAN"],
+    "MOAÑA": ["MEIRA"],
 }
+
+_PORT_SYNONYMS = ["PUERTO DE", "PORTO DE", "PEIRAO DE", "PRAIA DE", "MUELLE DE"]
 
 _PROVINCES = [
     "A CORUÑA",
@@ -46,6 +51,8 @@ def remove_province(town: str) -> str:
 
 def amend_town(town: str) -> str:
     town = town.replace("/", "-").replace("-", " - ")
+    for w in _PORT_SYNONYMS:
+        town = town.replace(w, "")
     for k, v in _NORMALIZED_TOWNS.items():
         if town in v or any(part in town.split() for part in v):
             town = k
