@@ -59,6 +59,7 @@ _NORMALIZED_ENTITIES = {
     "BUEU": ["BUEU TECCARSA"],
     "ESTEIRANA": ["ESTEIRANA REMO"],
     "A CABANA": ["A CABANA FERROL"],
+    "MUGARDOS - A CABANA": ["MUGARDOS - A CABANA FERROL"],
     "RIVEIRA": ["DE RIVEIRA"],
     "ZARAUTZ": ["ZARAUTZ GESALAGA-OKELAN", "ZARAUTZ INMOB. ORIO"],
     "PASAI DONIBANE KOXTAPE": ["P.DONIBANE IBERDROLA"],
@@ -130,6 +131,8 @@ def normalize_club_name(name: str) -> str:
 def deacronym_club_name(name: str) -> str:
     if any(w in ["P", "D", "PD"] for w in name.split()):
         name = re.sub(r"P\.? ?D\.?", "PASAIA DONIBANE", name)
+    if "CABANA" in name:
+        name = name.replace("CABANA FERROL", "CABANA")
     return whitespaces_clean(name)
 
 

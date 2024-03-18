@@ -243,6 +243,12 @@ class LGTHtmlParser(HtmlParser):
         if "TERESA HERRERA" in name:  # lgt never saves the final
             return "TROFEO TERESA HERRERA" if t_date.isoweekday() == 7 else "TROFEO TERESA HERRERA (CLASIFICATORIA)"
 
+        if all(n in name for n in ["ILLA", "SAMERTOLAMEU"]) and t_date.year in [2021, 2022, 2023]:
+            # HACK: this is a weird flag case in witch Meira restarted the edition for his 'B' team.
+            # We have "III BANDEIRA ILLA DO SAMERTOLAMEU" in 2017 for his main team and
+            # "III BANDEIRA ILLA DO SAMERTOLAMEU" in 2023 for his 'B' team. So we need to differentiate them.
+            return "BANDEIRA ILLA DO SAMERTOLAMEU B"
+
         if "PLAY" in name:
             return "PLAY-OFF LGT"
 
