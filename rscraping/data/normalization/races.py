@@ -64,7 +64,7 @@ _NORMALIZED_RACES = {
 }
 
 
-def normalize_name_parts(normalized_name: str) -> list[tuple[str, int | None]]:
+def normalize_name_parts(name: str) -> list[tuple[str, int | None]]:
     """
     Normalize the name to a list of (name, edition)
 
@@ -76,22 +76,15 @@ def normalize_name_parts(normalized_name: str) -> list[tuple[str, int | None]]:
     6. Remove roman numbers
     """
     parts: list[tuple[str, int | None]] = []
-    is_clasifier = "CLASIFICATORIA" in normalized_name
-    normalized_name = remove_parenthesis(whitespaces_clean(normalized_name))
-    normalized_name = f"{normalized_name} ({'CLASIFICATORIA'})" if is_clasifier else normalized_name
-    name_parts = normalized_name.split(" - ") if not is_play_off(normalized_name) else [normalized_name]
 
-    if not is_play_off(normalized_name) and len(name_parts) == 1:
-        editions = [w for w in normalized_name.split() if find_roman(w) is not None]
+    normalized = remove_parenthesis(whitespaces_clean(name))
+    normalized = f"{normalized} ({'CLASIFICATORIA'})" if "CLASIFICATORIA" in name else normalized
+
+    name_parts = normalized.split(" - ") if not is_play_off(normalized) else [normalized]
+    if not is_play_off(normalized) and len(name_parts) == 1:
+        editions = [w for w in normalized.split() if find_roman(w) is not None]
         if len(editions) > 1:
-            name_parts = []
-            previous_end_idx = 0
-            for edition in editions:
-                start_idx = normalized_name.find(edition, previous_end_idx)
-                if start_idx > 0:
-                    name_parts.append(whitespaces_clean(normalized_name[previous_end_idx:start_idx]))
-                    previous_end_idx = start_idx
-            name_parts.append(whitespaces_clean(normalized_name[previous_end_idx:]))
+            name_parts = split_by_edition_parts(normalized, editions)
 
     for name in name_parts:
         edition = find_edition(name)
@@ -132,6 +125,26 @@ def find_edition(name: str) -> int | None:
     name = re.sub(r"[\'\".:]", " ", name)
     roman_options = [e for e in [find_roman(w) for w in name.split()] if e is not None]
     return roman_to_int(roman_options[0]) if roman_options else None
+
+
+def split_by_edition_parts(normalized_name: str, editions: list[str]) -> list[str]:
+    """
+    Split the name by the edition numbers found in the name.
+
+    examples:
+        "XVII Bandera El Corte Inglés III Memorial Juan Zunzunegui"
+        ["XVII Bandera El Corte Inglés", "III Memorial Juan Zunzunegui"]
+    """
+    name_parts = []
+    if len(editions) > 1:
+        previous_end_idx = 0
+        for edition in editions:
+            start_idx = normalized_name.find(edition, previous_end_idx)
+            if start_idx > 0:
+                name_parts.append(whitespaces_clean(normalized_name[previous_end_idx:start_idx]))
+                previous_end_idx = start_idx
+        name_parts.append(whitespaces_clean(normalized_name[previous_end_idx:]))
+    return name_parts
 
 
 def find_race_sponsor(name: str) -> str | None:

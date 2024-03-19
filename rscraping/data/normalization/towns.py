@@ -1,6 +1,7 @@
 import re
 
 from pyutils.strings import remove_parenthesis, whitespaces_clean
+from rscraping.data.constants import SYNONYMS
 
 _NORMALIZED_TOWNS = {
     "VILAGARCÍA": ["VILAXOAN", "VILAXOÁN"],
@@ -10,9 +11,8 @@ _NORMALIZED_TOWNS = {
     "FERROL": ["CABANA"],
     "A CORUÑA": ["ORZAN"],
     "MOAÑA": ["MEIRA"],
+    "BOIRO": ["CABO DE CRUZ"],
 }
-
-_PORT_SYNONYMS = ["PUERTO DE", "PORTO DE", "PEIRAO DE", "PRAIA DE", "MUELLE DE"]
 
 _PROVINCES = [
     "A CORUÑA",
@@ -51,8 +51,8 @@ def remove_province(town: str) -> str:
 
 def amend_town(town: str) -> str:
     town = town.replace("/", "-").replace("-", " - ")
-    for w in _PORT_SYNONYMS:
-        town = town.replace(w, "")
+    for w in SYNONYMS["PUERTO"]:
+        town = town.replace(f"{w} DE", "").replace(f"{w} DA", "").replace(w, "")
     for k, v in _NORMALIZED_TOWNS.items():
         if town in v or any(part in town.split() for part in v):
             town = k
@@ -68,17 +68,12 @@ def extract_town(name: str) -> str | None:
     2. Try to extract the town from the 'CONCELLO DE' part
     """
 
-    def validate_town(town: str) -> str | None:
-        if town not in ["CLASIFICATORIA"]:
-            return town
-        return None
-
     town = None
     matches = re.findall(r"\((.*?)\)", name)
     if matches:
-        town = validate_town(whitespaces_clean(matches[0]).upper())
+        town = whitespaces_clean(matches[0]).upper()
 
     if not town and "CONCELLO DE" in name:
-        town = validate_town(whitespaces_clean(remove_parenthesis(name.split("CONCELLO DE ")[1])).upper())
+        town = whitespaces_clean(remove_parenthesis(name.split("CONCELLO DE ")[1])).upper()
 
-    return town
+    return town if town not in ["CLASIFICATORIA"] else None
