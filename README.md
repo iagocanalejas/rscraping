@@ -1,3 +1,7 @@
+# Architecture
+
+![Architecture](docs/architecture.png)
+
 # Commands
 
 ## Find Race
