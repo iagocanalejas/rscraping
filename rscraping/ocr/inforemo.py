@@ -89,7 +89,7 @@ class InforemoImageProcessor(ImageProcessor, source=Datasource.INFOREMO):
 
         # thresholding the image to a binary image and invert it
         _, img_bin = cv2.threshold(img, 200, 255, cv2.THRESH_BINARY)
-        img_bin = 255 - img_bin
+        img_bin = 255 - img_bin  # pyright: ignore
 
         # find vertical and horizontal lines
         img_vh = self._get_vh_lines(img_bin)
@@ -138,7 +138,7 @@ class InforemoImageProcessor(ImageProcessor, source=Datasource.INFOREMO):
 
         # Combine horizontal and vertical lines in a new third image, with both having same weight.
         img_vh = cv2.addWeighted(vertical_lines, 0.5, horizontal_lines, 0.5, 0.0)
-        img_vh = cv2.erode(~img_vh, kernel, iterations=2)
+        img_vh = cv2.erode(~img_vh, kernel, iterations=2)  # pyright: ignore
         _, img_vh = cv2.threshold(img_vh, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
 
         return img_vh

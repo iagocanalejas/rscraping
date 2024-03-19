@@ -131,16 +131,11 @@ class Participant:
 
     disqualified: bool = False
 
-    # extra arguments
-    lineup: Optional["Lineup"] = None
-
     def __str__(self) -> str:
         return self.to_json()
 
     def to_dict(self) -> dict:
-        d = {k: v for k, v in self.__dict__.items() if k not in ["race"]}
-        d["lineup"] = {k: v for k, v in self.lineup.__dict__.items() if k not in ["race"]} if self.lineup else None
-        return d
+        return {k: v for k, v in self.__dict__.items() if k not in ["race"]}
 
     def to_json(self) -> str:
         return json.dumps(self.to_dict())
@@ -148,13 +143,8 @@ class Participant:
     @staticmethod
     def from_json(json_str: str) -> "Participant":
         values = json.loads(json_str)
-        lineup = values["lineup"]
-        values["lineup"] = None
-
         if "race" not in values:
             values["race"] = None
 
         participant = Participant(**values)
-        if lineup:
-            participant.lineup = Lineup(**lineup)
         return participant

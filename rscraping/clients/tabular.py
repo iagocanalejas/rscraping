@@ -43,6 +43,8 @@ class TabularDataClient(Client, source=Datasource.TABULAR):
     FEMALE_START = 2015
     MALE_START = 2011
 
+    config: TabularClientConfig
+
     _url: str | None = None
     _df: pd.DataFrame
     _df_types: dict[Any, Callable] = {
@@ -77,6 +79,7 @@ class TabularDataClient(Client, source=Datasource.TABULAR):
         if not only_one_not_none(config.file_path, config.sheet_id, config.sheet_url):
             raise ValueError("sheet_id, sheet_url and file_path are mutually exclusive")
         self._df = self._load_dataframe(config)
+        self.config = config
         super().__init__(**kwargs)
 
     @override

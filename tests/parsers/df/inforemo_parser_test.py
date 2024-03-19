@@ -93,7 +93,6 @@ class TestInforemoParser(unittest.TestCase):
                 participant="CABO DA CRUZ",
                 race=_RACES[0],
                 disqualified=False,
-                lineup=None,
             ),
             Participant(
                 gender=GENDER_FEMALE,
@@ -107,7 +106,6 @@ class TestInforemoParser(unittest.TestCase):
                 participant="TIRAN",
                 race=_RACES[0],
                 disqualified=False,
-                lineup=None,
             ),
             Participant(
                 gender=GENDER_FEMALE,
@@ -121,7 +119,6 @@ class TestInforemoParser(unittest.TestCase):
                 participant="CHAPELA",
                 race=_RACES[0],
                 disqualified=False,
-                lineup=None,
             ),
         ],
         [
@@ -137,7 +134,6 @@ class TestInforemoParser(unittest.TestCase):
                 participant="CABO DA CRUZ",
                 race=_RACES[1],
                 disqualified=False,
-                lineup=None,
             ),
             Participant(
                 gender=GENDER_MALE,
@@ -151,7 +147,6 @@ class TestInforemoParser(unittest.TestCase):
                 participant="ARES",
                 race=_RACES[1],
                 disqualified=False,
-                lineup=None,
             ),
             Participant(
                 gender=GENDER_MALE,
@@ -165,7 +160,6 @@ class TestInforemoParser(unittest.TestCase):
                 participant="NARON",
                 race=_RACES[1],
                 disqualified=False,
-                lineup=None,
             ),
             Participant(
                 gender=GENDER_MALE,
@@ -179,7 +173,6 @@ class TestInforemoParser(unittest.TestCase):
                 participant="MUGARDOS",
                 race=_RACES[1],
                 disqualified=False,
-                lineup=None,
             ),
         ],
     ]

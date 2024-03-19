@@ -18,7 +18,6 @@ def find_race(
     is_female: bool,
     category: str | None = None,
     day: int | None = None,
-    with_lineup: bool = False,
 ) -> Race | None:
     """
     Find a race based on the provided parameters.
@@ -29,32 +28,13 @@ def find_race(
     - is_female (bool): Whether the race is for females (True) or not (False).
     - category (Optional[str]): The category of the race (optional).
     - day (Optional[int]): The day of the race (optional).
-    - with_lineup (bool): Whether to include lineup information for participants (default: False).
 
     Returns:
     - Optional[Race]: The found Race object if the race is found, otherwise None.
-
-    This function retrieves race information using the provided datasource and parameters.
-    If with_lineup is True, it attempts to find lineup information for each participant in the race and attaches it to
-    the participant object.
-
-    Note that lineup retrieval may raise NotImplementedError, in which case it will be caught and
-    the function will proceed without adding lineup information.
     """
 
     client = Client(source=datasource, is_female=is_female, category=category)
-    race = client.get_race_by_id(race_id, day=day)
-
-    if race is not None and with_lineup:
-        try:
-            lineups = client.get_lineup_by_race_id(race_id)
-            for participant in race.participants:
-                lineup = [lin for lin in lineups if lin.club == participant.participant]
-                participant.lineup = lineup[0] if len(lineup) == 1 else None
-        except NotImplementedError:
-            pass
-
-    return race
+    return client.get_race_by_id(race_id, day=day)
 
 
 def parse_race_image(

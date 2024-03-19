@@ -22,12 +22,11 @@ def _parse_arguments():
         help="Specifies if we need to search in the female pages.",
     )
     parser.add_argument("--day", type=int, help="Day we want (for multi races pages).")
-    parser.add_argument("--lineups", action="store_true", default=False, help="Tryies to fill the lineups.")
     parser.add_argument("--save", action="store_true", default=False, help="Saves the output to a csv file.")
     return parser.parse_args()
 
 
-def main(race_id: str, datasource: str, is_female: bool, with_lineups: bool, save: bool, day: int | None):
+def main(race_id: str, datasource: str, is_female: bool, save: bool, day: int | None):
     if not Datasource.has_value(datasource):
         raise ValueError(f"invalid datasource={datasource}")
     if datasource == Datasource.TABULAR.value:
@@ -37,7 +36,6 @@ def main(race_id: str, datasource: str, is_female: bool, with_lineups: bool, sav
         race_id=race_id,
         datasource=Datasource(datasource),
         is_female=is_female,
-        with_lineup=with_lineups,
         day=day,
     )
     if not race:
@@ -53,4 +51,4 @@ if __name__ == "__main__":
     args = _parse_arguments()
     logger.info(f"{os.path.basename(__file__)}:: args -> {args.__dict__}")
 
-    main(args.race_id, args.datasource, args.female, args.lineups, args.save, args.day)
+    main(args.race_id, args.datasource, args.female, args.save, args.day)
