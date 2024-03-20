@@ -1,17 +1,27 @@
 import re
 
-from pyutils.strings import remove_parenthesis, whitespaces_clean
+from pyutils.strings import (
+    match_normalization,
+    remove_parenthesis,
+    whitespaces_clean,
+)
 from rscraping.data.constants import SYNONYMS
 
 _NORMALIZED_TOWNS = {
-    "VILAGARCÍA": ["VILAXOAN", "VILAXOÁN"],
-    "DONOSTI": ["SAN SEBATIÁN", "SAN SEBASTIAN", "DONOSTIA"],
-    "PASAIA": ["PASAI DONIBANE", "PASAI SAN JUAN", "PASAI SAN PEDRO", "SAN JUAN", "SAN PEDRO"],
-    "REDONDELA": ["CHAPELA", "CESANTES"],
-    "FERROL": ["CABANA"],
-    "A CORUÑA": ["ORZAN"],
-    "MOAÑA": ["MEIRA"],
-    "BOIRO": ["CABO DE CRUZ"],
+    "VILAGARCÍA": [["VILAXOAN"], ["VILAXOÁN"]],
+    "DONOSTI": [["SAN", "SEBATIÁN"], ["SAN", "SEBASTIAN"], ["DONOSTIA"]],
+    "PASAIA": [
+        ["PASAI", "DONIBANE"],
+        ["PASAI", "SAN", "JUAN"],
+        ["PASAI", "SAN", "PEDRO"],
+        ["SAN", "JUAN"],
+        ["SAN", "PEDRO"],
+    ],
+    "REDONDELA": [["CHAPELA"], ["CESANTES"]],
+    "FERROL": [["CABANA"]],
+    "A CORUÑA": [["ORZAN"]],
+    "MOAÑA": [["MEIRA"]],
+    "BOIRO": [["CABO", "CRUZ"]],
 }
 
 _PROVINCES = [
@@ -51,12 +61,11 @@ def remove_province(town: str) -> str:
 
 def amend_town(town: str) -> str:
     town = town.replace("/", "-").replace("-", " - ")
+
     for w in SYNONYMS["PUERTO"]:
         town = town.replace(f"{w} DE", "").replace(f"{w} DA", "").replace(w, "")
-    for k, v in _NORMALIZED_TOWNS.items():
-        if town in v or any(part in town.split() for part in v):
-            town = k
-            break
+
+    town = match_normalization(town, _NORMALIZED_TOWNS)
     return whitespaces_clean(town)
 
 

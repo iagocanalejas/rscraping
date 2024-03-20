@@ -1,23 +1,25 @@
 import re
 
-from pyutils.strings import find_roman, remove_parenthesis, remove_roman, roman_to_int, whitespaces_clean
+from pyutils.strings import (
+    apply_replaces,
+    find_roman,
+    match_normalization,
+    remove_parenthesis,
+    remove_roman,
+    roman_to_int,
+    whitespaces_clean,
+)
 from rscraping.data.functions import is_play_off
 
-_MISSPELLINGS = [
-    ("IKURIÑA", "IKURRIÑA"),
-    ("IKURINA", "IKURRIÑA"),
-    ("IÑURRIÑA", "IKURRIÑA"),
-    ("KOFRADIA", "KOFRADÍA"),
-    ("RECICLAMOS LA LUZ", ""),
-    ("PIRATA COM", "PIRATA.COM"),
-    ("PAY OFF", "PlAY OFF"),
-    ("CASTILLA - LA", "CASTILLA LA"),
-    ("AYTO", "AYUNTAMIENTO"),
-    (" AE ", ""),
-    ("EXCMO", ""),
-    ("ILTMO", ""),
-    ("TRAIEIRAS", "TRAIÑEIRAS"),
-]
+_MISSPELLINGS = {
+    "": ["RECICLAMOS LA LUZ", " AE ", "EXCMO", "ILTMO"],
+    "IKURRIÑA": ["IKURIÑA", "IKURINA", "IÑURRIÑA"],
+    "PIRATA.COM": ["PIRATA COM"],
+    "PlAY OFF": ["PAY OFF"],
+    "CASTILLA LA": ["CASTILLA - LA"],
+    "AYUNTAMIENTO": ["AYTO"],
+    "TRAIÑEIRAS": ["TRAIEIRAS"],
+}
 
 _KNOWN_RACE_SPONSORS = [
     "CEFYCAL",
@@ -207,23 +209,13 @@ def amend_race_name(name: str) -> str:
     name = name.replace("CCD CESANTES", "CESANTES")
 
     name = name.replace("/", "-").replace("-", " - ")
-    for a, b in _MISSPELLINGS:
-        name = name.replace(a, b)
+    name = apply_replaces(name, _MISSPELLINGS)
     return whitespaces_clean(name)
 
 
 def normalize_known_race_names(name: str) -> str:
-    for synonym, values in _NORMALIZED_RACES.items():
-        for value in values:
-            if name in " ".join(value) or all(v in name for v in value):
-                return synonym
-    return name
+    return match_normalization(name, _NORMALIZED_RACES)
 
 
 def normalize_ko_race_names(name: str) -> str:
-    for k, values in _KO_NAMES.items():
-        if any(v in name for v in values) and k not in name:
-            for v in values:
-                name = name.replace(v, k)
-            return name
-    return name
+    return apply_replaces(name, _KO_NAMES)

@@ -1,8 +1,7 @@
 import re
 
-from pyutils.strings import remove_parenthesis, whitespaces_clean
+from pyutils.strings import match_normalization, remove_parenthesis, whitespaces_clean
 
-# list of normalizations to specific to be generalized
 _ENTITY_TITLES_SHORT = [
     "CR",
     "SD",
@@ -23,6 +22,7 @@ _ENTITY_TITLES_SHORT = [
     "CN",
     "AR",
 ]
+
 _ENTITY_TITLES = [
     "SOCIEDAD CULTURAL Y RECREATIVA",
     "BETERANOEN ARRAUNKETA KLUBA",
@@ -48,32 +48,33 @@ _ENTITY_TITLES = [
     "ARRAUN",
     "LICEO",
 ]
+
 _NORMALIZED_ENTITIES = {
-    "CABO DA CRUZ": ["CABO DE CRUZ", "CABO"],
-    "ARES": ["DE ARES"],
-    "CESANTES": ["CESANTES REMO - RODAVIGO"],
-    "DEUSTO": ["DEUSTO - BILBAO", "DEUSTO-BILBAO"],
-    "FEDERACION GALEGA DE REMO": ["LGT - FEGR"],
-    "PERILLO": ["SALGADO PERILLO"],
-    "LIGA GALEGA DE TRAIÑAS": ["LIGA GALEGA TRAIÑEIRAS", "LIGA GALEGA TRAINEIRAS", "LGT"],
-    "BUEU": ["BUEU TECCARSA"],
-    "ESTEIRANA": ["ESTEIRANA REMO"],
-    "A CABANA": ["A CABANA FERROL"],
-    "MUGARDOS - A CABANA": ["MUGARDOS - A CABANA FERROL"],
-    "RIVEIRA": ["DE RIVEIRA"],
-    "ZARAUTZ": ["ZARAUTZ GESALAGA-OKELAN", "ZARAUTZ INMOB. ORIO"],
-    "PASAI DONIBANE KOXTAPE": ["P.DONIBANE IBERDROLA"],
-    "HONDARRIBIA": ["HONADRRIBIA", "HONDARRBIA"],
-    "SANTURTZI": ["ITSASOKO AMA", "SOTERA", "ITSASOKO AMA SANTURTZI"],
-    "ONDARROA": ["OMDARROA"],
-    "ILLUMBE": ["ILLUNBE"],
-    "PORTUGALETE": ["POTUGALETE"],
-    "GETXO": ["GETRXO"],
-    "DONOSTIARRA": ["DNOSTIARRA"],
-    "UR KIROLAK": ["UR-KIROLAK"],
-    "URDAIBAI": ["BERMEO URDAIBAI"],
-    "CASTREÑA": ["CASTRO CANTERAS DE SANTULLAN"],  # this one is a mess since SDR Castro close
+    "PUEBLA - CABO": [["CABO", "PUEBLA"]],
+    "CABO DA CRUZ": [["CABO", "CRUZ"], ["CABO"]],
+    "ARES": [["DE", "ARES"]],
+    "DEUSTO": [["DEUSTO", "BILBAO"]],
+    "FEDERACION GALEGA DE REMO": [["LGT", "FEGR"]],
+    "PERILLO": [["SALGADO", "PERILLO"]],
+    "LIGA GALEGA DE TRAIÑAS": [["LIGA", "GALEGA", "TRAIÑEIRAS"], ["LIGA", "GALEGA", "TRAINEIRAS"], ["LGT"]],
+    "ESTEIRANA": [["ESTEIRANA", "REMO"]],
+    "MUGARDOS - A CABANA": [["MUGARDOS", "CABANA", "FERROL"]],
+    "A CABANA": [["CABANA", "FERROL"]],
+    "RIVEIRA": [[" RIVEIRA"]],
+    "ZARAUTZ": [["ZARAUTZ", "GESALAGA", "OKELAN"], ["ZARAUTZ", "INMOB", "ORIO"]],
+    "PASAI DONIBANE KOXTAPE": [["DONIBANE", "IBERDROLA"]],
+    "HONDARRIBIA": [["HONADRRIBIA"], ["HONDARRBIA"]],
+    "SANTURTZI": [["ITSASOKO", "AMA"], ["SOTERA"], ["ITSASOKO", "AMA", "SANTURTZI"]],
+    "ONDARROA": [["OMDARROA"]],
+    "ILLUMBE": [["ILLUNBE"]],
+    "PORTUGALETE": [["POTUGALETE"]],
+    "GETXO": [["GETRXO"]],
+    "DONOSTIARRA": [["DNOSTIARRA"]],
+    "UR KIROLAK": [["UR-KIROLAK"]],
+    "URDAIBAI": [["BERMEO", "URDAIBAI"]],
+    "CASTREÑA": [["CASTRO", "CANTERAS", "SANTULLAN"]],  # this one is a mess since SDR Castro close
 }
+
 _KNOWN_SPONSORS = [
     "BAHIAS DE BIZKAIA",
     "UROLA KOSTA",
@@ -95,6 +96,7 @@ _KNOWN_SPONSORS = [
     "RODAVIGO",
     "NORTEGAS",
     "SIMEI",
+    "TECCARSA",
     "NATURHOUSE",
     "SALEGI JATETXEA",
 ]
@@ -118,12 +120,7 @@ def normalize_club_name(name: str) -> str:
     name = name.replace(".", "")
     name = remove_club_title(name)
     name = remove_club_sponsor(name)
-
-    # specific club normalizations
-    for k, v in _NORMALIZED_ENTITIES.items():
-        if name in v or any(part in name.split() for part in v):
-            name = k
-            break
+    name = match_normalization(name, _NORMALIZED_ENTITIES)
 
     return whitespaces_clean(name)
 

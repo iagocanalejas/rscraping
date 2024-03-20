@@ -1,6 +1,8 @@
 import re
 from datetime import datetime, time
 
+from pyutils.strings import apply_replaces
+
 
 def normalize_lap_time(value: str) -> time | None:
     """
@@ -53,7 +55,4 @@ MONTHS = {
 
 def normalize_spanish_months(phrase: str) -> str:
     phrase = phrase.upper()
-    for key, values in MONTHS.items():
-        for value in [v for v in values if v in phrase]:
-            phrase = phrase.replace(value, key)
-    return phrase
+    return apply_replaces(phrase, MONTHS)
