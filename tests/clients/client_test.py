@@ -39,6 +39,10 @@ class TestClient(unittest.TestCase):
         client = Client(source=Datasource.TABULAR, config=TabularClientConfig(sheet_id=""))
         self.assertTrue(isinstance(client, TabularDataClient))
 
+        client = Client(source=Datasource.TABULAR, config=TabularClientConfig(sheet_id="", sheet_name="femenina"))
+        self.assertTrue(isinstance(client, TabularDataClient))
+        self.assertTrue(client._is_female)
+
     # testing replacement for _load_dataframe
     def _load_dataframe(*_, **__):
         return None

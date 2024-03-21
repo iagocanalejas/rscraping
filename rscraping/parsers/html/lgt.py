@@ -15,18 +15,20 @@ from rscraping.data.constants import (
     RACE_CONVENTIONAL,
     RACE_TIME_TRIAL,
     RACE_TRAINERA,
+    SYNONYM_FEMALE,
+    SYNONYMS,
 )
-from rscraping.data.functions import is_play_off
+from rscraping.data.functions import is_female, is_play_off
 from rscraping.data.models import Datasource, Participant, Race, RaceName
-from rscraping.data.normalization.clubs import normalize_club_name
-from rscraping.data.normalization.races import (
+from rscraping.data.normalization import (
     find_race_sponsor,
+    normalize_club_name,
+    normalize_lap_time,
     normalize_name_parts,
     normalize_race_name,
+    normalize_town,
     remove_day_indicator,
 )
-from rscraping.data.normalization.times import normalize_lap_time
-from rscraping.data.normalization.towns import normalize_town
 
 from ._protocol import HtmlParser
 
@@ -46,8 +48,8 @@ class LGTHtmlParser(HtmlParser):
 
         t_date = self.get_date(selector)
         league = self.get_league(selector)
-        is_female = any(e in name for e in ["FEMENINA", "FEMININA"]) or (league is not None and "F" in league.split())
-        gender = GENDER_FEMALE if is_female else GENDER_MALE
+        _is_female = is_female(name) or (league is not None and "F" in league.split())
+        gender = GENDER_FEMALE if _is_female else GENDER_MALE
 
         normalized_names = normalize_name_parts(normalize_race_name(name))
         if len(normalized_names) == 0:
@@ -253,7 +255,7 @@ class LGTHtmlParser(HtmlParser):
             return "PLAY-OFF LGT"
 
         # remove gender
-        for g in ["FEMENINA", "FEMININA"]:
+        for g in SYNONYMS[SYNONYM_FEMALE]:
             name = name.replace(g, "")
 
         return whitespaces_clean(name)

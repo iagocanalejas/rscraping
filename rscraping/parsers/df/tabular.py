@@ -15,12 +15,13 @@ from rscraping.data.constants import (
 from rscraping.data.models import Datasource, Participant, Race
 from rscraping.data.normalization import (
     extract_town,
+    find_race_sponsor,
     normalize_club_name,
     normalize_name_parts,
     normalize_race_name,
+    normalize_town,
     remove_day_indicator,
 )
-from rscraping.data.normalization.races import find_race_sponsor
 
 from ._parser import DataFrameParserProtocol
 
@@ -50,6 +51,8 @@ class TabularDataFrameParser(DataFrameParserProtocol):
         if len(normalized_names) == 0:
             return None
 
+        town = extract_town(normalize_race_name(str(row[COLUMN_NAME])))
+
         race = Race(
             name=str(row[COLUMN_NAME]),
             normalized_names=normalized_names,
@@ -58,7 +61,7 @@ class TabularDataFrameParser(DataFrameParserProtocol):
             day=2 if "XORNADA" in row[COLUMN_NAME] and "2" in row[COLUMN_NAME] else 1,
             modality=RACE_TRAINERA,
             league=str(row[COLUMN_LEAGUE]).upper() if str(row[COLUMN_LEAGUE]) else None,
-            town=extract_town(normalize_race_name(str(row[COLUMN_NAME]))),
+            town=normalize_town(town) if town else None,
             organizer=str(row[COLUMN_ORGANIZER]).upper() if str(row[COLUMN_ORGANIZER]) else None,
             sponsor=find_race_sponsor(str(row[COLUMN_NAME])),
             race_ids=[row.name],  # pyright: ignore

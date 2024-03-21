@@ -17,6 +17,8 @@ from rscraping.data.constants import (
     RACE_CONVENTIONAL,
     RACE_TIME_TRIAL,
     RACE_TRAINERA,
+    SYNONYM_VETERAN,
+    SYNONYMS,
 )
 from rscraping.data.models import Datasource, Participant, Race
 from rscraping.data.normalization.clubs import normalize_club_name
@@ -194,7 +196,7 @@ class InforemoDataFrameParser(DataFrameParser, source=Datasource.INFOREMO):
 
     def get_category(self, data: Series) -> str:
         modality = data[2]
-        if any(e in modality for e in ["VETERANO", "VETERANA"]):
+        if any(e in modality for e in SYNONYMS[SYNONYM_VETERAN]):
             return CATEGORY_VETERAN
         return CATEGORY_ABSOLUT
 

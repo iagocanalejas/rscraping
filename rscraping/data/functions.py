@@ -4,6 +4,7 @@ import sys
 from typing import Any
 
 from pyutils.strings import remove_symbols
+from rscraping.data.constants import SYNONYM_FEMALE, SYNONYM_MEMORIAL, SYNONYMS
 from rscraping.data.models import Lineup, Race
 
 
@@ -12,7 +13,11 @@ def is_play_off(name: str) -> bool:
 
 
 def is_memorial(name: str) -> bool:
-    return any(w in name for w in ["MEMORIAL", "OMEALDIA"])
+    return any(w in name.split() for w in SYNONYMS[SYNONYM_MEMORIAL])
+
+
+def is_female(name: str) -> bool:
+    return any(w in name.split() for w in SYNONYMS[SYNONYM_FEMALE])
 
 
 def is_branch_club(name: str, letter: str = "B") -> bool:

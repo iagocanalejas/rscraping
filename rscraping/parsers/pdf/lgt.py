@@ -3,7 +3,15 @@ import re
 from fitz import Page
 
 from pyutils.lists import flatten
-from rscraping.data.constants import SYNONYMS
+from rscraping.data.constants import (
+    SYNONYM_COACH,
+    SYNONYM_COXWAIN,
+    SYNONYM_DELEGATE,
+    SYNONYM_HOMEGROWN,
+    SYNONYM_NOT_OWN,
+    SYNONYM_OWN,
+    SYNONYMS,
+)
 from rscraping.data.models import Datasource, Lineup
 from rscraping.data.normalization.clubs import normalize_club_name
 from rscraping.data.normalization.races import normalize_race_name
@@ -14,13 +22,13 @@ from ._protocol import PdfParser
 class LGTPdfParser(PdfParser):
     DATASOURCE = Datasource.LGT
 
-    _CONDITION = list(flatten([SYNONYMS["HOMEGROWN"], SYNONYMS["OWN"], SYNONYMS["NOT_OWN"]]))
+    _CONDITION = list(flatten([SYNONYMS[SYNONYM_HOMEGROWN], SYNONYMS[SYNONYM_OWN], SYNONYMS[SYNONYM_NOT_OWN]]))
     _TOKEN = list(
         flatten(
             [
-                SYNONYMS["COACH"],
-                SYNONYMS["DELEGATE"],
-                SYNONYMS["COXWAIN"],
+                SYNONYMS[SYNONYM_COACH],
+                SYNONYMS[SYNONYM_DELEGATE],
+                SYNONYMS[SYNONYM_COXWAIN],
                 ["ESTRIBOR", "BABOR", "PROEL", "SUPLENTE"],
             ]
         )
@@ -32,9 +40,9 @@ class LGTPdfParser(PdfParser):
         return Lineup(
             race=race,
             club=club,
-            coach=[r for t, r in rowers if t in SYNONYMS["COACH"]][0],
-            delegate=[r for t, r in rowers if t in SYNONYMS["DELEGATE"]][0],
-            coxswain=[r for t, r in rowers if t in SYNONYMS["COXWAIN"]][0],
+            coach=[r for t, r in rowers if t in SYNONYMS[SYNONYM_COACH]][0],
+            delegate=[r for t, r in rowers if t in SYNONYMS[SYNONYM_DELEGATE]][0],
+            coxswain=[r for t, r in rowers if t in SYNONYMS[SYNONYM_COXWAIN]][0],
             starboard=[r for t, r in rowers if any(k in t for k in ["ESTRIBOR"])],
             larboard=[r for t, r in rowers if any(k in t for k in ["BABOR"])],
             substitute=[r for t, r in rowers if any(k in t for k in ["SUPLENTE"])],

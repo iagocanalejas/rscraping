@@ -4,7 +4,14 @@ from fitz import Page
 
 from pyutils.lists import flatten
 from pyutils.strings import whitespaces_clean
-from rscraping.data.constants import SYNONYMS
+from rscraping.data.constants import (
+    SYNONYM_COXWAIN,
+    SYNONYM_HOMEGROWN,
+    SYNONYM_NOT_OWN,
+    SYNONYM_OWN,
+    SYNONYM_ROWER,
+    SYNONYMS,
+)
 from rscraping.data.models import Datasource, Lineup
 from rscraping.data.normalization.clubs import normalize_club_name
 from rscraping.data.normalization.races import normalize_race_name
@@ -16,7 +23,7 @@ class ACTPdfParser(PdfParser):
     DATASOURCE = Datasource.ACT
 
     _TRASH = ["FIRMA Y SELLO", "PROPIOS:", "CANTERANOS:", "NO PROPIOS:", "CAPITÁN", "CAPITANA"]
-    _CONDITION = list(flatten([SYNONYMS["HOMEGROWN"], SYNONYMS["OWN"], SYNONYMS["NOT_OWN"]]))
+    _CONDITION = list(flatten([SYNONYMS[SYNONYM_HOMEGROWN], SYNONYMS[SYNONYM_OWN], SYNONYMS[SYNONYM_NOT_OWN]]))
 
     def parse_lineup(self, page: Page) -> Lineup | None:
         text = [e for e in page.get_text().split("\n") if e]
@@ -76,7 +83,7 @@ class ACTPdfParser(PdfParser):
 
     def _get_substitutes_tokens_indexes(self, rowers: list[str]) -> list[int]:
         def is_substitute_index(rower: str) -> bool:
-            return rower.upper() in SYNONYMS["ROWER"] or rower.upper() in SYNONYMS["COXWAIN"]
+            return rower.upper() in SYNONYMS[SYNONYM_ROWER] or rower.upper() in SYNONYMS[SYNONYM_COXWAIN]
 
         # ['Remero', 'EKAITZ ', 'BADIOLA', 'Canterano', 'Remero', 'UNAX ', 'BEDIALAUNETA', 'Canterano', ...]
         # find all substitutes (marked as 'Remero' | 'Patrón')

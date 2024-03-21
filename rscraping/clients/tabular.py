@@ -8,6 +8,7 @@ import pandas as pd
 
 from pyutils.shortcuts import only_one_not_none
 from pyutils.strings import roman_to_int
+from rscraping.data.functions import is_female
 from rscraping.data.models import Datasource, Lineup, Race, RaceName
 from rscraping.parsers.df import (
     COLUMN_CLUB,
@@ -80,6 +81,10 @@ class TabularDataClient(Client, source=Datasource.TABULAR):
             raise ValueError("sheet_id, sheet_url and file_path are mutually exclusive")
         self._df = self._load_dataframe(config)
         self.config = config
+
+        if config.sheet_name and is_female(config.sheet_name.upper()):
+            self._is_female = True
+
         super().__init__(**kwargs)
 
     @override

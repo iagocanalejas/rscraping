@@ -16,6 +16,7 @@ from rscraping.data.constants import (
     RACE_TIME_TRIAL,
     RACE_TRAINERA,
 )
+from rscraping.data.functions import is_play_off
 from rscraping.data.models import Datasource, Lineup, Participant, Race, RaceName
 from rscraping.data.normalization.clubs import normalize_club_name
 from rscraping.data.normalization.races import find_race_sponsor, normalize_race_name
@@ -71,6 +72,7 @@ class TrainerasHtmlParser(HtmlParser):
 
         participants = self.get_participants(selector, day)
         ttype = self.get_type(participants)
+        ttype = ttype if not is_play_off(name) else RACE_TIME_TRIAL
         category = self.get_category(selector)
 
         race = Race(
