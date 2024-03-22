@@ -1,4 +1,5 @@
 from collections.abc import Generator
+from datetime import date
 from typing import Any
 
 from pandas import DataFrame, Series
@@ -44,14 +45,19 @@ class TabularDataFrameParser(DataFrameParserProtocol):
         if not isinstance(row, Series):
             return None
 
+        normalized_name = self._normalize_race_name(
+            normalize_race_name(str(row[COLUMN_NAME])),
+            str(row[COLUMN_LEAGUE]).upper() if str(row[COLUMN_LEAGUE]) else None,
+            row[COLUMN_DATE],  # pyright: ignore
+        )
         normalized_names = [
             (remove_day_indicator(n), int_or_none(str(row[COLUMN_EDITION])))
-            for (n, _) in normalize_name_parts(normalize_race_name(str(row[COLUMN_NAME])))
+            for (n, _) in normalize_name_parts(normalized_name)
         ]
         if len(normalized_names) == 0:
             return None
 
-        town = extract_town(normalize_race_name(str(row[COLUMN_NAME])))
+        town = extract_town(normalized_name)
 
         race = Race(
             name=str(row[COLUMN_NAME]),
@@ -104,3 +110,15 @@ class TabularDataFrameParser(DataFrameParserProtocol):
             race = self.parse_race_serie(row, is_female=is_female, url=url)
             if race:
                 yield race
+
+    @staticmethod
+    def _normalize_race_name(name: str, league: str | None, t_date: date) -> str:
+        if all(n in name for n in ["ILLA", "SAMERTOLAMEU"]) and (
+            (league == "LIGA A" and t_date.year in [2023]) or (league == "LIGA B" and t_date.year in [2021, 2022])
+        ):
+            # HACK: this is a weird flag case in witch Meira restarted the edition for his 'B' team.
+            # We have "III BANDEIRA ILLA DO SAMERTOLAMEU" in 2017 for his main team and
+            # "III BANDEIRA ILLA DO SAMERTOLAMEU" in 2023 for his 'B' team. So we need to differentiate them.
+            return "BANDEIRA ILLA DO SAMERTOLAMEU B"
+
+        return name

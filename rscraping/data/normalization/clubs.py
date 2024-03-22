@@ -1,6 +1,7 @@
 import re
 
 from pyutils.strings import match_normalization, remove_parenthesis, whitespaces_clean
+from rscraping.data.functions import is_branch_club
 
 _ENTITY_TITLES_SHORT = [
     "CR",
@@ -16,7 +17,6 @@ _ENTITY_TITLES_SHORT = [
     "CRN",
     "CRO",
     "FEM",
-    "B",
     "AN",
     "AE",
     "CN",
@@ -120,7 +120,11 @@ def normalize_club_name(name: str) -> str:
     name = name.replace(".", "")
     name = remove_club_title(name)
     name = remove_club_sponsor(name)
+
+    is_B_team, is_C_team = is_branch_club(name), is_branch_club(name, letter="C")  # never saw more than a C
     name = match_normalization(name, _NORMALIZED_ENTITIES)
+    name = f"{name} C" if is_C_team and not is_branch_club(name, letter="C") else name
+    name = f"{name} B" if is_B_team and not is_branch_club(name) else name
 
     return whitespaces_clean(name)
 
@@ -128,8 +132,6 @@ def normalize_club_name(name: str) -> str:
 def deacronym_club_name(name: str) -> str:
     if any(w in ["P", "D", "PD"] for w in name.split()):
         name = re.sub(r"P\.? ?D\.?", "PASAIA DONIBANE", name)
-    if "CABANA" in name:
-        name = name.replace("CABANA FERROL", "CABANA")
     return whitespaces_clean(name)
 
 

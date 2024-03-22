@@ -8,7 +8,7 @@ from pyutils.strings import (
 from rscraping.data.constants import SYNONYM_PORT, SYNONYMS
 
 _NORMALIZED_TOWNS = {
-    "VILAGARCÍA": [["VILAXOAN"], ["VILAXOÁN"]],
+    "VILAGARCÍA": [["VILAXOAN"], ["VILAXOÁN"], ["VILAGARCIA"]],
     "DONOSTI": [["SAN", "SEBATIÁN"], ["SAN", "SEBASTIAN"], ["DONOSTIA"]],
     "PASAIA": [
         ["PASAI", "DONIBANE"],
@@ -20,8 +20,10 @@ _NORMALIZED_TOWNS = {
     "REDONDELA": [["CHAPELA"], ["CESANTES"]],
     "FERROL": [["CABANA"]],
     "A CORUÑA": [["ORZAN"]],
-    "MOAÑA": [["MEIRA"]],
+    "A POBRA DO CARAMIÑAL": [["POBRA"], ["PUEBLA"]],
+    "MOAÑA": [["MEIRA"], ["TIRAN"], ["TIRÁN"]],
     "BOIRO": [["CABO", "CRUZ"]],
+    "O GROVE": [["PEDRAS", "NEGRAS"], ["GROVE"]],
 }
 
 _PROVINCES = [

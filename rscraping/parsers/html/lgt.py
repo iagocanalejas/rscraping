@@ -56,7 +56,7 @@ class LGTHtmlParser(HtmlParser):
             logger.error(f"{self.DATASOURCE}: unable to normalize {name=}")
             return None
         normalized_names = [
-            self._hardcoded_playoff_edition(self._normalize_race_name(n, t_date), year=t_date.year, edition=e)
+            self._hardcoded_playoff_edition(self._normalize_race_name(n, league, t_date), year=t_date.year, edition=e)
             for (n, e) in normalized_names
         ]
         logger.info(f"{self.DATASOURCE}: race normalized to {normalized_names=}")
@@ -239,13 +239,15 @@ class LGTHtmlParser(HtmlParser):
     ####################################################
 
     @staticmethod
-    def _normalize_race_name(name: str, t_date: date) -> str:
+    def _normalize_race_name(name: str, league: str | None, t_date: date) -> str:
         name = remove_day_indicator(name)
 
         if "TERESA HERRERA" in name:  # lgt never saves the final
             return "TROFEO TERESA HERRERA" if t_date.isoweekday() == 7 else "TROFEO TERESA HERRERA (CLASIFICATORIA)"
 
-        if all(n in name for n in ["ILLA", "SAMERTOLAMEU"]) and t_date.year in [2021, 2022, 2023]:
+        if all(n in name for n in ["ILLA", "SAMERTOLAMEU"]) and (
+            (league == "LIGA A" and t_date.year in [2023]) or (league == "LIGA B" and t_date.year in [2021, 2022])
+        ):
             # HACK: this is a weird flag case in witch Meira restarted the edition for his 'B' team.
             # We have "III BANDEIRA ILLA DO SAMERTOLAMEU" in 2017 for his main team and
             # "III BANDEIRA ILLA DO SAMERTOLAMEU" in 2023 for his 'B' team. So we need to differentiate them.

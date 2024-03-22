@@ -3,7 +3,7 @@ import unittest
 from rscraping.data.normalization import normalize_league_name
 
 
-class TestLeagueNameNormalization(unittest.TestCase):
+class TestLeagueNormalization(unittest.TestCase):
     def setUp(self) -> None:
         self.NAMES = [
             "LIGA FEM",

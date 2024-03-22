@@ -3,7 +3,7 @@ import unittest
 from rscraping.data.normalization.races import normalize_name_parts, normalize_race_name, remove_day_indicator
 
 
-class TestRaceNameNormalization(unittest.TestCase):
+class TestRaceNormalization(unittest.TestCase):
     def setUp(self) -> None:
         self.NAMES = [
             "XXXVIII. El Correo Ikurriña - Kutxabank SN - Lekeitioko Udala",
