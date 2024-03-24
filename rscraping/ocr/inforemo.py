@@ -1,5 +1,6 @@
 import locale
 import os
+from typing import override
 
 import cv2
 import numpy as np
@@ -14,7 +15,8 @@ from rscraping.ocr.image import ImageProcessor
 class InforemoImageProcessor(ImageProcessor, source=Datasource.INFOREMO):
     DATASOURCE = Datasource.INFOREMO
 
-    def retrieve_header_data(self, path: str, header_size: int = 3, **_) -> DataFrame:
+    @override
+    def retrieve_header_data(self, path: str, header_size: int = 3, **_) -> str:
         if not os.path.exists(path) or not os.path.isfile(path):
             raise ValueError(f"invalid {path=}")
 
@@ -28,8 +30,9 @@ class InforemoImageProcessor(ImageProcessor, source=Datasource.INFOREMO):
             out = pytesseract.image_to_string(self.img, config="--psm 10")
 
         locale.setlocale(locale.LC_TIME, default_locale)
-        return out
+        return str(out)
 
+    @override
     def retrieve_tabular_dataframe(self, path: str, header_size: int = 3, **_) -> DataFrame:
         if not os.path.exists(path) or not os.path.isfile(path):
             raise ValueError(f"invalid {path=}")
@@ -62,7 +65,7 @@ class InforemoImageProcessor(ImageProcessor, source=Datasource.INFOREMO):
                     out = pytesseract.image_to_string(border, config="--psm 4")
                     if len(out) == 0:
                         out = pytesseract.image_to_string(border, config="--psm 10")
-                    inner = inner + " " + out
+                    inner = inner + " " + str(out)
                 outer.append(inner)
 
         # Creating a dataframe of the generated OCR list

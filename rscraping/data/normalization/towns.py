@@ -8,8 +8,16 @@ from pyutils.strings import (
 from rscraping.data.constants import SYNONYM_PORT, SYNONYMS
 
 _NORMALIZED_TOWNS = {
-    "VILAGARCÍA": [["VILAXOAN"], ["VILAXOÁN"], ["VILAGARCIA"]],
-    "DONOSTI": [["SAN", "SEBATIÁN"], ["SAN", "SEBASTIAN"], ["DONOSTIA"]],
+    "VILAGARCÍA": [
+        ["VILAXOAN"],
+        ["VILAXOÁN"],
+        ["VILAGARCIA"],
+    ],
+    "DONOSTI": [
+        ["SAN", "SEBASTIAN"],
+        ["SAN", "SEBASTIÁN"],
+        ["DONOSTIA"],
+    ],
     "PASAIA": [
         ["PASAI", "DONIBANE"],
         ["PASAI", "SAN", "JUAN"],
@@ -17,13 +25,23 @@ _NORMALIZED_TOWNS = {
         ["SAN", "JUAN"],
         ["SAN", "PEDRO"],
     ],
-    "REDONDELA": [["CHAPELA"], ["CESANTES"]],
+    "REDONDELA": [
+        ["CHAPELA"],
+        ["CESANTES"],
+    ],
     "FERROL": [["CABANA"]],
     "A CORUÑA": [["ORZAN"]],
     "A POBRA DO CARAMIÑAL": [["POBRA"], ["PUEBLA"]],
-    "MOAÑA": [["MEIRA"], ["TIRAN"], ["TIRÁN"]],
+    "MOAÑA": [
+        ["MEIRA"],
+        ["TIRAN"],
+        ["TIRÁN"],
+    ],
     "BOIRO": [["CABO", "CRUZ"]],
-    "O GROVE": [["PEDRAS", "NEGRAS"], ["GROVE"]],
+    "O GROVE": [
+        ["PEDRAS", "NEGRAS"],
+        ["GROVE"],
+    ],
 }
 
 _PROVINCES = [

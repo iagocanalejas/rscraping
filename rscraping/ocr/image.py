@@ -34,7 +34,7 @@ class ImageProcessor(ABC):
     #                 ABSTRACT METHODS                 #
     ####################################################
     @abstractmethod
-    def retrieve_header_data(self, path: str, header_size: int = 3, **kwargs) -> DataFrame:
+    def retrieve_header_data(self, path: str, header_size: int = 3, **kwargs) -> str:
         raise NotImplementedError
 
     @abstractmethod

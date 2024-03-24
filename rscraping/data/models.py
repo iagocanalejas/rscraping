@@ -2,7 +2,6 @@ import collections
 import json
 from dataclasses import dataclass
 from enum import StrEnum, auto
-from typing import Optional
 
 RaceName = collections.namedtuple("RaceName", ["race_id", "name"])
 
@@ -25,7 +24,7 @@ class Datasource(StrEnum):
         return value is not None and value.lower() in [cls.INFOREMO]
 
     @classmethod
-    def _missing_(cls, value) -> Optional["Datasource"]:
+    def _missing_(cls, value) -> "Datasource | None":
         if not isinstance(value, str):
             return None
         value = value.lower()

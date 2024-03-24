@@ -23,7 +23,7 @@ class LGTPdfParser(PdfParser):
     DATASOURCE = Datasource.LGT
 
     _CONDITION = list(flatten([SYNONYMS[SYNONYM_HOMEGROWN], SYNONYMS[SYNONYM_OWN], SYNONYMS[SYNONYM_NOT_OWN]]))
-    _TOKEN = list(
+    _TOKEN: list[str] = list(
         flatten(
             [
                 SYNONYMS[SYNONYM_COACH],
