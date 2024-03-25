@@ -7,4 +7,14 @@ from rscraping.data.models import Race
 
 
 class DataFrameParserProtocol(Protocol):
-    def parse_races(self, data: DataFrame, **kwargs) -> Generator[Race, Any, Any]: ...
+    def parse_races(self, data: DataFrame, **kwargs) -> Generator[Race, Any, Any]:
+        """
+        Parse the given DataFrame to retrieve the Race objects.
+
+        Args:
+            data (DataFrame): The DataFrame to parse.
+            **kwargs: Additional keyword arguments.
+
+        Yields: Race: The parsed races.
+        """
+        ...

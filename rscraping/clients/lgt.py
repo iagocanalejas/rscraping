@@ -126,6 +126,7 @@ class LGTClient(Client, source=Datasource.LGT):
         kwargs["results_selector"] = self.get_results_selector(race_id)
         return super().get_race_by_id(race_id, **kwargs)
 
+    @override
     def get_race_by_url(self, url: str, race_id: str, **kwargs):
         if race_id in self._excluded_ids:
             return None
@@ -135,16 +136,6 @@ class LGTClient(Client, source=Datasource.LGT):
 
     @override
     def get_race_names_by_year(self, year: int, **_) -> Generator[RaceName, Any, Any]:
-        """
-        Find the race names for a given year and gender. Uses the unchecked IDs found in get_race_ids_by_year to
-        find them.
-
-        Args:
-            year (int): The year for which to generate race names.
-            **kwargs: Additional keyword arguments.
-
-        Yields: RaceName: Race names.
-        """
         today = date.today().year
         if today == year:
             race_names = self._html_parser.parse_race_names(selector=self.get_calendar_selector())
@@ -165,17 +156,17 @@ class LGTClient(Client, source=Datasource.LGT):
     @override
     def get_race_ids_by_year(self, year: int, **_) -> Generator[str, Any, Any]:
         """
-        Find the race IDs for a given year and gender.
+        Find the IDs of the races that took place in a given year.
 
-        As this datasource doesn't give us an easy way of retrieving the races for a given year we need to bruteforce
+        As the LGT datasource doesn't give us an easy way of retrieving the races for a given year we need to bruteforce
         it, this method will do a binary search for the 'upper' and 'lower' bounds of a season.
 
         We also need to ignore a hole ton of useless IDs (_excluded_ids) that are not used or have invalid information.
 
-        NOTE: For the current year tryies to find the IDs in the calendar page.
+        NOTE: For the current year it first tryies to find the IDs in the calendar page.
 
         Args:
-            year (int): The year for which to generate race IDs.
+            year (int): The year for which to find the IDs.
             **kwargs: Additional keyword arguments.
 
         Yields: str: Unchecked race IDs, note that *this list can contain invalid IDs* as this method does not check

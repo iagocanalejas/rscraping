@@ -25,7 +25,7 @@ class TestRaceNormalization(unittest.TestCase):
         for idx, race_name in enumerate(self.NAMES):
             self.assertEqual(normalize_race_name(race_name), results[idx])
 
-    def test_normalize_name_parts(self):
+    def test_name_parts_normalization(self):
         results = [
             [("EL CORREO IKURRIÑA", 38), ("KUTXABANK SARI NAGUSIA", None), ("LEKEITIOKO UDALA", None)],
             [("HONDARRIBIKO BANDERA", 36), ("MAPFRE SARI NAGUSIA", None)],

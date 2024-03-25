@@ -13,7 +13,7 @@ class TestInforemoParser(unittest.TestCase):
         self.parser = InforemoDataFrameParser(source=Datasource.INFOREMO)
         self.fixtures = os.path.join(os.getcwd(), "fixtures", "df")
 
-    def test_parse_race_from(self):
+    def test_parse_races(self):
         header_data = """
         CAMPEONATO GALEGO DE TRAINERAS
 

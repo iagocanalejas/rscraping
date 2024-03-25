@@ -82,8 +82,16 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
         content = content.content.decode("utf-8")
         return self._html_parser.parse_club_race_ids(Selector(content))
 
-    @override
     def get_race_ids_by_rower(self, rower_id: str, year: str | None = None, **_) -> Generator[str, Any, Any]:
+        """
+        Find the race IDs associated with a specific rower.
+
+        Args:
+            rower_id (str): The ID of the rower.
+            **kwargs: Additional keyword arguments.
+
+        Yields: str: Race IDs associated with the rower.
+        """
         content = requests.get(url=self.get_rower_url(rower_id), headers=HTTP_HEADERS()).content.decode("utf-8")
         yield from self._html_parser.parse_rower_race_ids(Selector(content), year=year)
 

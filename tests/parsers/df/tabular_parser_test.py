@@ -13,7 +13,7 @@ class TestTabularDataParser(unittest.TestCase):
         self.parser = TabularDataFrameParser()
         self.fixtures = os.path.join(os.getcwd(), "fixtures", "df")
 
-    def test_parse_race_series(self):
+    def test_parse_race(self):
         df = pd.read_hdf(os.path.join(self.fixtures, "gdrive_tabular.h5"), key="data")
         assert isinstance(df, pd.DataFrame)  # needed as 'read_hdf' is returning TableIterator
 
@@ -31,7 +31,7 @@ class TestTabularDataParser(unittest.TestCase):
         self.assertEqual(len(participants), 1)
         self.assertEqual(participants[0], self._PARTICIPANT)
 
-    def test_parse_races_from(self):
+    def test_parse_races(self):
         df = pd.read_hdf(os.path.join(self.fixtures, "gdrive_tabular.h5"), key="data")
         assert isinstance(df, pd.DataFrame)
 
@@ -44,7 +44,7 @@ class TestTabularDataParser(unittest.TestCase):
             self.assertEqual(len(participants), 1)
             self.assertEqual(participants[0], self._PARTICIPANTS[i])
 
-    def test_parse_races_ids(self):
+    def test_parse_race_ids(self):
         df = pd.read_hdf(os.path.join(self.fixtures, "gdrive_tabular.h5"), key="data")
         assert isinstance(df, pd.DataFrame)
 
@@ -54,7 +54,7 @@ class TestTabularDataParser(unittest.TestCase):
         races = self.parser.parse_race_ids(df, 2012)
         self.assertEqual(list(races), [])
 
-    def test_parse_races_names(self):
+    def test_parse_race_names(self):
         df = pd.read_hdf(os.path.join(self.fixtures, "gdrive_tabular.h5"), key="data")
         assert isinstance(df, pd.DataFrame)
 

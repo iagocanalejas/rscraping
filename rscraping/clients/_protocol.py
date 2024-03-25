@@ -21,7 +21,7 @@ class ClientProtocol(Protocol):
 
     def validate_year(self, year: int):
         """
-        Checks the given year for validity in datasource, raising a ValueError if it's outside the valid range.
+        Checks the given year for the current datasource raising a ValueError if it's outside the range.
 
         Args:
             year (int): The year to validate.
@@ -32,18 +32,18 @@ class ClientProtocol(Protocol):
 
     def validate_url(self, url: str):
         """
-        Checks the given url for validity in datasource, raising a ValueError if it's not valid.
+        Checks the given url for the current datasource, raising a ValueError if it's invalid.
 
         Args:
-            url (int): The URL to validate.
+            url (str): The URL to validate.
 
-        Raises: ValueError: If the url is not valid.
+        Raises: ValueError: If the url is invalid.
         """
         ...
 
     def get_race_by_id(self, race_id: str, **kwargs) -> Race | None:
         """
-        Retrieve race details by ID, parsing data from the corresponding URL.
+        Retrieve race details by ID parsing data from the corresponding datasource.
 
         Args:
             race_id (str): The ID of the race.
@@ -55,7 +55,7 @@ class ClientProtocol(Protocol):
 
     def get_race_by_url(self, url: str, race_id: str, **kwargs) -> Race | None:
         """
-        Retrieve race details by parsing data from the corresponding URL.
+        Retrieve race details by parsing data from the corresponding datasource.
 
         Args:
             url (str): The URL of the race.
@@ -68,10 +68,10 @@ class ClientProtocol(Protocol):
 
     def get_race_names_by_year(self, year: int, **kwargs) -> Generator[RaceName, Any, Any]:
         """
-        Find the race names for a given year.
+        Find the names of the races that took place in a given year.
 
         Args:
-            year (int): The year for which to generate race names.
+            year (int): The year for which find the names.
             **kwargs: Additional keyword arguments.
 
         Yields: RaceName: Race names.
@@ -80,10 +80,10 @@ class ClientProtocol(Protocol):
 
     def get_race_ids_by_year(self, year: int, **kwargs) -> Generator[str, Any, Any]:
         """
-        Find the race IDs for a given year.
+        Find the IDs of the races that took place in a given year.
 
         Args:
-            year (int): The year for which to generate race IDs.
+            year (int): The year for which to find the IDs.
             **kwargs: Additional keyword arguments.
 
         Yields: str: Race IDs.
@@ -92,26 +92,14 @@ class ClientProtocol(Protocol):
 
     def get_race_ids_by_club(self, club_id: str, year: int, **kwargs) -> Generator[str, Any, Any]:
         """
-        Find the race IDs for a given club and year.
+        Find the IDs for the races in witch a given club participated in a given year.
 
         Args:
             club_id (str): The ID of the club.
-            year (int): The year for which to generate race IDs.
+            year (int): The year for which to find race IDs.
             **kwargs: Additional keyword arguments.
 
         Yields: str: Race IDs.
-        """
-        ...
-
-    def get_race_ids_by_rower(self, rower_id: str, **kwargs) -> Generator[str, Any, Any]:
-        """
-        Find the race IDs associated with a specific rower.
-
-        Args:
-            rower_id (str): The ID of the rower.
-            **kwargs: Additional keyword arguments.
-
-        Yields: str: Race IDs associated with the rower.
         """
         ...
 

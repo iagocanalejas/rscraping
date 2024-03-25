@@ -109,6 +109,11 @@ class TabularDataClient(Client, source=Datasource.TABULAR):
             raise ValueError(f"invalid {url=}")
 
     def get_races(self, **kwargs) -> Generator[Race, Any, Any]:
+        """
+        Retrieve all the race details in the current DataFrame.
+
+        Yields: Race: All the races in the DataFrame.
+        """
         return self._parser.parse_races(self._df, is_female=self._is_female, url=self._url)
 
     @override
@@ -166,23 +171,25 @@ class TabularDataClient(Client, source=Datasource.TABULAR):
     ################################################
 
     @property
+    @override
     def _html_parser(self) -> HtmlParser:
         raise NotImplementedError
 
     @property
+    @override
     def _pdf_parser(self) -> PdfParser:
         raise NotImplementedError
 
-    def get_race_ids_by_rower(self, rower_id: str, **kwargs) -> Generator[str, Any, Any]:
-        raise NotImplementedError
-
+    @override
     def get_lineup_by_race_id(self, race_id: str, **kwargs) -> Generator[Lineup, Any, Any]:
         raise NotImplementedError
 
+    @override
     @staticmethod
     def get_races_url(year: int, **kwargs) -> str:
         raise NotImplementedError
 
+    @override
     @staticmethod
     def get_lineup_url(race_id: str, **kwargs) -> str:
         raise NotImplementedError

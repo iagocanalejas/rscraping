@@ -10,6 +10,7 @@ from parsel.selector import Selector
 
 from pyutils.strings import find_date
 from rscraping.clients import Client
+from rscraping.clients.traineras import TrainerasClient
 from rscraping.data.constants import HTTP_HEADERS
 from rscraping.data.models import Datasource
 from rscraping.parsers.html.traineras import TrainerasHtmlParser
@@ -19,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 # this only works with traineras.es
 def main(rower_id: str, club_name: str, year: str | None = None, output: str = "./out"):
-    client = Client(source=Datasource.TRAINERAS)  # type: ignore
+    client: TrainerasClient = Client(source=Datasource.TRAINERAS)  # type: ignore
     parser: TrainerasHtmlParser = client._html_parser  # type: ignore
 
     for race_id in client.get_race_ids_by_rower(rower_id, year=year):
