@@ -120,3 +120,7 @@ class Client(ClientProtocol):
     @override
     def get_lineup_by_race_id(self, race_id: str, **kwargs) -> Generator[Lineup, Any, Any]:
         raise NotImplementedError
+
+    @override
+    def get_race_ids_by_club(self, club_id: str, year: int, **kwargs) -> Generator[str, Any, Any]:
+        raise NotImplementedError

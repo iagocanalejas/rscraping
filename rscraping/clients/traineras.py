@@ -5,7 +5,7 @@ from typing import Any, override
 import requests
 from parsel.selector import Selector
 
-from rscraping.data.constants import HTTP_HEADERS
+from rscraping.data.constants import CATEGORY_SCHOOL, CATEGORY_VETERAN, HTTP_HEADERS
 from rscraping.data.models import Datasource, Lineup, RaceName
 from rscraping.parsers.html import TrainerasHtmlParser
 
@@ -40,6 +40,17 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
     @staticmethod
     def get_rower_url(rower_id: str, **_) -> str:
         return f"https://traineras.es/personas/{rower_id}"
+
+    def get_club_races_url(self, club_id: str, year: int, **_) -> str:
+        param = f"?anyo={year}"
+        if self._category == CATEGORY_VETERAN:
+            extra = "VF" if self._is_female else "VM"
+        elif self._category == CATEGORY_SCHOOL:
+            extra = "JF" if self._is_female else "JM"
+        else:
+            extra = "SF" if self._is_female else "SM"
+        param = f"{param}-{extra}"
+        return f"https://traineras.es/clubregatas/{club_id}{param}"
 
     @override
     def validate_url(self, url: str):
@@ -80,6 +91,12 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
                 continue
             lineup = requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8")
             yield self._html_parser.parse_lineup(Selector(lineup))
+
+    @override
+    def get_race_ids_by_club(self, club_id: str, year: int, **kwargs) -> Generator[str, Any, Any]:
+        content = requests.get(url=self.get_club_races_url(club_id, year), headers=HTTP_HEADERS())
+        content = content.content.decode("utf-8")
+        return self._html_parser.parse_club_race_ids(Selector(content))
 
     def get_pages(self, year: int) -> Generator[Selector, Any, Any]:
         """

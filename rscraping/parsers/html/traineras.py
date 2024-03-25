@@ -117,7 +117,12 @@ class TrainerasHtmlParser(HtmlParser):
 
     @override
     def parse_race_ids(
-        self, selector: Selector, *, is_female: bool | None = None, category: str | None = None, **_
+        self,
+        selector: Selector,
+        *,
+        is_female: bool | None = None,
+        category: str | None = None,
+        **_,
     ) -> Generator[str, Any, Any]:
         for race in self.parse_race_names(selector, is_female=is_female, category=category):
             yield race.race_id
@@ -144,7 +149,11 @@ class TrainerasHtmlParser(HtmlParser):
             name = " ".join(n for n in name.split() if n != ttype)
             yield RaceName(race_id=row.xpath("//*/td[1]/a/@href").get("").split("/")[-1], name=name)
 
-    def parse_rower_race_ids(self, selector: Selector, year: str | None = None, **_) -> Generator[str, Any, Any]:
+    def parse_club_race_ids(self, selector: Selector) -> Generator[str, Any, Any]:
+        rows = selector.xpath("/html/body/div[1]/div[2]/div/table/tr").getall()
+        return (Selector(row).xpath("//*/td[1]/a/@href").get("").split("/")[-1] for row in rows[1:])
+
+    def parse_rower_race_ids(self, selector: Selector, year: str | None = None) -> Generator[str, Any, Any]:
         rows = selector.xpath("/html/body/main/section[2]/div/div/div[1]/div/table/tr/td/table/tr").getall()
         if not year:
             return (Selector(r).xpath("//*/td/a/@href").get("").split("/")[-1] for r in rows)
