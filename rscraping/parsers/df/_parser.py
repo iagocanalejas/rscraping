@@ -1,6 +1,10 @@
 from abc import ABC
+from collections.abc import Generator
+from typing import Any, override
 
-from rscraping.data.models import Datasource
+from pandas import DataFrame
+
+from rscraping.data.models import Datasource, Race
 
 from ._protocol import DataFrameParserProtocol
 
@@ -19,3 +23,7 @@ class DataFrameParser(DataFrameParserProtocol, ABC):
         final_obj = object.__new__(subclass)
 
         return final_obj
+
+    @override
+    def parse_races(self, data: DataFrame, **kwargs) -> Generator[Race, Any, Any]:
+        raise NotImplementedError

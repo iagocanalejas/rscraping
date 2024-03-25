@@ -70,7 +70,7 @@ def parse_race_image(
     header_data = processor.retrieve_header_data(path=path, header_size=header_size)
     df = processor.retrieve_tabular_dataframe(path=path, header_size=header_size)
 
-    return parser.parse_races_from(
+    return parser.parse_races(
         data=df,
         file_name=os.path.splitext(os.path.basename(path))[0],
         header=header_data,

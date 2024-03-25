@@ -66,6 +66,18 @@ class ClientProtocol(Protocol):
         """
         ...
 
+    def get_race_names_by_year(self, year: int, **kwargs) -> Generator[RaceName, Any, Any]:
+        """
+        Find the race names for a given year.
+
+        Args:
+            year (int): The year for which to generate race names.
+            **kwargs: Additional keyword arguments.
+
+        Yields: RaceName: Race names.
+        """
+        ...
+
     def get_race_ids_by_year(self, year: int, **kwargs) -> Generator[str, Any, Any]:
         """
         Find the race IDs for a given year.
@@ -88,18 +100,6 @@ class ClientProtocol(Protocol):
             **kwargs: Additional keyword arguments.
 
         Yields: str: Race IDs.
-        """
-        ...
-
-    def get_race_names_by_year(self, year: int, **kwargs) -> Generator[RaceName, Any, Any]:
-        """
-        Find the race names for a given year.
-
-        Args:
-            year (int): The year for which to generate race names.
-            **kwargs: Additional keyword arguments.
-
-        Yields: RaceName: Race names.
         """
         ...
 

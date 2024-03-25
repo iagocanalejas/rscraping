@@ -65,21 +65,27 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
             raise ValueError(f"invalid {url=}")
 
     @override
+    def get_race_names_by_year(self, year: int, **_) -> Generator[RaceName, Any, Any]:
+        self.validate_year(year)
+        for page in self.get_pages(year):
+            yield from self._html_parser.parse_race_names(page, is_female=self._is_female, category=self._category)
+
+    @override
     def get_race_ids_by_year(self, year: int, **_) -> Generator[str, Any, Any]:
         self.validate_year(year)
         for page in self.get_pages(year):
             yield from self._html_parser.parse_race_ids(page, is_female=self._is_female, category=self._category)
 
     @override
+    def get_race_ids_by_club(self, club_id: str, year: int, **kwargs) -> Generator[str, Any, Any]:
+        content = requests.get(url=self.get_club_races_url(club_id, year), headers=HTTP_HEADERS())
+        content = content.content.decode("utf-8")
+        return self._html_parser.parse_club_race_ids(Selector(content))
+
+    @override
     def get_race_ids_by_rower(self, rower_id: str, year: str | None = None, **_) -> Generator[str, Any, Any]:
         content = requests.get(url=self.get_rower_url(rower_id), headers=HTTP_HEADERS()).content.decode("utf-8")
         yield from self._html_parser.parse_rower_race_ids(Selector(content), year=year)
-
-    @override
-    def get_race_names_by_year(self, year: int, **_) -> Generator[RaceName, Any, Any]:
-        self.validate_year(year)
-        for page in self.get_pages(year):
-            yield from self._html_parser.parse_race_names(page, is_female=self._is_female, category=self._category)
 
     @override
     def get_lineup_by_race_id(self, race_id: str, **_) -> Generator[Lineup, Any, Any]:
@@ -91,12 +97,6 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
                 continue
             lineup = requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8")
             yield self._html_parser.parse_lineup(Selector(lineup))
-
-    @override
-    def get_race_ids_by_club(self, club_id: str, year: int, **kwargs) -> Generator[str, Any, Any]:
-        content = requests.get(url=self.get_club_races_url(club_id, year), headers=HTTP_HEADERS())
-        content = content.content.decode("utf-8")
-        return self._html_parser.parse_club_race_ids(Selector(content))
 
     def get_pages(self, year: int) -> Generator[Selector, Any, Any]:
         """

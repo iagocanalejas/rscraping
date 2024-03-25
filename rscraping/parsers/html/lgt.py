@@ -115,14 +115,13 @@ class LGTHtmlParser(HtmlParser):
     @override
     def parse_race_names(self, selector: Selector, **_) -> Generator[RaceName, Any, Any]:
         values = [Selector(u) for u in selector.xpath("//*/div/div/div[*]/div").getall()]
-        values = [
-            (
-                u.xpath("//*/a/@href").get("").split("/")[-1].split("-")[0],
-                u.xpath("//*/table/tr/td[2]/text()").get(""),
+        return (
+            RaceName(
+                race_id=u.xpath("//*/a/@href").get("").split("/")[-1].split("-")[0],
+                name=u.xpath("//*/table/tr/td[2]/text()").get(""),
             )
             for u in values
-        ]
-        return (RaceName(race_id=p[0], name=whitespaces_clean(p[1]).upper()) for p in values)
+        )
 
     @override
     def parse_lineup(self, *_, **__):

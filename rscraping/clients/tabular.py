@@ -108,25 +108,25 @@ class TabularDataClient(Client, source=Datasource.TABULAR):
         if not pattern.match(url):
             raise ValueError(f"invalid {url=}")
 
+    def get_races(self, **kwargs) -> Generator[Race, Any, Any]:
+        return self._parser.parse_races(self._df, is_female=self._is_female, url=self._url)
+
     @override
     def get_race_by_id(self, race_id: str, *_, **kwargs) -> Race | None:
         race_row = self._df.iloc[int(race_id) - 1]
-        return self._parser.parse_race_serie(race_row, is_female=self._is_female, url=self._url)
+        return self._parser.parse_race(race_row, is_female=self._is_female, url=self._url)
 
     @override
     def get_race_by_url(self, *_, race_id: str, **kwargs) -> Race | None:
         return self.get_race_by_id(race_id=race_id, **kwargs)
 
-    def get_races(self, **kwargs) -> Generator[Race, Any, Any]:
-        return self._parser.parse_races_from(self._df, is_female=self._is_female, url=self._url)
+    @override
+    def get_race_names_by_year(self, year: int, *_, **kwargs) -> Generator[RaceName, Any, Any]:
+        return self._parser.parse_race_names(self._df, year)
 
     @override
     def get_race_ids_by_year(self, year: int, *_, **kwargs) -> Generator[str, Any, Any]:
         return self._parser.parse_race_ids(self._df, year)
-
-    @override
-    def get_race_names_by_year(self, year: int, *_, **kwargs) -> Generator[RaceName, Any, Any]:
-        return self._parser.parse_race_names(self._df, year)
 
     ################################################
     ############## PRIVATE METHODS #################

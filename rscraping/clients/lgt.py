@@ -134,6 +134,35 @@ class LGTClient(Client, source=Datasource.LGT):
         return super().get_race_by_url(url, race_id, **kwargs)
 
     @override
+    def get_race_names_by_year(self, year: int, **_) -> Generator[RaceName, Any, Any]:
+        """
+        Find the race names for a given year and gender. Uses the unchecked IDs found in get_race_ids_by_year to
+        find them.
+
+        Args:
+            year (int): The year for which to generate race names.
+            **kwargs: Additional keyword arguments.
+
+        Yields: RaceName: Race names.
+        """
+        today = date.today().year
+        if today == year:
+            race_names = self._html_parser.parse_race_names(selector=self.get_calendar_selector())
+            if race_names:
+                yield from race_names
+                return
+
+        for id in self.get_race_ids_by_year(year, is_female=self._is_female):
+            if id in self._excluded_ids:
+                pass
+
+            url = self.get_race_details_url(id)
+            selector = Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8"))
+            if self._html_parser.is_valid_race(selector):
+                name = self._html_parser.get_name(selector)
+                yield RaceName(race_id=id, name=whitespaces_clean(name).upper())
+
+    @override
     def get_race_ids_by_year(self, year: int, **_) -> Generator[str, Any, Any]:
         """
         Find the race IDs for a given year and gender.
@@ -191,35 +220,6 @@ class LGTClient(Client, source=Datasource.LGT):
         upper_race_id = right
 
         return (str(r) for r in range(lower_race_id, (upper_race_id + 1)) if r not in self._excluded_ids)
-
-    @override
-    def get_race_names_by_year(self, year: int, **_) -> Generator[RaceName, Any, Any]:
-        """
-        Find the race names for a given year and gender. Uses the unchecked IDs found in get_race_ids_by_year to
-        find them.
-
-        Args:
-            year (int): The year for which to generate race names.
-            **kwargs: Additional keyword arguments.
-
-        Yields: RaceName: Race names.
-        """
-        today = date.today().year
-        if today == year:
-            race_names = self._html_parser.parse_race_names(selector=self.get_calendar_selector())
-            if race_names:
-                yield from race_names
-                return
-
-        for id in self.get_race_ids_by_year(year, is_female=self._is_female):
-            if id in self._excluded_ids:
-                pass
-
-            url = self.get_race_details_url(id)
-            selector = Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8"))
-            if self._html_parser.is_valid_race(selector):
-                name = self._html_parser.get_name(selector)
-                yield RaceName(race_id=id, name=whitespaces_clean(name).upper())
 
     @override
     def get_lineup_by_race_id(self, race_id: str, **_) -> Generator[Lineup, Any, Any]:

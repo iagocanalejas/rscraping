@@ -18,7 +18,7 @@ class TestTabularDataParser(unittest.TestCase):
         assert isinstance(df, pd.DataFrame)  # needed as 'read_hdf' is returning TableIterator
 
         race_row = df.iloc[0]
-        race = self.parser.parse_race_serie(race_row, is_female=False, url="test_url")
+        race = self.parser.parse_race(race_row, is_female=False, url="test_url")
 
         if not race:
             self.assertIsNotNone(race)
@@ -35,7 +35,7 @@ class TestTabularDataParser(unittest.TestCase):
         df = pd.read_hdf(os.path.join(self.fixtures, "gdrive_tabular.h5"), key="data")
         assert isinstance(df, pd.DataFrame)
 
-        races = self.parser.parse_races_from(df, is_female=False, url="test_url")
+        races = self.parser.parse_races(df, is_female=False, url="test_url")
         for i, race in enumerate(races):
             participants = race.participants
             race.participants = []

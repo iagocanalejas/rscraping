@@ -110,8 +110,13 @@ class ACTHtmlParser(HtmlParser):
     def parse_race_names(self, selector: Selector, **_) -> Generator[RaceName, Any, Any]:
         hrefs = selector.xpath('//*[@id="col-a"]/div/section/div[5]/table/tbody/tr[*]/td[*]/a').getall()
         selectors = [Selector(h) for h in hrefs]
-        pairs = [(s.xpath("//*/@href").get("").split("r=")[-1], s.xpath("//*/text()").get("")) for s in selectors]
-        return (RaceName(race_id=p[0], name=whitespaces_clean(p[1]).upper()) for p in pairs)
+        return (
+            RaceName(
+                race_id=s.xpath("//*/@href").get("").split("r=")[-1],
+                name=whitespaces_clean(s.xpath("//*/text()").get("")).upper(),
+            )
+            for s in selectors
+        )
 
     @override
     def parse_lineup(self, *_, **__):

@@ -119,7 +119,6 @@ class TrainerasHtmlParser(HtmlParser):
     def parse_race_ids(
         self,
         selector: Selector,
-        *,
         is_female: bool | None = None,
         category: str | None = None,
         **_,
@@ -131,7 +130,6 @@ class TrainerasHtmlParser(HtmlParser):
     def parse_race_names(
         self,
         selector: Selector,
-        *,
         is_female: bool | None = None,
         category: str | None = None,
         **_,

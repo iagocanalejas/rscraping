@@ -1,7 +1,7 @@
 import re
 from collections.abc import Generator
 from datetime import date, datetime
-from typing import Any
+from typing import Any, override
 
 import inquirer
 from pandas import DataFrame, Series
@@ -37,14 +37,14 @@ class InforemoDataFrameParser(DataFrameParser, source=Datasource.INFOREMO):
         GENDER_MIX: ["MIXTO"],
     }
 
-    def parse_races_from(
+    @override
+    def parse_races(
         self,
         data: DataFrame,
-        *_,
-        file_name: str,
-        header: str,
+        file_name: str = "",
+        header: str = "",
         manual_input: bool = False,
-        **__,
+        **_,
     ) -> Generator[Race, Any, Any]:
         name = self._try_find_race_name(header, manual_input=manual_input)
         t_date = self._try_find_race_date(header, manual_input=manual_input)

@@ -25,7 +25,7 @@ class TestInforemoParser(unittest.TestCase):
         df = pd.read_hdf(os.path.join(self.fixtures, "inforemo_tabular.h5"), key="data")
         assert isinstance(df, pd.DataFrame)  # needed as 'read_hdf' is returning TableIterator
 
-        races = list(self.parser.parse_races_from(data=df, file_name="inforemo", header=header_data, tabular=df))
+        races = list(self.parser.parse_races(data=df, file_name="inforemo", header=header_data, tabular=df))
 
         self.assertEqual(len(races), 2)
 

@@ -112,8 +112,13 @@ class ARCHtmlParser(HtmlParser):
             else selector.xpath('//*[@id="main"]/div[4]/table/tbody/tr[*]/td[2]/span/a').getall()
         )
         selectors = [Selector(h) for h in hrefs]
-        pairs = [(s.xpath("//*/@href").get("").split("/")[-2], s.xpath("//*/text()").get("")) for s in selectors]
-        return (RaceName(race_id=p[0], name=whitespaces_clean(p[1]).upper()) for p in pairs)
+        return (
+            RaceName(
+                race_id=s.xpath("//*/@href").get("").split("/")[-2],
+                name=whitespaces_clean(s.xpath("//*/text()").get("")).upper(),
+            )
+            for s in selectors
+        )
 
     def parse_club_ids(self, selector: Selector) -> Generator[str, Any, Any]:
         urls = (

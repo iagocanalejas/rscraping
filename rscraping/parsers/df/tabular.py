@@ -1,6 +1,6 @@
 from collections.abc import Generator
 from datetime import date
-from typing import Any
+from typing import Any, override
 
 from pandas import DataFrame, Series
 
@@ -41,7 +41,20 @@ COLUMN_NUMBER_LAPS = "N Largos"
 
 
 class TabularDataFrameParser(DataFrameParserProtocol):
-    def parse_race_serie(self, row: Series, is_female: bool = False, url: str | None = None) -> Race | None:
+    @override
+    def parse_races(
+        self,
+        data: DataFrame,
+        is_female: bool = False,
+        url: str | None = None,
+        **__,
+    ) -> Generator[Race, Any, Any]:
+        for _, row in data.iterrows():
+            race = self.parse_race(row, is_female=is_female, url=url)
+            if race:
+                yield race
+
+    def parse_race(self, row: Series, is_female: bool = False, url: str | None = None) -> Race | None:
         if not isinstance(row, Series):
             return None
 
@@ -105,19 +118,6 @@ class TabularDataFrameParser(DataFrameParserProtocol):
     def parse_race_names(self, data: DataFrame, year: int) -> Generator[RaceName, Any, Any]:
         df = data[data[COLUMN_DATE].dt.year == year]
         return (RaceName(race_id=str(row.name), name=str(row[COLUMN_NAME])) for _, row in df.iterrows())
-
-    def parse_races_from(
-        self,
-        data: DataFrame,
-        *_,
-        is_female: bool = False,
-        url: str | None = None,
-        **__,
-    ) -> Generator[Race, Any, Any]:
-        for _, row in data.iterrows():
-            race = self.parse_race_serie(row, is_female=is_female, url=url)
-            if race:
-                yield race
 
     @staticmethod
     def _normalize_race_name(name: str, league: str | None, t_date: date) -> str:
