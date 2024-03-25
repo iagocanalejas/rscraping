@@ -122,7 +122,7 @@ class LGTHtmlParser(HtmlParser):
             )
             for u in values
         ]
-        return (RaceName(p[0], whitespaces_clean(p[1]).upper()) for p in values)
+        return (RaceName(race_id=p[0], name=whitespaces_clean(p[1]).upper()) for p in values)
 
     @override
     def parse_lineup(self, *_, **__):

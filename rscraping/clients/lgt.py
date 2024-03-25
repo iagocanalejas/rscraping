@@ -219,7 +219,7 @@ class LGTClient(Client, source=Datasource.LGT):
             selector = Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8"))
             if self._html_parser.is_valid_race(selector):
                 name = self._html_parser.get_name(selector)
-                yield RaceName(id, whitespaces_clean(name).upper())
+                yield RaceName(race_id=id, name=whitespaces_clean(name).upper())
 
     @override
     def get_lineup_by_race_id(self, race_id: str, **_) -> Generator[Lineup, Any, Any]:

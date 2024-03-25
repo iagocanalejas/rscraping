@@ -13,7 +13,7 @@ from rscraping.data.constants import (
     RACE_TIME_TRIAL,
     RACE_TRAINERA,
 )
-from rscraping.data.models import Datasource, Participant, Race
+from rscraping.data.models import Datasource, Participant, Race, RaceName
 from rscraping.data.normalization import (
     extract_town,
     find_race_sponsor,
@@ -97,6 +97,14 @@ class TabularDataFrameParser(DataFrameParserProtocol):
         ]
 
         return race
+
+    def parse_race_ids(self, data: DataFrame, year: int) -> Generator[str, Any, Any]:
+        df = data[data[COLUMN_DATE].dt.year == year]
+        return (str(row.name) for _, row in df.iterrows())
+
+    def parse_race_names(self, data: DataFrame, year: int) -> Generator[RaceName, Any, Any]:
+        df = data[data[COLUMN_DATE].dt.year == year]
+        return (RaceName(race_id=str(row.name), name=str(row[COLUMN_NAME])) for _, row in df.iterrows())
 
     def parse_races_from(
         self,

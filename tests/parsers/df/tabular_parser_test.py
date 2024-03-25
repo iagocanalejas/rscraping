@@ -4,7 +4,7 @@ import unittest
 import pandas as pd
 
 from rscraping.data.constants import CATEGORY_ABSOLUT, GENDER_MALE, RACE_CONVENTIONAL, RACE_TIME_TRIAL, RACE_TRAINERA
-from rscraping.data.models import Datasource, Participant, Race
+from rscraping.data.models import Datasource, Participant, Race, RaceName
 from rscraping.parsers.df import TabularDataFrameParser
 
 
@@ -43,6 +43,26 @@ class TestTabularDataParser(unittest.TestCase):
             self.assertEqual(race, self._RACES[i])
             self.assertEqual(len(participants), 1)
             self.assertEqual(participants[0], self._PARTICIPANTS[i])
+
+    def test_parse_races_ids(self):
+        df = pd.read_hdf(os.path.join(self.fixtures, "gdrive_tabular.h5"), key="data")
+        assert isinstance(df, pd.DataFrame)
+
+        races = self.parser.parse_race_ids(df, 2011)
+        self.assertEqual(list(races), ["1"])
+
+        races = self.parser.parse_race_ids(df, 2012)
+        self.assertEqual(list(races), [])
+
+    def test_parse_races_names(self):
+        df = pd.read_hdf(os.path.join(self.fixtures, "gdrive_tabular.h5"), key="data")
+        assert isinstance(df, pd.DataFrame)
+
+        races = self.parser.parse_race_names(df, 2011)
+        self.assertEqual(list(races), [RaceName(race_id="1", name="REGATA CARITAS VILAXOAN")])
+
+        races = self.parser.parse_race_names(df, 2012)
+        self.assertEqual(list(races), [])
 
     _RACE = Race(
         name="REGATA CARITAS VILAXOAN",

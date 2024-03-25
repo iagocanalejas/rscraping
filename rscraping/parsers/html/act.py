@@ -111,7 +111,7 @@ class ACTHtmlParser(HtmlParser):
         hrefs = selector.xpath('//*[@id="col-a"]/div/section/div[5]/table/tbody/tr[*]/td[*]/a').getall()
         selectors = [Selector(h) for h in hrefs]
         pairs = [(s.xpath("//*/@href").get("").split("r=")[-1], s.xpath("//*/text()").get("")) for s in selectors]
-        return (RaceName(p[0], whitespaces_clean(p[1]).upper()) for p in pairs)
+        return (RaceName(race_id=p[0], name=whitespaces_clean(p[1]).upper()) for p in pairs)
 
     @override
     def parse_lineup(self, *_, **__):

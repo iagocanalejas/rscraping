@@ -117,31 +117,32 @@ class TrainerasHtmlParser(HtmlParser):
 
     @override
     def parse_race_ids(
+        self, selector: Selector, *, is_female: bool | None = None, category: str | None = None, **_
+    ) -> Generator[str, Any, Any]:
+        for race in self.parse_race_names(selector, is_female=is_female, category=category):
+            yield race.race_id
+
+    @override
+    def parse_race_names(
         self,
         selector: Selector,
         *,
         is_female: bool | None = None,
         category: str | None = None,
-        include_league_races: bool = False,
         **_,
-    ) -> Generator[str, Any, Any]:
+    ) -> Generator[RaceName, Any, Any]:
         if category and category not in [CATEGORY_ABSOLUT, CATEGORY_VETERAN, CATEGORY_SCHOOL]:
             raise ValueError(f"invalid {category=}")
 
         rows = [Selector(r) for r in selector.xpath("/html/body/div[1]/div[2]/table/tbody/tr").getall()]
-        return (
-            row.xpath("//*/td[1]/a/@href").get("").split("/")[-1]
-            for row in rows
-            if (
-                self._has_gender(is_female, row.xpath("//*/td[2]/text()").get(""))
-                and self._has_type(category, row.xpath("//*/td[2]/text()").get(""))
-                and (
-                    include_league_races
-                    or category != CATEGORY_ABSOLUT
-                    or any(t in row.xpath("//*/td[1]/a/text()").get("") for t in self._FILTERS)
-                )
-            )
-        )
+        for row in rows:
+            ttype = row.xpath("//*/td[2]/text()").get("")
+            if not self._has_gender(is_female, ttype) or not self._has_type(category, ttype):
+                continue
+
+            name = whitespaces_clean(row.xpath("//*/td[1]/a/text()").get("").upper())
+            name = " ".join(n for n in name.split() if n != ttype)
+            yield RaceName(race_id=row.xpath("//*/td[1]/a/@href").get("").split("/")[-1], name=name)
 
     def parse_rower_race_ids(self, selector: Selector, year: str | None = None, **_) -> Generator[str, Any, Any]:
         rows = selector.xpath("/html/body/main/section[2]/div/div/div[1]/div/table/tr/td/table/tr").getall()
@@ -152,37 +153,6 @@ class TrainerasHtmlParser(HtmlParser):
             Selector(r).xpath("//*/td/a/@href").get("").split("/")[-1]
             for r in rows
             if year in selector.xpath("//*/td[2]/text()").get("")
-        )
-
-    @override
-    def parse_race_names(
-        self,
-        selector: Selector,
-        *,
-        is_female: bool | None = None,
-        category: str | None = None,
-        include_league_races: bool = False,
-        **_,
-    ) -> Generator[RaceName, Any, Any]:
-        if category and category not in [CATEGORY_ABSOLUT, CATEGORY_VETERAN, CATEGORY_SCHOOL]:
-            raise ValueError(f"invalid {category=}")
-
-        rows = [Selector(r) for r in selector.xpath("/html/body/div[1]/div[2]/table/tbody/tr").getall()]
-        return (
-            RaceName(
-                row.xpath("//*/td[1]/a/@href").get("").split("/")[-1],
-                whitespaces_clean(row.xpath("//*/td[1]/a/text()").get("")).upper(),
-            )
-            for row in rows
-            if (
-                self._has_gender(is_female, row.xpath("//*/td[2]/text()").get(""))
-                and self._has_type(category, row.xpath("//*/td[2]/text()").get(""))
-                and (
-                    include_league_races
-                    or category != CATEGORY_ABSOLUT
-                    or any(t in row.xpath("//*/td[1]/a/text()").get("") for t in self._FILTERS)
-                )
-            )
         )
 
     @override

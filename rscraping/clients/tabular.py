@@ -122,15 +122,11 @@ class TabularDataClient(Client, source=Datasource.TABULAR):
 
     @override
     def get_race_ids_by_year(self, year: int, *_, **kwargs) -> Generator[str, Any, Any]:
-        df = self._df[self._df[COLUMN_DATE].dt.year == year]
-        for _, row in df.iterrows():
-            yield str(row.name)
+        return self._parser.parse_race_ids(self._df, year)
 
     @override
     def get_race_names_by_year(self, year: int, *_, **kwargs) -> Generator[RaceName, Any, Any]:
-        df = self._df[self._df[COLUMN_DATE].dt.year == year]
-        for _, row in df.iterrows():
-            yield RaceName(race_id=str(row.name), name=str(row[COLUMN_NAME]))
+        return self._parser.parse_race_names(self._df, year)
 
     ################################################
     ############## PRIVATE METHODS #################

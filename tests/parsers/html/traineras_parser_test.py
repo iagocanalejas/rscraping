@@ -155,18 +155,18 @@ class TestTrainerasParser(unittest.TestCase):
     ]
 
     _MALE_RACE_NAMES = [
-        RaceName(race_id="5455", name="MEMORIAL PEPE O RUSO SM"),
-        RaceName(race_id="5457", name="MEMORIAL PEPE O RUSO VM"),
-        RaceName(race_id="5458", name="MEMORIAL PEPE O RUSO M"),
-        RaceName(race_id="5535", name="MEMORIAL AURORA TRUEBA SM"),
-        RaceName(race_id="5536", name="MEMORIAL AURORA TRUEBA VM"),
+        RaceName(race_id="5455", name="MEMORIAL PEPE O RUSO"),
+        RaceName(race_id="5457", name="MEMORIAL PEPE O RUSO"),
+        RaceName(race_id="5458", name="MEMORIAL PEPE O RUSO"),
+        RaceName(race_id="5535", name="MEMORIAL AURORA TRUEBA"),
+        RaceName(race_id="5536", name="MEMORIAL AURORA TRUEBA"),
     ]
     _VETERAN_RACE_NAMES = [
-        RaceName(race_id="5457", name="MEMORIAL PEPE O RUSO VM"),
-        RaceName(race_id="5536", name="MEMORIAL AURORA TRUEBA VM"),
+        RaceName(race_id="5457", name="MEMORIAL PEPE O RUSO"),
+        RaceName(race_id="5536", name="MEMORIAL AURORA TRUEBA"),
     ]
     _FEMALE_RACE_NAMES = [
-        RaceName(race_id="5456", name="MEMORIAL PEPE O RUSO SF"),
+        RaceName(race_id="5456", name="MEMORIAL PEPE O RUSO"),
     ]
 
     _LINEUP = Lineup(

@@ -1,9 +1,12 @@
-import collections
 import json
 from dataclasses import dataclass
 from enum import StrEnum, auto
 
-RaceName = collections.namedtuple("RaceName", ["race_id", "name"])
+
+@dataclass
+class RaceName:
+    race_id: str
+    name: str
 
 
 class Datasource(StrEnum):
