@@ -255,10 +255,11 @@ class TrainerasHtmlParser(HtmlParser):
         name = participant.xpath("//*/td[2]/text()").get()
         return whitespaces_clean(name).upper() if name else ""
 
-    def get_distance(self, selector: Selector) -> int:
+    def get_distance(self, selector: Selector) -> int | None:
         parts = whitespaces_clean(selector.xpath("/html/body/div[1]/main/div/div/div/div[1]/h2/text()").get(""))
-        part = parts.split(" - ")[-2]
-        return part is not None and int(part.replace(" metros", ""))
+        parts = parts.split(" - ")
+        part = next((p for p in parts if "metros" in p), None)
+        return int(part.replace(" metros", "")) if part is not None else None
 
     def get_laps(self, participant: Selector) -> list[str]:
         laps = participant.xpath("//*/td/text()").getall()[2:-4]
