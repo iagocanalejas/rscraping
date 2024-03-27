@@ -76,11 +76,11 @@ class TrainerasHtmlParser(HtmlParser):
         category = self.get_category(selector)
 
         race = Race(
-            name=self.get_name(selector),
+            name=name,
             normalized_names=[(normalize_race_name(name), None)],
             date=t_date.strftime("%d/%m/%Y"),
             type=ttype,
-            day=day,
+            day=self._clean_day(day, name),
             modality=RACE_TRAINERA,
             league=None,  # not present
             town=self.get_town(selector, day=day),
@@ -303,3 +303,8 @@ class TrainerasHtmlParser(HtmlParser):
         if category == CATEGORY_SCHOOL:
             return value in self._SCHOOL
         return False
+
+    def _clean_day(self, day: int, name: str) -> int:
+        if "TERESA" in name and "HERRERA" in name:
+            return 1
+        return day
