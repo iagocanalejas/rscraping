@@ -29,7 +29,7 @@ def main(rower_id: str, club_name: str, year: str | None = None, output: str = "
 
         t_date = find_date(selector.xpath(f"/html/body/div[1]/main/div/div/div/div[{1}]/h2/text()").get(""))
         t_date = t_date.strftime("%d%m%Y") if t_date else None
-        participants: list[Selector] = parser.get_participants(selector, day=1)
+        participants: list[Selector] = parser.get_participants(selector, table=1)
         for participant in participants:
             if (
                 club_name.upper() not in parser.get_club_name(participant)

@@ -28,7 +28,7 @@ from ._protocol import HtmlParser
 logger = logging.getLogger(os.path.dirname(os.path.realpath(__file__)))
 
 
-class MultiDayRaceException(Exception):
+class MultiRaceException(Exception):
     pass
 
 
@@ -47,10 +47,10 @@ class TrainerasHtmlParser(HtmlParser):
     _FILTERS = ["MEMORIAL", "CONTRARRELOJ", "DESCENSO", "ASCENSO", "CAMPEONATO", "TERESA HERRERA", "CONCHA"]
 
     @override
-    def parse_race(self, selector: Selector, *, race_id: str, day: int | None = None, **_) -> Race | None:
-        if len(selector.xpath("/html/body/div[1]/main/div[1]/div/div/div[2]/table[*]").getall()) > 1 and not day:
-            raise MultiDayRaceException()
-        day = day if day else 1
+    def parse_race(self, selector: Selector, *, race_id: str, table: int | None = None, **_) -> Race | None:
+        if len(selector.xpath("/html/body/div[1]/main/div[1]/div/div/div[2]/table[*]").getall()) > 1 and not table:
+            raise MultiRaceException()
+        table = table or 1
 
         name = self.get_name(selector)
         if not name:
@@ -58,7 +58,10 @@ class TrainerasHtmlParser(HtmlParser):
             return None
         logger.info(f"{self.DATASOURCE}: found race {name}")
 
-        t_date = find_date(selector.xpath(f"/html/body/div[1]/main/div/div/div/div[{day}]/h2/text()").get(""))
+        t_date = find_date(selector.xpath(f"/html/body/div[1]/main/div/div/div/div[{table}]/h2/text()").get(""))
+        if table == 3:
+            # HACK: this is a weird case where traineras.es have 3 races in the same page: ref_id=2503
+            t_date = find_date(selector.xpath("/html/body/div[1]/main/div/div/div/div[2]/h2[2]/text()").get(""))
         gender = self.get_gender(selector)
         distance = self.get_distance(selector)
 
@@ -70,7 +73,7 @@ class TrainerasHtmlParser(HtmlParser):
             return None
         logger.info(f"{self.DATASOURCE}: race normalized to {name=}")
 
-        participants = self.get_participants(selector, day)
+        participants = self.get_participants(selector, table)
         ttype = self.get_type(participants)
         ttype = ttype if not is_play_off(name) else RACE_TIME_TRIAL
         category = self.get_category(selector)
@@ -80,10 +83,10 @@ class TrainerasHtmlParser(HtmlParser):
             normalized_names=[(normalize_race_name(name), None)],
             date=t_date.strftime("%d/%m/%Y"),
             type=ttype,
-            day=self._clean_day(day, name),
+            day=self._clean_day(table, name),
             modality=RACE_TRAINERA,
             league=None,  # not present
-            town=self.get_town(selector, day=day),
+            town=self.get_town(selector, race_table=table),
             organizer=None,
             sponsor=find_race_sponsor(self.get_name(selector)),
             race_ids=[race_id],
@@ -91,7 +94,7 @@ class TrainerasHtmlParser(HtmlParser):
             gender=gender,
             datasource=self.DATASOURCE.value,
             cancelled=self.is_cancelled(participants),
-            race_laps=self.get_race_laps(selector, day),
+            race_laps=self.get_race_laps(selector, table),
             race_lanes=self.get_race_lanes(participants),
             participants=[],
         )
@@ -224,8 +227,8 @@ class TrainerasHtmlParser(HtmlParser):
             return CATEGORY_SCHOOL
         return CATEGORY_ABSOLUT
 
-    def get_town(self, selector: Selector, day: int) -> str:
-        parts = selector.xpath(f"/html/body/div[1]/main/div/div/div/div[{day}]/h2/text()").get("")
+    def get_town(self, selector: Selector, race_table: int) -> str:
+        parts = selector.xpath(f"/html/body/div[1]/main/div/div/div/div[{race_table}]/h2/text()").get("")
         return normalize_town(whitespaces_clean(parts.split(" - ")[0]))
 
     def get_race_lanes(self, participants: list[Selector]) -> int:
@@ -234,8 +237,8 @@ class TrainerasHtmlParser(HtmlParser):
         lanes = list(self.get_lane(p) for p in participants)
         return max(int(lane) for lane in lanes)
 
-    def get_race_laps(self, selector: Selector, day: int) -> int:
-        cia = selector.xpath(f"/html/body/div[1]/main/div[1]/div/div/div[2]/table[{day}]/tr[2]/td/text()").getall()
+    def get_race_laps(self, selector: Selector, table: int) -> int:
+        cia = selector.xpath(f"/html/body/div[1]/main/div[1]/div/div/div[2]/table[{table}]/tr[2]/td/text()").getall()
         return len([c for c in cia if ":" in c])
 
     def is_cancelled(self, participants: list[Selector]) -> bool:
@@ -243,8 +246,8 @@ class TrainerasHtmlParser(HtmlParser):
         laps = [self.get_laps(p) for p in participants if not self.is_disqualified(p)]
         return len([lap for lap in laps if len(lap) == 0]) >= len(participants) // 2
 
-    def get_participants(self, selector: Selector, day: int) -> list[Selector]:
-        rows = selector.xpath(f"/html/body/div[1]/main/div[1]/div/div/div[2]/table[{day}]/tr").getall()
+    def get_participants(self, selector: Selector, table: int) -> list[Selector]:
+        rows = selector.xpath(f"/html/body/div[1]/main/div[1]/div/div/div[2]/table[{table}]/tr").getall()
         return [Selector(text=t) for t in rows][1:]
 
     def get_lane(self, participant: Selector) -> int:
@@ -262,14 +265,14 @@ class TrainerasHtmlParser(HtmlParser):
         return int(part.replace(" metros", "")) if part is not None else None
 
     def get_laps(self, participant: Selector) -> list[str]:
-        laps = participant.xpath("//*/td/text()").getall()[2:-4]
+        laps = [e for e in participant.xpath("//*/td/text()").getall() if ":" in e]
         return [t.strftime("%M:%S.%f") for t in [normalize_lap_time(e) for e in laps if e] if t is not None]
 
     def is_disqualified(self, participant: Selector) -> bool:
         # race_id=5360|5535
         # try to find the "Desc." text in the final crono
         laps = participant.xpath("//*/td/text()").getall()[2:-4]
-        return laps[-1] == "Desc." or laps[-1] == "FR"
+        return any("Desc." in lap or "FR" in lap for lap in laps)
 
     def get_series(self, participant: Selector) -> int:
         series = participant.xpath("//*/td[4]/text()").get()
@@ -304,7 +307,7 @@ class TrainerasHtmlParser(HtmlParser):
             return value in self._SCHOOL
         return False
 
-    def _clean_day(self, day: int, name: str) -> int:
+    def _clean_day(self, table: int, name: str) -> int:
         if "TERESA" in name and "HERRERA" in name:
             return 1
-        return day
+        return table

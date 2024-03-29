@@ -5,7 +5,7 @@ from parsel.selector import Selector
 
 from rscraping.data.constants import CATEGORY_ABSOLUT, CATEGORY_VETERAN, GENDER_MALE, RACE_CONVENTIONAL, RACE_TRAINERA
 from rscraping.data.models import Datasource, Lineup, Participant, Race, RaceName
-from rscraping.parsers.html.traineras import MultiDayRaceException, TrainerasHtmlParser
+from rscraping.parsers.html.traineras import MultiRaceException, TrainerasHtmlParser
 
 
 class TestTrainerasParser(unittest.TestCase):
@@ -15,7 +15,7 @@ class TestTrainerasParser(unittest.TestCase):
 
     def test_multi_day_race_exception(self):
         with open(os.path.join(self.fixtures, "traineras_details.html")) as file:
-            with self.assertRaises(MultiDayRaceException):
+            with self.assertRaises(MultiRaceException):
                 self.parser.parse_race(
                     Selector(file.read()),
                     race_id="1234",
@@ -27,12 +27,12 @@ class TestTrainerasParser(unittest.TestCase):
             race_1 = self.parser.parse_race(
                 selector,
                 race_id="1234",
-                day=1,
+                table=1,
             )
             race_2 = self.parser.parse_race(
                 selector,
                 race_id="1234",
-                day=2,
+                table=2,
             )
         if not race_1 or not race_2:
             raise ValueError("unable to parse race")
@@ -90,25 +90,26 @@ class TestTrainerasParser(unittest.TestCase):
             self.assertEqual(self.parser.get_number_of_pages(Selector(file.read())), 1)
 
     _RACE_1 = Race(
-        name="BANDERA CIUDAD DE LA CORUÑA",
-        date="09/07/2022",
+        name="BANDERA TERESA HERRERA",
+        date="11/08/2012",
         day=1,
-        modality="TRAINERA",
-        type="CONVENTIONAL",
+        modality=RACE_TRAINERA,
+        type=RACE_CONVENTIONAL,
         league=None,
         town="A CORUÑA",
         organizer=None,
         sponsor=None,
-        normalized_names=[("BANDERA CIUDAD DE LA CORUÑA", None)],
+        normalized_names=[("BANDERA TERESA HERRERA", None)],
         race_ids=["1234"],
         url=None,
-        gender=GENDER_MALE,
         datasource="traineras",
+        gender=GENDER_MALE,
         participants=[],
-        race_laps=4,
-        race_lanes=4,
+        race_laps=2,
+        race_lanes=1,
         cancelled=False,
     )
+
     _RACE_2 = Race(
         name="BANDERA CIUDAD DE LA CORUÑA",
         date="09/07/2022",
@@ -134,26 +135,26 @@ class TestTrainerasParser(unittest.TestCase):
         Participant(
             gender=GENDER_MALE,
             category=CATEGORY_ABSOLUT,
-            club_name="URDAIBAI A.E.",
+            club_name="C.R. MECOS",
             lane=1,
-            series=3,
-            laps=["05:08.000000", "09:59.000000", "15:30.000000", "20:17.260000"],
+            series=1,
+            laps=['11:02.000000', '22:09.350000'],
             distance=5556,
             handicap=None,
-            participant="URDAIBAI",
+            participant="MECOS",
             race=_RACE_1,
             disqualified=False,
         ),
         Participant(
             gender=GENDER_MALE,
             category=CATEGORY_ABSOLUT,
-            club_name="C.R.O. ORIO A.E.",
-            lane=4,
-            series=3,
-            laps=["05:09.000000", "10:06.000000", "15:38.000000", "20:24.700000"],
+            club_name="C.R. PERILLO",
+            lane=1,
+            series=1,
+            laps=['11:05.000000', '22:20.660000'],
             distance=5556,
             handicap=None,
-            participant="ORIO",
+            participant="PERILLO",
             race=_RACE_1,
             disqualified=False,
         ),

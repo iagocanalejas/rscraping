@@ -98,7 +98,7 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
     @override
     def get_lineup_by_race_id(self, race_id: str, **_) -> Generator[Lineup, Any, Any]:
         content = requests.get(url=self.get_race_details_url(race_id), headers=HTTP_HEADERS()).content.decode("utf-8")
-        participants = self._html_parser.get_participants(Selector(content), day=1)
+        participants = self._html_parser.get_participants(Selector(content), table=1)
         for participant in participants:
             url = participant.xpath("//*/td[9]/a/@href").get("")
             if not url:
