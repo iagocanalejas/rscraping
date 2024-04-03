@@ -45,7 +45,8 @@ class ACTHtmlParser(HtmlParser):
 
         t_date = find_date(name)
         if not t_date:
-            raise ValueError(f"{self.DATASOURCE}: no date found for {name=}")
+            logger.error(f"{self.DATASOURCE}: no date found for {name=}")
+            return None
 
         gender = GENDER_FEMALE if is_female else GENDER_MALE
 

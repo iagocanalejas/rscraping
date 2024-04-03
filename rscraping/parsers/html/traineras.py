@@ -66,7 +66,8 @@ class TrainerasHtmlParser(HtmlParser):
         distance = self.get_distance(selector)
 
         if not t_date:
-            raise ValueError(f"{self.DATASOURCE}: no date found for {name=}")
+            logger.error(f"{self.DATASOURCE}: no date found for {name=}")
+            return None
 
         if not name:
             logger.error(f"{self.DATASOURCE}: no race found for {race_id=}")

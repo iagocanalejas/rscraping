@@ -37,7 +37,8 @@ class ABEHtmlParser(HtmlParser):
         t_date = find_date(name)
 
         if not t_date:
-            raise ValueError(f"{self.DATASOURCE}: no date found for {name=}")
+            logger.error(f"{self.DATASOURCE}: no date found for {name=}")
+            return None
 
         normalized_names = normalize_name_parts(normalize_race_name(name))
         if len(normalized_names) == 0:
