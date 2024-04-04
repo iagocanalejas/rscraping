@@ -39,6 +39,7 @@ _NORMALIZED_TOWNS = {
     ],
     "BOIRO": [["CABO", "CRUZ"]],
     "OLEIROS": [["PERILLO"]],
+    "RIVEIRA": [["RIVEIRA"], ["RIBEIRA"]],
     "O GROVE": [
         ["PEDRAS", "NEGRAS"],
         ["GROVE"],
