@@ -25,6 +25,36 @@ def is_branch_club(name: str, letter: str = "B") -> bool:
     return any(e == letter for e in clean_name.upper().split())
 
 
+def is_act(name: str, is_female: bool = False) -> bool:
+    if is_female:
+        return "EUSKOTREN" in name
+    return all(w in name.split() for w in ["EUSKO", "LABEL"]) or "ACT" in name.split() or "EUSKOLABEL" in name
+
+
+def is_lgt(name: str, letter: str = "A") -> bool:
+    match letter:
+        case "A":
+            return all(w in name.split() for w in ["LGT", "A"]) or "LGTA" in name
+        case "B":
+            return all(w in name.split() for w in ["LGT", "B"]) or "LGTB" in name
+        case "F":
+            return all(w in name.split() for w in ["LGT", "F"]) or "LGTF" in name
+    raise ValueError(f"Invalid letter: {letter}")
+
+
+def is_arc(name: str, category: int = 1) -> bool:
+    match category:
+        case 1:
+            return "ARC" in name.split()
+        case 2:
+            return "ARC2" in name.split()
+    raise ValueError(f"Invalid category: {category}")
+
+
+def is_ete(name: str) -> bool:
+    return "ETE" in name.split()
+
+
 def expand_path(path: str, valid_files: list[str]) -> list[str]:
     def is_valid(file: str) -> bool:
         _, extension = os.path.splitext(file)

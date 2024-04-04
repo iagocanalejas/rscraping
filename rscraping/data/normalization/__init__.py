@@ -25,4 +25,4 @@ from .towns import (
     remove_province as remove_province,
     extract_town as extract_town,
 )
-from .leagues import normalize_league_name as normalize_league_name
+from .leagues import normalize_league_name as normalize_league_name, find_league as find_league

@@ -18,10 +18,14 @@ from rscraping.data.constants import (
 )
 from rscraping.data.functions import is_play_off
 from rscraping.data.models import Datasource, Lineup, Participant, Race, RaceName
-from rscraping.data.normalization.clubs import normalize_club_name
-from rscraping.data.normalization.races import find_race_sponsor, normalize_race_name
-from rscraping.data.normalization.times import normalize_lap_time
-from rscraping.data.normalization.towns import normalize_town
+from rscraping.data.normalization import (
+    find_league,
+    find_race_sponsor,
+    normalize_club_name,
+    normalize_lap_time,
+    normalize_race_name,
+    normalize_town,
+)
 
 from ._protocol import HtmlParser
 
@@ -86,7 +90,7 @@ class TrainerasHtmlParser(HtmlParser):
             type=ttype,
             day=self._clean_day(table, name),
             modality=RACE_TRAINERA,
-            league=None,  # not present
+            league=find_league(name),
             town=self.get_town(selector, race_table=table),
             organizer=None,
             sponsor=find_race_sponsor(self.get_name(selector)),

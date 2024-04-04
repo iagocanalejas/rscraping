@@ -8,7 +8,7 @@ from pyutils.strings import (
 from rscraping.data.constants import SYNONYM_PORT, SYNONYMS
 
 _NORMALIZED_TOWNS = {
-    "VILAGARCÍA": [
+    "VILAGARCÍA DE AROUSA": [
         ["VILAXOAN"],
         ["VILAXOÁN"],
         ["VILAGARCIA"],
@@ -38,8 +38,8 @@ _NORMALIZED_TOWNS = {
         ["TIRÁN"],
     ],
     "BOIRO": [["CABO", "CRUZ"]],
-    "OLEIROS": [["PERILLO"]],
-    "RIVEIRA": [["RIVEIRA"], ["RIBEIRA"]],
+    "OLEIROS": [["PERILLO"], ["MERA"]],
+    "RIVEIRA": [["RIVEIRA"], ["RIBEIRA"], ["AGUIÑO"]],
     "O GROVE": [
         ["PEDRAS", "NEGRAS"],
         ["GROVE"],
