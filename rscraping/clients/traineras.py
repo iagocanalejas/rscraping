@@ -6,7 +6,7 @@ import requests
 from parsel.selector import Selector
 
 from rscraping.data.constants import CATEGORY_SCHOOL, CATEGORY_VETERAN, HTTP_HEADERS
-from rscraping.data.models import Datasource, Lineup, RaceName
+from rscraping.data.models import Datasource, Lineup, Race, RaceName
 from rscraping.parsers.html import TrainerasHtmlParser
 
 from ._client import Client
@@ -38,6 +38,10 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
         return f"https://traineras.es/regatas/{year}?page={page}"
 
     @staticmethod
+    def get_search_races_url(name: str) -> str:
+        return f"https://traineras.es/banderas?nombre={name.replace(' ', '+')}"
+
+    @staticmethod
     def get_rower_url(rower_id: str, **_) -> str:
         return f"https://traineras.es/personas/{rower_id}"
 
@@ -63,6 +67,38 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
 
         if not pattern.match(url):
             raise ValueError(f"invalid {url=}")
+
+    @override
+    def get_race_by_id(self, race_id: str, **kwargs) -> Race | None:
+        """
+        Retrieve race details by ID parsing data from 'traineras.es'.
+        This method also retrieves the flag edition for the race if available.
+
+        Args:
+            race_id (str): The ID of the race.
+            **kwargs: Additional keyword arguments.
+
+        Returns: Race | None: The parsed race details or None if the race is not found.
+        """
+        race = super().get_race_by_id(race_id, **kwargs)
+        if not race:
+            return None
+
+        # search the race name in the flags seach page
+        url = self.get_search_races_url(race.name)
+        content = Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8"))
+        flag_urls = self._html_parser.parse_search_flags(content)
+
+        if len(flag_urls) < 1:
+            return race
+
+        # the first flag should be an exact match of the given one, so we can use it to get the editions
+        content = Selector(requests.get(url=flag_urls[0], headers=HTTP_HEADERS()).content.decode("utf-8"))
+        edition = next((e for (y, e) in self._html_parser.parse_flag_editions(content) if y == race.year), None)
+        if edition:
+            race.normalized_names = [(n[0], edition) for n in race.normalized_names]
+
+        return race
 
     @override
     def get_race_names_by_year(self, year: int, **_) -> Generator[RaceName, Any, Any]:

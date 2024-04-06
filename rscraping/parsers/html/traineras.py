@@ -1,6 +1,7 @@
 import logging
 import os
 from collections.abc import Generator
+from datetime import datetime
 from typing import Any, override
 
 from parsel.selector import Selector
@@ -169,6 +170,19 @@ class TrainerasHtmlParser(HtmlParser):
             for r in rows
             if year in selector.xpath("//*/td[2]/text()").get("")
         )
+
+    def parse_search_flags(self, selector: Selector) -> list[str]:
+        return selector.xpath("/html/body/div[1]/div[2]/div/div/div[*]/div/div/div[2]/h5/a/@href").getall()
+
+    def parse_flag_editions(self, selector: Selector, is_female: bool = False) -> Generator[tuple[int, int], Any, Any]:
+        table = selector.xpath(f"/html/body/main/div/div/div/div[{2 if is_female else 1}]/div/table").get(None)
+        if table:
+            for row in Selector(table).xpath("//*/tr").getall()[1:]:
+                parts = Selector(row).xpath("//*/td/text()").getall()
+                yield (
+                    datetime.strptime(whitespaces_clean(parts[1]), "%d-%m-%Y").date().year,
+                    int(whitespaces_clean(parts[0])),
+                )
 
     @override
     def parse_lineup(self, selector: Selector, **_) -> Lineup:

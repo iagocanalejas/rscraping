@@ -43,6 +43,19 @@ class TestTrainerasParser(unittest.TestCase):
         self.assertEqual(race_1, self._RACE_1)
         self.assertEqual(participants, self._PARTICIPANTS)
 
+    def test_parse_race_names(self):
+        with open(os.path.join(self.fixtures, "traineras_results.html")) as file:
+            data = file.read()
+
+        race_names = self.parser.parse_race_names(Selector(data), is_female=False)
+        self.assertEqual(list(race_names), self._MALE_RACE_NAMES)
+
+        race_names = self.parser.parse_race_names(Selector(data), is_female=False, category=CATEGORY_VETERAN)
+        self.assertEqual(list(race_names), self._VETERAN_RACE_NAMES)
+
+        race_names = self.parser.parse_race_names(Selector(data), is_female=True)
+        self.assertEqual(list(race_names), self._FEMALE_RACE_NAMES)
+
     def test_parse_race_ids(self):
         with open(os.path.join(self.fixtures, "traineras_results.html")) as file:
             data = Selector(file.read())
@@ -66,18 +79,18 @@ class TestTrainerasParser(unittest.TestCase):
             ids = self.parser.parse_rower_race_ids(Selector(file.read()))
         self.assertEqual(list(ids), ["732", "3041", "1981", "733", "570", "516", "3309"])
 
-    def test_parse_race_names(self):
-        with open(os.path.join(self.fixtures, "traineras_results.html")) as file:
-            data = file.read()
+    def test_parse_search_flags(self):
+        with open(os.path.join(self.fixtures, "traineras_search_flags.html")) as file:
+            urls = self.parser.parse_search_flags(Selector(file.read()))
+        self.assertEqual(urls, ["https://traineras.es/banderas/104#SM", "https://traineras.es/banderas/679#SF"])
 
-        race_names = self.parser.parse_race_names(Selector(data), is_female=False)
-        self.assertEqual(list(race_names), self._MALE_RACE_NAMES)
-
-        race_names = self.parser.parse_race_names(Selector(data), is_female=False, category=CATEGORY_VETERAN)
-        self.assertEqual(list(race_names), self._VETERAN_RACE_NAMES)
-
-        race_names = self.parser.parse_race_names(Selector(data), is_female=True)
-        self.assertEqual(list(race_names), self._FEMALE_RACE_NAMES)
+    def test_parse_flag_editions(self):
+        with open(os.path.join(self.fixtures, "traineras_flag_editions.html")) as file:
+            content = Selector(file.read())
+            male_editions = self.parser.parse_flag_editions(content)
+            female_editions = self.parser.parse_flag_editions(content, is_female=True)
+        self.assertEqual(list(male_editions), [(2007, 1), (2008, 2), (2011, 3), (2023, 14)])
+        self.assertEqual(list(female_editions), [(2016, 1), (2017, 2), (2023, 8)])
 
     def test_parse_lineup(self):
         with open(os.path.join(self.fixtures, "traineras_lineup.html")) as file:
@@ -138,7 +151,7 @@ class TestTrainerasParser(unittest.TestCase):
             club_name="C.R. MECOS",
             lane=1,
             series=1,
-            laps=['11:02.000000', '22:09.350000'],
+            laps=["11:02.000000", "22:09.350000"],
             distance=5556,
             handicap=None,
             participant="MECOS",
@@ -151,7 +164,7 @@ class TestTrainerasParser(unittest.TestCase):
             club_name="C.R. PERILLO",
             lane=1,
             series=1,
-            laps=['11:05.000000', '22:20.660000'],
+            laps=["11:05.000000", "22:20.660000"],
             distance=5556,
             handicap=None,
             participant="PERILLO",

@@ -1,5 +1,6 @@
 import json
 from dataclasses import dataclass
+from datetime import datetime
 from enum import StrEnum, auto
 
 
@@ -91,6 +92,10 @@ class Race:
     race_laps: int | None = None
     race_lanes: int | None = None
     cancelled: bool = False
+
+    @property
+    def year(self) -> int:
+        return datetime.strptime(self.date, "%d/%m/%Y").date().year
 
     def __str__(self) -> str:
         return self.to_json()
