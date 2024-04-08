@@ -11,7 +11,7 @@ from rscraping.parsers.html.lgt import LGTHtmlParser
 class TestLGTParser(unittest.TestCase):
     def setUp(self):
         self.parser = LGTHtmlParser()
-        self.fixtures = os.path.join(os.getcwd(), "fixtures", "html")
+        self.fixtures = os.path.join(os.getcwd(), "tests", "fixtures", "html")
 
     def test_parse_race(self):
         with (

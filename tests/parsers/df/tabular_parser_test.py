@@ -11,7 +11,7 @@ from rscraping.parsers.df import TabularDataFrameParser
 class TestTabularDataParser(unittest.TestCase):
     def setUp(self):
         self.parser = TabularDataFrameParser()
-        self.fixtures = os.path.join(os.getcwd(), "fixtures", "df")
+        self.fixtures = os.path.join(os.getcwd(), "tests", "fixtures", "df")
 
     def test_parse_race(self):
         df = pd.read_hdf(os.path.join(self.fixtures, "gdrive_tabular.h5"), key="data")

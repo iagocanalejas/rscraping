@@ -11,7 +11,7 @@ from rscraping.parsers.html import ABEHtmlParser
 class TestABEParser(unittest.TestCase):
     def setUp(self):
         self.parser = ABEHtmlParser()
-        self.fixtures = os.path.join(os.getcwd(), "fixtures", "html")
+        self.fixtures = os.path.join(os.getcwd(), "tests", "fixtures", "html")
 
     def test_parse_race(self):
         with open(os.path.join(self.fixtures, "abe_details.html")) as file:

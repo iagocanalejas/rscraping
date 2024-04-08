@@ -10,7 +10,7 @@ from rscraping.parsers.pdf.act import ACTPdfParser
 class TestACTParser(unittest.TestCase):
     def setUp(self):
         self.parser = ACTPdfParser()
-        self.fixtures = os.path.join(os.getcwd(), "fixtures", "pdf")
+        self.fixtures = os.path.join(os.getcwd(), "tests", "fixtures", "pdf")
 
     def test_parse_race(self):
         lineup = None

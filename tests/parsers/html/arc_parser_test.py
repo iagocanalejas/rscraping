@@ -11,7 +11,7 @@ from rscraping.parsers.html.arc import ARCHtmlParser
 class TestARCParser(unittest.TestCase):
     def setUp(self):
         self.parser = ARCHtmlParser()
-        self.fixtures = os.path.join(os.getcwd(), "fixtures", "html")
+        self.fixtures = os.path.join(os.getcwd(), "tests", "fixtures", "html")
 
     def test_parse_race(self):
         with open(os.path.join(self.fixtures, "arc_details.html")) as file:

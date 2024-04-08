@@ -11,7 +11,7 @@ from rscraping.parsers.df.inforemo import InforemoDataFrameParser
 class TestInforemoParser(unittest.TestCase):
     def setUp(self):
         self.parser = InforemoDataFrameParser(source=Datasource.INFOREMO)
-        self.fixtures = os.path.join(os.getcwd(), "fixtures", "df")
+        self.fixtures = os.path.join(os.getcwd(), "tests", "fixtures", "df")
 
     def test_parse_races(self):
         header_data = """
