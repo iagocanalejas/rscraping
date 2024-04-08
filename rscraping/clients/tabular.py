@@ -8,7 +8,7 @@ import pandas as pd
 
 from pyutils.shortcuts import only_one_not_none
 from pyutils.strings import roman_to_int
-from rscraping.data.functions import is_female
+from rscraping.data.checks import is_female
 from rscraping.data.models import Datasource, Lineup, Race, RaceName
 from rscraping.parsers.df import (
     COLUMN_CLUB,

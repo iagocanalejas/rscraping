@@ -104,7 +104,7 @@ class TestTrainerasParser(unittest.TestCase):
 
     _RACE_1 = Race(
         name="BANDERA TERESA HERRERA",
-        date="11/08/2012",
+        date="12/08/2012",
         day=1,
         modality=RACE_TRAINERA,
         type=RACE_CONVENTIONAL,

@@ -9,7 +9,7 @@ from pyutils.strings import (
     roman_to_int,
     whitespaces_clean,
 )
-from rscraping.data.functions import is_play_off
+from rscraping.data.checks import is_play_off
 
 _MISSPELLINGS = {
     "": ["RECICLAMOS LA LUZ", " AE ", "EXCMO", "ILTMO"],

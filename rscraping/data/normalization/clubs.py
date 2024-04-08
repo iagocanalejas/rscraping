@@ -1,7 +1,7 @@
 import re
 
 from pyutils.strings import match_normalization, remove_parenthesis, whitespaces_clean
-from rscraping.data.functions import is_branch_club
+from rscraping.data.checks import is_branch_club
 
 _ENTITY_TITLES_SHORT = [
     "CR",

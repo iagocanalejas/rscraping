@@ -7,6 +7,7 @@ from typing import Any, override
 from parsel.selector import Selector
 
 from pyutils.strings import find_date, whitespaces_clean
+from rscraping.data.checks import should_be_time_trial
 from rscraping.data.constants import (
     CATEGORY_ABSOLUT,
     CATEGORY_SCHOOL,
@@ -17,7 +18,6 @@ from rscraping.data.constants import (
     RACE_TIME_TRIAL,
     RACE_TRAINERA,
 )
-from rscraping.data.functions import is_play_off
 from rscraping.data.models import Datasource, Lineup, Participant, Race, RaceName
 from rscraping.data.normalization import (
     find_league,
@@ -81,7 +81,7 @@ class TrainerasHtmlParser(HtmlParser):
 
         participants = self.get_participants(selector, table)
         ttype = self.get_type(participants)
-        ttype = ttype if not is_play_off(name) else RACE_TIME_TRIAL
+        ttype = ttype if not should_be_time_trial(name, t_date) else RACE_TIME_TRIAL
         category = self.get_category(selector)
 
         race = Race(

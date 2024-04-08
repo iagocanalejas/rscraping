@@ -1,5 +1,5 @@
 from pyutils.strings import match_normalization
-from rscraping.data.functions import is_act, is_arc, is_ete, is_lgt, is_play_off
+from rscraping.data.checks import is_act, is_arc, is_ete, is_lgt, is_play_off
 
 __LEAGUES_MAP = {
     "LIGA GALEGA DE TRAIÑAS": [["LGT"]],

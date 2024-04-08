@@ -8,6 +8,7 @@ from typing import Any, override
 from parsel.selector import Selector
 
 from pyutils.strings import remove_parenthesis, whitespaces_clean
+from rscraping.data.checks import is_play_off
 from rscraping.data.constants import (
     CATEGORY_ABSOLUT,
     GENDER_FEMALE,
@@ -16,7 +17,6 @@ from rscraping.data.constants import (
     RACE_TIME_TRIAL,
     RACE_TRAINERA,
 )
-from rscraping.data.functions import is_play_off
 from rscraping.data.models import Datasource, Lineup, Participant, Race, RaceName
 from rscraping.data.normalization.clubs import normalize_club_name
 from rscraping.data.normalization.races import (
