@@ -11,6 +11,7 @@ class TestRaceNormalization(unittest.TestCase):
             "Orioko XXXIII. Estropada - Orio Kanpina XI. Bandera",
             "Getxoko Estropaden XLV. Ikurriña - J.A. Agirre Lehendakariaren XIX. Omenaldia",
             "XVII BANDEIRA CIDADE DE FERROL III MEMORIAL MIGUEL DERUNGS CRIADO",
+            "X BANDERA ILLA DO SAMERTOLAMEU-FANDICOSTA",
         ]
 
     def test_race_name_normalization(self):
@@ -20,6 +21,7 @@ class TestRaceNormalization(unittest.TestCase):
             "ORIOKO XXXIII ESTROPADA - ORIO KANPINA XI BANDERA",
             "GETXOKO ESTROPADEN XLV IKURRIÑA - JOSE ANTONIO AGIRRE LEHENDAKARIAREN XIX OMENALDIA",
             "XVII BANDEIRA CIDADE DE FERROL III MEMORIAL MIGUEL DERUNGS CRIADO",
+            "X BANDEIRA ILLA DO SAMERTOLAMEU - FANDICOSTA",
         ]
 
         for idx, race_name in enumerate(self.NAMES):
@@ -32,6 +34,7 @@ class TestRaceNormalization(unittest.TestCase):
             [("ORIOKO ESTROPADA", 33), ("ORIO KANPINA BANDERA", 11)],
             [("GETXOKO ESTROPADEN IKURRIÑA", 45), ("JOSE ANTONIO AGIRRE LEHENDAKARIAREN OMENALDIA", 19)],
             [("BANDEIRA CIDADE DE FERROL", 17), ("MEMORIAL MIGUEL DERUNGS CRIADO", 3)],
+            [("BANDEIRA ILLA DO SAMERTOLAMEU - FANDICOSTA", 10)],
         ]
 
         races = [normalize_race_name(n) for n in self.NAMES]

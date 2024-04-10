@@ -125,8 +125,6 @@ class TabularDataFrameParser(DataFrameParserProtocol):
             (league == "LIGA A" and t_date.year in [2023]) or (league == "LIGA B" and t_date.year in [2021, 2022])
         ):
             # HACK: this is a weird flag case in witch Meira restarted the edition for his 'B' team.
-            # We have "III BANDEIRA ILLA DO SAMERTOLAMEU" in 2017 for his main team and
-            # "III BANDEIRA ILLA DO SAMERTOLAMEU" in 2023 for his 'B' team. So we need to differentiate them.
-            return "BANDEIRA ILLA DO SAMERTOLAMEU B"
+            return "BANDERA ILLA DO SAMERTOLAMEU - FANDICOSTA"
 
         return name

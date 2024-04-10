@@ -3,6 +3,7 @@ import re
 from pyutils.strings import (
     apply_replaces,
     find_roman,
+    int_to_roman,
     match_normalization,
     remove_parenthesis,
     remove_roman,
@@ -22,12 +23,13 @@ _MISSPELLINGS = {
 }
 
 _KNOWN_RACE_SPONSORS = [
-    "CEFYCAL",
-    "FANDICOSTA",
-    "ONURA HOMES",
-    "WOFCO",
-    "YURRITA GROUP",
-    "YURRITA",
+    ("CEFYCAL", True),
+    ("FANDICOSTA", False),
+    ("ONURA HOMES", True),
+    ("SALGADO CONGELADOS", False),
+    ("WOFCO", True),
+    ("YURRITA GROUP", True),
+    ("YURRITA", True),
 ]
 
 _KO_NAMES = {
@@ -60,13 +62,15 @@ _NORMALIZED_RACES = {
     "KEPA DEUN ARRANTZALEEN KOFRADÍA IKURRIÑA": [["COFRADÍA", "SAN", "PEDRO"], ["COFRADIA", "SAN", "PEDRO"]],
     "MEMORIAL LAGAR": [["MEMORIAL", "MIGUEL", "LORES"]],
     "MEMORIAL RULY": [["MEMORIAL", "RAUL", "REY"]],
-    "BANDEIRA CONGELADOS SALGADO": [["SALGADO"]],
+    "BANDEIRA SALGADO CONGELADOS": [["SALGADO"]],
     "BANDEIRA CONCELLO DE RIBEIRA": [
         ["BANDEIRA", "RIBEIRA"],
         ["BANDEIRA", "RIVEIRA"],
         ["BANDERA", "RIBEIRA"],
         ["BANDERA", "RIVEIRA"],
     ],
+    "BANDEIRA VIRXE DO CARME": [["VIRXE", "CARME"], ["VIRGEN", "CARMEN"]],
+    "BANDEIRA ILLA DO SAMERTOLAMEU - FANDICOSTA": [["ILLA", "SAMERTOLAMEU", "FANDICOSTA"]],
 }
 
 
@@ -86,7 +90,8 @@ def normalize_name_parts(name: str) -> list[tuple[str, int | None]]:
     normalized = remove_parenthesis(whitespaces_clean(name))
     normalized = f"{normalized} ({'CLASIFICATORIA'})" if "CLASIFICATORIA" in name else normalized
 
-    name_parts = normalized.split(" - ") if not is_play_off(normalized) else [normalized]
+    should_split = not any(r in normalized for r in _NORMALIZED_RACES.keys() if " - " in r)
+    name_parts = normalized.split(" - ") if should_split and not is_play_off(normalized) else [normalized]
     if not is_play_off(normalized) and len(name_parts) == 1:
         editions = [w for w in normalized.split() if find_roman(w) is not None]
         if len(editions) > 1:
@@ -121,6 +126,7 @@ def normalize_race_name(name: str) -> str:
     name = amend_race_name(name)
     name = remove_league_indicator(name)
     name = remove_race_sponsor(name)
+
     name = normalize_known_race_names(name)
     name = normalize_ko_race_names(name)
 
@@ -157,16 +163,16 @@ def find_race_sponsor(name: str) -> str | None:
     """
     Find the race sponsor in our known list
     """
-    for sponsor in _KNOWN_RACE_SPONSORS:
+    for sponsor, _ in _KNOWN_RACE_SPONSORS:
         if sponsor in name:
             return sponsor
-    if "SALGADO" in name:  # HACK: the race name is the sponsor name so we cannot replace it
-        return "SALGADO CONGELADOS"
     return None
 
 
 def remove_race_sponsor(name: str) -> str:
-    for sponsor in _KNOWN_RACE_SPONSORS:
+    for sponsor, should_replace in _KNOWN_RACE_SPONSORS:
+        if not should_replace:
+            continue
         name = name.replace(sponsor, "")
     if name.endswith(" - "):
         name = name.replace(" - ", "")
@@ -220,7 +226,11 @@ def amend_race_name(name: str) -> str:
 
 
 def normalize_known_race_names(name: str) -> str:
-    return match_normalization(name, _NORMALIZED_RACES)
+    edition = find_edition(name)
+    normalized = match_normalization(name, _NORMALIZED_RACES)
+    if edition and int_to_roman(edition) not in normalized.split():
+        normalized = f"{int_to_roman(edition)} {normalized}"
+    return normalized
 
 
 def normalize_ko_race_names(name: str) -> str:

@@ -86,7 +86,7 @@ class TrainerasHtmlParser(HtmlParser):
 
         race = Race(
             name=name,
-            normalized_names=[(normalize_race_name(name), None)],
+            normalized_names=[(self._normalize_race_name(normalize_race_name(name), name), None)],
             date=t_date.strftime("%d/%m/%Y"),
             type=ttype,
             day=self._clean_day(table, name),
@@ -254,7 +254,7 @@ class TrainerasHtmlParser(HtmlParser):
         if self.get_type(participants) == RACE_TIME_TRIAL:
             return 1
         lanes = list(self.get_lane(p) for p in participants)
-        return max(int(lane) for lane in lanes)
+        return max(int(lane) for lane in lanes if lane is not None)
 
     def get_race_laps(self, selector: Selector, table: int) -> int:
         cia = selector.xpath(f"/html/body/div[1]/main/div[1]/div/div/div[2]/table[{table}]/tr[2]/td/text()").getall()
@@ -269,9 +269,9 @@ class TrainerasHtmlParser(HtmlParser):
         rows = selector.xpath(f"/html/body/div[1]/main/div[1]/div/div/div[2]/table[{table}]/tr").getall()
         return [Selector(text=t) for t in rows][1:]
 
-    def get_lane(self, participant: Selector) -> int:
+    def get_lane(self, participant: Selector) -> int | None:
         lane = participant.xpath("//*/td[3]/text()").get()
-        return int(lane) if lane else 0
+        return int(lane) if lane else None
 
     def get_club_name(self, participant: Selector) -> str:
         name = participant.xpath("//*/td[2]/text()").get()
@@ -325,6 +325,14 @@ class TrainerasHtmlParser(HtmlParser):
         if category == CATEGORY_SCHOOL:
             return value in self._SCHOOL
         return False
+
+    @staticmethod
+    def _normalize_race_name(name: str, original_name: str) -> str:
+        if all(n in name for n in ["ILLA", "SAMERTOLAMEU"]) and "FANDICOSTA" in original_name:
+            # HACK: this is a weird flag case in witch Meira restarted the edition for his 'B' team.
+            return "BANDERA ILLA DO SAMERTOLAMEU - FANDICOSTA"
+
+        return name
 
     def _clean_day(self, table: int, name: str) -> int:
         if "TERESA" in name and "HERRERA" in name:

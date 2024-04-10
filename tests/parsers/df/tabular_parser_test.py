@@ -169,7 +169,7 @@ class TestTabularDataParser(unittest.TestCase):
             town=None,
             organizer="CLUB DE REGATAS PERILLO",
             sponsor="SALGADO CONGELADOS",
-            normalized_names=[("BANDEIRA CONGELADOS SALGADO", 6)],
+            normalized_names=[("BANDEIRA SALGADO CONGELADOS", 6)],
             race_ids=["4"],
             url="test_url",
             datasource=Datasource.TABULAR.value,

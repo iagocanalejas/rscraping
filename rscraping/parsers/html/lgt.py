@@ -29,6 +29,7 @@ from rscraping.data.normalization import (
     normalize_town,
     remove_day_indicator,
 )
+from rscraping.data.normalization.races import find_edition
 
 from ._protocol import HtmlParser
 
@@ -59,6 +60,10 @@ class LGTHtmlParser(HtmlParser):
             self._hardcoded_playoff_edition(self._normalize_race_name(n, league, t_date), year=t_date.year, edition=e)
             for (n, e) in normalized_names
         ]
+        # try to find the edition in the original name before normalizations
+        if not any(e is not None for (_, e) in normalized_names):
+            edition = find_edition(name)
+            normalized_names = [(n, edition) for (n, _) in normalized_names]
         logger.info(f"{self.DATASOURCE}: race normalized to {normalized_names=}")
 
         participants = self.get_participants(results_selector)
@@ -248,9 +253,7 @@ class LGTHtmlParser(HtmlParser):
             (league == "LIGA A" and t_date.year in [2023]) or (league == "LIGA B" and t_date.year in [2021, 2022])
         ):
             # HACK: this is a weird flag case in witch Meira restarted the edition for his 'B' team.
-            # We have "III BANDEIRA ILLA DO SAMERTOLAMEU" in 2017 for his main team and
-            # "III BANDEIRA ILLA DO SAMERTOLAMEU" in 2023 for his 'B' team. So we need to differentiate them.
-            return "BANDEIRA ILLA DO SAMERTOLAMEU B"
+            return "BANDERA ILLA DO SAMERTOLAMEU - FANDICOSTA"
 
         if "PLAY" in name:
             return "PLAY-OFF LGT"

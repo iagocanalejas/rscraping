@@ -19,6 +19,11 @@ def normalize_lap_time(value: str) -> time | None:
     parts = re.findall(r"\d+", value)
     if all(p == "00" for p in parts):
         return None
+    if len(parts) == 1:
+        # try to fix '20.55.07' page errors
+        dot_parts = value.split(".")
+        if len(dot_parts) == 3:
+            return datetime.strptime(f"{dot_parts[0]}:{dot_parts[1]}.{dot_parts[2]}", "%M:%S.%f").time()
     if len(parts) == 2:
         # try to fix '2102:48' | '25:2257' page errors
         if len(parts[0]) == 3:
