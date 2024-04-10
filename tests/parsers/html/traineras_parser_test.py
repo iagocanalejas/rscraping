@@ -69,6 +69,14 @@ class TestTrainerasParser(unittest.TestCase):
         ids = self.parser.parse_race_ids(data, is_female=True)
         self.assertEqual(list(ids), ["5456"])
 
+    def test_parse_flag_race_ids(self):
+        with open(os.path.join(self.fixtures, "traineras_flag.html")) as file:
+            selector = Selector(file.read())
+            male_ids = self.parser.parse_flag_race_ids(selector, is_female=False)
+            female_ids = self.parser.parse_flag_race_ids(selector, is_female=True)
+        self.assertEqual(list(male_ids), ["2476", "2477", "5814"])
+        self.assertEqual(list(female_ids), ["2508", "5815"])
+
     def test_parse_club_race_ids(self):
         with open(os.path.join(self.fixtures, "traineras_club.html")) as file:
             ids = self.parser.parse_club_race_ids(Selector(file.read()))
@@ -81,13 +89,13 @@ class TestTrainerasParser(unittest.TestCase):
 
     def test_parse_search_flags(self):
         with open(os.path.join(self.fixtures, "traineras_search_flags.html")) as file:
-            urls = self.parser.parse_search_flags(Selector(file.read()))
+            urls = self.parser.parse_searched_flag_urls(Selector(file.read()))
         self.assertEqual(urls, ["https://traineras.es/banderas/104#SM", "https://traineras.es/banderas/679#SF"])
 
     def test_parse_flag_editions(self):
         with open(os.path.join(self.fixtures, "traineras_flag_editions.html")) as file:
             content = Selector(file.read())
-            male_editions = self.parser.parse_flag_editions(content)
+            male_editions = self.parser.parse_flag_editions(content, is_female=False)
             female_editions = self.parser.parse_flag_editions(content, is_female=True)
         self.assertEqual(list(male_editions), [(2007, 1), (2008, 2), (2011, 3), (2023, 14)])
         self.assertEqual(list(female_editions), [(2016, 1), (2017, 2), (2023, 8)])

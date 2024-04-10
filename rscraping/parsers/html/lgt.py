@@ -7,6 +7,7 @@ from typing import Any, override
 
 from parsel.selector import Selector
 
+from pyutils.shortcuts import none
 from pyutils.strings import whitespaces_clean
 from rscraping.data.checks import is_female, is_play_off
 from rscraping.data.constants import (
@@ -61,7 +62,7 @@ class LGTHtmlParser(HtmlParser):
             for (n, e) in normalized_names
         ]
         # try to find the edition in the original name before normalizations
-        if not any(e is not None for (_, e) in normalized_names):
+        if none(e for (_, e) in normalized_names):
             edition = find_edition(name)
             normalized_names = [(n, edition) for (n, _) in normalized_names]
         logger.info(f"{self.DATASOURCE}: race normalized to {normalized_names=}")

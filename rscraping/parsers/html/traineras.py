@@ -156,6 +156,10 @@ class TrainerasHtmlParser(HtmlParser):
             name = " ".join(n for n in name.split() if n != ttype)
             yield RaceName(race_id=row.xpath("//*/td[1]/a/@href").get("").split("/")[-1], name=name)
 
+    def parse_flag_race_ids(self, selector: Selector, is_female: bool) -> Generator[str, Any, Any]:
+        rows = selector.xpath(f"/html/body/main/div/div/div/div[{2 if is_female else 1}]/div/table/tr").getall()
+        return (Selector(row).xpath("//*/td[3]/a/@href").get("").split("/")[-1] for row in rows[1:])
+
     def parse_club_race_ids(self, selector: Selector) -> Generator[str, Any, Any]:
         rows = selector.xpath("/html/body/div[1]/div[2]/div/table/tr").getall()
         return (Selector(row).xpath("//*/td[1]/a/@href").get("").split("/")[-1] for row in rows[1:])
@@ -171,10 +175,10 @@ class TrainerasHtmlParser(HtmlParser):
             if year in selector.xpath("//*/td[2]/text()").get("")
         )
 
-    def parse_search_flags(self, selector: Selector) -> list[str]:
+    def parse_searched_flag_urls(self, selector: Selector) -> list[str]:
         return selector.xpath("/html/body/div[1]/div[2]/div/div/div[*]/div/div/div[2]/h5/a/@href").getall()
 
-    def parse_flag_editions(self, selector: Selector, is_female: bool = False) -> Generator[tuple[int, int], Any, Any]:
+    def parse_flag_editions(self, selector: Selector, is_female: bool) -> Generator[tuple[int, int], Any, Any]:
         table = selector.xpath(f"/html/body/main/div/div/div/div[{2 if is_female else 1}]/div/table").get(None)
         if table:
             for row in Selector(table).xpath("//*/tr").getall()[1:]:

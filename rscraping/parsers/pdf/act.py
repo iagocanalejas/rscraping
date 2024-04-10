@@ -3,6 +3,7 @@ import sys
 from fitz import Page
 
 from pyutils.lists import flatten
+from pyutils.shortcuts import none
 from pyutils.strings import whitespaces_clean
 from rscraping.data.constants import (
     SYNONYM_COXWAIN,
@@ -60,7 +61,7 @@ class ACTPdfParser(PdfParser):
         return normalize_race_name(race), normalize_club_name(club)
 
     def _parse_rowers(self, rowers: list[str]) -> tuple[str, str, list[str], list[str]]:
-        rowers = [r for r in rowers if not any(t for t in self._TRASH if t in r.upper())]
+        rowers = [rower for rower in rowers if none(t in rower.upper() for t in self._TRASH)]
 
         coach, delegate = self._get_coach_and_delegate(rowers)
 

@@ -42,6 +42,10 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
         return f"https://traineras.es/banderas?nombre={name.replace(' ', '+')}"
 
     @staticmethod
+    def get_flag_url(flag_id: str) -> str:
+        return f"https://traineras.es/banderas/{flag_id}"
+
+    @staticmethod
     def get_rower_url(rower_id: str, **_) -> str:
         return f"https://traineras.es/personas/{rower_id}"
 
@@ -68,6 +72,20 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
         if not pattern.match(url):
             raise ValueError(f"invalid {url=}")
 
+    def get_race_ids_by_flag(self, flag_id: str) -> Generator[str, Any, Any]:
+        """
+        Find the IDs of the race editions for a given flag.
+
+        Args:
+            flag_id (str): The ID of the flag.
+            **kwargs: Additional keyword arguments.
+
+        Yields: str: Race IDs.
+        """
+        url = self.get_flag_url(flag_id)
+        content = Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8"))
+        yield from self._html_parser.parse_flag_race_ids(content, is_female=self._is_female)
+
     @override
     def get_race_by_id(self, race_id: str, **kwargs) -> Race | None:
         """
@@ -87,14 +105,15 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
         # search the race name in the flags seach page
         url = self.get_search_races_url(race.name)
         content = Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8"))
-        flag_urls = self._html_parser.parse_search_flags(content)
+        flag_urls = self._html_parser.parse_searched_flag_urls(content)
 
         if len(flag_urls) < 1:
             return race
 
         # the first flag should be an exact match of the given one, so we can use it to get the editions
         content = Selector(requests.get(url=flag_urls[0], headers=HTTP_HEADERS()).content.decode("utf-8"))
-        edition = next((e for (y, e) in self._html_parser.parse_flag_editions(content) if y == race.year), None)
+        editions = self._html_parser.parse_flag_editions(content, is_female=self._is_female)
+        edition = next((e for (y, e) in editions if y == race.year), None)
         if edition:
             race.normalized_names = [(n[0], edition) for n in race.normalized_names]
 

@@ -37,6 +37,7 @@ _NORMALIZED_TOWNS = {
         ["TIRAN"],
         ["TIRÁN"],
     ],
+    "MUROS": [["MUROS"], ["ESTEIRO"]],
     "BOIRO": [["CABO", "CRUZ"]],
     "OLEIROS": [["PERILLO"], ["MERA"]],
     "RIVEIRA": [["RIVEIRA"], ["RIBEIRA"], ["AGUIÑO"]],

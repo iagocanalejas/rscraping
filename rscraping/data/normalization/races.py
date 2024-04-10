@@ -1,5 +1,6 @@
 import re
 
+from pyutils.shortcuts import none
 from pyutils.strings import (
     apply_replaces,
     find_roman,
@@ -90,7 +91,7 @@ def normalize_name_parts(name: str) -> list[tuple[str, int | None]]:
     normalized = remove_parenthesis(whitespaces_clean(name))
     normalized = f"{normalized} ({'CLASIFICATORIA'})" if "CLASIFICATORIA" in name else normalized
 
-    should_split = not any(r in normalized for r in _NORMALIZED_RACES.keys() if " - " in r)
+    should_split = none(" - " in r in normalized for r in _NORMALIZED_RACES.keys())
     name_parts = normalized.split(" - ") if should_split and not is_play_off(normalized) else [normalized]
     if not is_play_off(normalized) and len(name_parts) == 1:
         editions = [w for w in normalized.split() if find_roman(w) is not None]
