@@ -53,7 +53,7 @@ class TrainerasHtmlParser(HtmlParser):
 
     @override
     def parse_race(self, selector: Selector, *, race_id: str, table: int | None = None, **_) -> Race | None:
-        if len(selector.xpath("/html/body/div[1]/main/div[1]/div/div/div[2]/table[*]").getall()) > 1 and not table:
+        if self._races_count(selector) > 1 and not table:
             raise MultiRaceException()
         table = table or 1
 
@@ -63,10 +63,8 @@ class TrainerasHtmlParser(HtmlParser):
             return None
         logger.info(f"{self.DATASOURCE}: found race {name}")
 
-        t_date = find_date(selector.xpath(f"/html/body/div[1]/main/div/div/div/div[{table}]/h2/text()").get(""))
-        if table == 3:
-            # HACK: this is a weird case where traineras.es have 3 races in the same page: ref_id=2503
-            t_date = find_date(selector.xpath("/html/body/div[1]/main/div/div/div/div[2]/h2[2]/text()").get(""))
+        path = "div[1]/h2" if table == 1 else f"div[2]/h2[{table - 1}]"
+        t_date = find_date(selector.xpath(f"/html/body/div[1]/main/div/div/div/{path}/text()").get(""))
         gender = self.get_gender(selector)
         distance = self.get_distance(selector)
 
@@ -254,15 +252,19 @@ class TrainerasHtmlParser(HtmlParser):
         parts = selector.xpath(f"/html/body/div[1]/main/div/div/div/div[{race_table}]/h2/text()").get("")
         return normalize_town(whitespaces_clean(parts.split(" - ")[0]))
 
-    def get_race_lanes(self, participants: list[Selector]) -> int:
+    def get_race_lanes(self, participants: list[Selector]) -> int | None:
         if self.get_type(participants) == RACE_TIME_TRIAL:
             return 1
         lanes = list(self.get_lane(p) for p in participants)
-        return max(int(lane) for lane in lanes if lane is not None)
+        lanes = {int(lane) for lane in lanes if lane is not None}
+        return len(lanes) if lanes else None
 
     def get_race_laps(self, selector: Selector, table: int) -> int:
-        cia = selector.xpath(f"/html/body/div[1]/main/div[1]/div/div/div[2]/table[{table}]/tr[2]/td/text()").getall()
-        return len([c for c in cia if ":" in c])
+        cia = []
+        for participant in self.get_participants(selector, table):
+            participant_cia = participant.xpath("//*/td/text()").getall()
+            cia.append([p for p in participant_cia if ":" in p])
+        return len(max(cia, key=len))
 
     def is_cancelled(self, participants: list[Selector]) -> bool:
         # race_id=4061|211
@@ -270,8 +272,8 @@ class TrainerasHtmlParser(HtmlParser):
         return len([lap for lap in laps if len(lap) == 0]) >= len(participants) // 2
 
     def get_participants(self, selector: Selector, table: int) -> list[Selector]:
-        rows = selector.xpath(f"/html/body/div[1]/main/div[1]/div/div/div[2]/table[{table}]/tr").getall()
-        return [Selector(text=t) for t in rows][1:]
+        rows = selector.xpath(f"{self._participants_path(selector)}[{table}]/tr").getall()
+        return [Selector(t) for t in rows[1:]]
 
     def get_lane(self, participant: Selector) -> int | None:
         lane = participant.xpath("//*/td[3]/text()").get()
@@ -316,6 +318,10 @@ class TrainerasHtmlParser(HtmlParser):
     ####################################################
     #                     PRIVATE                      #
     ####################################################
+
+    def _races_count(self, selector: Selector) -> int:
+        return len(selector.xpath(f"{self._participants_path(selector)}[*]").getall())
+
     def _has_gender(self, is_female: bool | None, value: str) -> bool:
         return is_female is None or (value in self._FEMALE if is_female else value not in self._FEMALE)
 
@@ -330,6 +336,19 @@ class TrainerasHtmlParser(HtmlParser):
             return value in self._SCHOOL
         return False
 
+    def _clean_day(self, table: int, name: str) -> int:
+        if "TERESA" in name and "HERRERA" in name:
+            return 1
+        return table
+
+    @staticmethod
+    def _participants_path(selector: Selector) -> str:
+        path = "/html/body/div[1]/main/div[1]/div/div/div[2]/table"
+        if not selector.xpath(path):
+            # race_id=5706
+            path = "/html/body/div[1]/main/div[1]/div/div/div[3]/table"
+        return path
+
     @staticmethod
     def _normalize_race_name(name: str, original_name: str) -> str:
         if all(n in name for n in ["ILLA", "SAMERTOLAMEU"]) and "FANDICOSTA" in original_name:
@@ -337,8 +356,3 @@ class TrainerasHtmlParser(HtmlParser):
             return "BANDERA ILLA DO SAMERTOLAMEU - FANDICOSTA"
 
         return name
-
-    def _clean_day(self, table: int, name: str) -> int:
-        if "TERESA" in name and "HERRERA" in name:
-            return 1
-        return table
