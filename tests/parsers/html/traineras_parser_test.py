@@ -11,7 +11,7 @@ from rscraping.data.constants import (
     RACE_TIME_TRIAL,
     RACE_TRAINERA,
 )
-from rscraping.data.models import Datasource, Lineup, Participant, Race, RaceName
+from rscraping.data.models import Datasource, Participant, Race, RaceName
 from rscraping.parsers.html.traineras import MultiRaceException, TrainerasHtmlParser
 
 
@@ -145,12 +145,6 @@ class TestTrainerasParser(unittest.TestCase):
             female_editions = self.parser.parse_flag_editions(content, is_female=True)
         self.assertEqual(list(male_editions), [(2007, 1), (2008, 2), (2011, 3), (2023, 14)])
         self.assertEqual(list(female_editions), [(2016, 1), (2017, 2), (2023, 8)])
-
-    def test_parse_lineup(self):
-        with open(os.path.join(self.fixtures, "traineras_lineup.html")) as file:
-            lineup = self.parser.parse_lineup(Selector(file.read()))
-
-        self.assertEqual(lineup, self._LINEUP)
 
     def test_get_number_of_pages(self):
         with open(os.path.join(self.fixtures, "traineras_results.html")) as file:
@@ -535,33 +529,3 @@ class TestTrainerasParser(unittest.TestCase):
     _FEMALE_RACE_NAMES = [
         RaceName(race_id="5456", name="MEMORIAL PEPE O RUSO"),
     ]
-
-    _LINEUP = Lineup(
-        race="BANDERA CCD CESANTES",
-        club="C.M. CASTROPOL",
-        coach="Unai Fernández Fernández",
-        delegate="",
-        coxswain="Roberto Villamil López",
-        starboard=[
-            "Natalia Fernández Bedia",
-            "Valeria Álvarez Fojo",
-            "Izaskun Fernández Fernández",
-            "Cristina Blanco Álvarez",
-            "Lucía Carballido González",
-            "María Enar García Gutiérrez",
-        ],
-        larboard=[
-            "Lorena Rodríguez Castaño",
-            "Carolina Yáñez Santana",
-            "Laura Villabrille López",
-            "Eva María Maica Sáez",
-            "María Fernández Mariñas",
-            "Mónica Fernández Fernández",
-        ],
-        substitute=[],
-        bow="María García López",
-        images=[
-            "https://traineras.es/images/regatas/52960-0.jpg",
-            "https://traineras.es/images/regatas/52960-1.jpg",
-        ],
-    )

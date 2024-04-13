@@ -119,10 +119,6 @@ class ACTHtmlParser(HtmlParser):
             for s in selectors
         )
 
-    @override
-    def parse_lineup(self, *_, **__):
-        raise NotImplementedError
-
     ####################################################
     #                     GETTERS                      #
     ####################################################

@@ -17,7 +17,7 @@ from rscraping.data.constants import (
     RACE_TIME_TRIAL,
     RACE_TRAINERA,
 )
-from rscraping.data.models import Datasource, Lineup, Participant, Race, RaceName
+from rscraping.data.models import Datasource, Participant, Race, RaceName
 from rscraping.data.normalization.clubs import normalize_club_name
 from rscraping.data.normalization.races import (
     find_race_sponsor,
@@ -118,66 +118,6 @@ class ARCHtmlParser(HtmlParser):
                 name=whitespaces_clean(s.xpath("//*/text()").get("")).upper(),
             )
             for s in selectors
-        )
-
-    def parse_club_ids(self, selector: Selector) -> Generator[str, Any, Any]:
-        urls = (
-            selector.xpath('//*[@id="main"]/div/div[2]/h2[*]/a/@href').getall()
-            + selector.xpath('//*[@id="main"]/div/div[3]/h2[*]/a/@href').getall()
-        )
-        return (url_parts[-2] for url_parts in (url.split("/") for url in urls))
-
-    @override
-    def parse_lineup(self, selector: Selector, **_) -> Lineup:
-        race = selector.xpath('//*[@id="main"]/div[2]/div[1]/h2/a/text()').get("")
-        club = selector.xpath('//*[@id="main"]/div[2]/div[2]/div[1]/div[2]/div/h2/a/text()').get("")
-
-        body = Selector(selector.xpath('//*[@id="regatas_hojas_impresion"]/table/tbody').get(""))
-        coach = body.xpath("//*/tr[7]/td[2]/div/p/text()").get("")
-        delegate = body.xpath("//*/tr[7]/td[1]/div/p/text()").get("")
-        coxswain = body.xpath("//*/tr[13]/td[4]/div/div/p/a/text()").get("")
-        bow = body.xpath("//*/tr[2]/td/div/div/p/a/text()").get("")
-
-        starboard = [
-            body.xpath("//*/tr[12]/td[5]/div/p/a/text()").get(""),
-            body.xpath("//*/tr[11]/td[5]/div/p/a/text()").get(""),
-            body.xpath("//*/tr[10]/td[5]/div/p/a/text()").get(""),
-            body.xpath("//*/tr[9]/td[4]/div/p/a/text()").get(""),
-            body.xpath("//*/tr[8]/td[5]/div/p/a/text()").get(""),
-            body.xpath("//*/tr[7]/td[5]/div/p/a/text()").get(""),
-        ]
-
-        larboard = [
-            body.xpath("//*/tr[12]/td[4]/div/p/a/text()").get(""),
-            body.xpath("//*/tr[11]/td[4]/div/p/a/text()").get(""),
-            body.xpath("//*/tr[10]/td[4]/div/p/a/text()").get(""),
-            body.xpath("//*/tr[9]/td[3]/div/p/a/text()").get(""),
-            body.xpath("//*/tr[8]/td[4]/div/p/a/text()").get(""),
-            body.xpath("//*/tr[7]/td[4]/div/p/a/text()").get(""),
-        ]
-
-        substitute = [
-            body.xpath("//*/tr[10]/td[1]/div/p/a/text()").get(""),
-            body.xpath("//*/tr[10]/td[2]/div/p/a/text()").get(""),
-            body.xpath("//*/tr[11]/td[1]/div/p/a/text()").get(""),
-            body.xpath("//*/tr[11]/td[2]/div/p/a/text()").get(""),
-            body.xpath("//*/tr[12]/td[1]/div/p/a/text()").get(""),
-            body.xpath("//*/tr[12]/td[2]/div/p/a/text()").get(""),
-            body.xpath("//*/tr[13]/td[1]/div/p/a/text()").get(""),
-            body.xpath("//*/tr[13]/td[2]/div/p/a/text()").get(""),
-        ]
-
-        return Lineup(
-            race=normalize_race_name(race),
-            club=normalize_club_name(club),
-            coach=whitespaces_clean(coach.upper()),
-            delegate=whitespaces_clean(delegate.upper()),
-            coxswain=whitespaces_clean(coxswain.upper()),
-            starboard=[whitespaces_clean(s).upper() for s in starboard if s],
-            larboard=[whitespaces_clean(s).upper() for s in larboard if s],
-            substitute=[whitespaces_clean(s).upper() for s in substitute if s],
-            bow=whitespaces_clean(bow).upper(),
-            images=[],
         )
 
     ####################################################

@@ -6,9 +6,8 @@ import requests
 from parsel.selector import Selector
 
 from rscraping.data.constants import HTTP_HEADERS
-from rscraping.data.models import Datasource, Lineup, Race, RaceName
+from rscraping.data.models import Datasource, Race, RaceName
 from rscraping.parsers.html import HtmlParser
-from rscraping.parsers.pdf import PdfParser
 
 from ._protocol import ClientProtocol
 
@@ -24,11 +23,6 @@ class Client(ClientProtocol):
     @property
     @override
     def _html_parser(self) -> HtmlParser:
-        raise NotImplementedError
-
-    @property
-    @override
-    def _pdf_parser(self) -> PdfParser:
         raise NotImplementedError
 
     def __init_subclass__(cls, **kwargs):
@@ -109,14 +103,5 @@ class Client(ClientProtocol):
         raise NotImplementedError
 
     @override
-    @staticmethod
-    def get_lineup_url(race_id: str, **kwargs) -> str:
-        raise NotImplementedError
-
-    @override
     def get_race_ids_by_club(self, club_id: str, year: int, **kwargs) -> Generator[str, Any, Any]:
-        raise NotImplementedError
-
-    @override
-    def get_lineup_by_race_id(self, race_id: str, **kwargs) -> Generator[Lineup, Any, Any]:
         raise NotImplementedError

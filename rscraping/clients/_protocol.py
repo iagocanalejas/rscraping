@@ -1,9 +1,8 @@
 from collections.abc import Generator
 from typing import Any, Protocol
 
-from rscraping.data.models import Datasource, Lineup, Race, RaceName
+from rscraping.data.models import Datasource, Race, RaceName
 from rscraping.parsers.html import HtmlParser
-from rscraping.parsers.pdf import PdfParser
 
 
 class ClientProtocol(Protocol):
@@ -15,9 +14,6 @@ class ClientProtocol(Protocol):
 
     @property
     def _html_parser(self) -> HtmlParser: ...
-
-    @property
-    def _pdf_parser(self) -> PdfParser: ...
 
     def validate_year(self, year: int):
         """
@@ -103,18 +99,6 @@ class ClientProtocol(Protocol):
         """
         ...
 
-    def get_lineup_by_race_id(self, race_id: str, **kwargs) -> Generator[Lineup, Any, Any]:
-        """
-        Get the lineups for a specific race.
-
-        Args:
-            race_id (str): The ID of the race.
-            **kwargs: Additional keyword arguments.
-
-        Yields: Lineup: Lineups for the race.
-        """
-        ...
-
     @staticmethod
     def get_race_details_url(race_id: str, **kwargs) -> str:
         """
@@ -126,12 +110,5 @@ class ClientProtocol(Protocol):
     def get_races_url(year: int, **kwargs) -> str:
         """
         Return the URL for retrieving races in a specific year.
-        """
-        ...
-
-    @staticmethod
-    def get_lineup_url(race_id: str, **kwargs) -> str:
-        """
-        Return the URL for retrieving the lineup of a specific race.
         """
         ...

@@ -7,3 +7,22 @@ strictListInference = true
 strictDictionaryInference = true
 strictSetInference = true
 deprecateTypingAliases = true
+
+[tool.coverage.run]
+source = ["rscraping"]
+omit = [
+	"rscraping/_functions.py",
+	"rscraping/data/*.py",
+	"rscraping/**/_protocol.py",
+]
+
+[tool.coverage.report]
+exclude_also = [
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+	"logger.*",
+    ]

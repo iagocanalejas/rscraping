@@ -129,10 +129,6 @@ class LGTHtmlParser(HtmlParser):
             for u in values
         )
 
-    @override
-    def parse_lineup(self, *_, **__):
-        raise NotImplementedError
-
     ####################################################
     #                     GETTERS                      #
     ####################################################

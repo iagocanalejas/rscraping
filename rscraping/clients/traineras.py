@@ -6,7 +6,7 @@ import requests
 from parsel.selector import Selector
 
 from rscraping.data.constants import CATEGORY_SCHOOL, CATEGORY_VETERAN, HTTP_HEADERS
-from rscraping.data.models import Datasource, Lineup, Race, RaceName
+from rscraping.data.models import Datasource, Race, RaceName
 from rscraping.parsers.html import TrainerasHtmlParser
 
 from ._client import Client
@@ -149,17 +149,6 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
         """
         content = requests.get(url=self.get_rower_url(rower_id), headers=HTTP_HEADERS()).content.decode("utf-8")
         yield from self._html_parser.parse_rower_race_ids(Selector(content), year=year)
-
-    @override
-    def get_lineup_by_race_id(self, race_id: str, **_) -> Generator[Lineup, Any, Any]:
-        content = requests.get(url=self.get_race_details_url(race_id), headers=HTTP_HEADERS()).content.decode("utf-8")
-        participants = self._html_parser.get_participants(Selector(content), table=1)
-        for participant in participants:
-            url = participant.xpath("//*/td[9]/a/@href").get("")
-            if not url:
-                continue
-            lineup = requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8")
-            yield self._html_parser.parse_lineup(Selector(lineup))
 
     def get_pages(self, year: int) -> Generator[Selector, Any, Any]:
         """

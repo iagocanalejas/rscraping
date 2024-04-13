@@ -104,10 +104,6 @@ class ABEHtmlParser(HtmlParser):
         pairs = [(s.xpath("//*/@href").get("").split("/")[-2], s.xpath("//*/text()").get("")) for s in selectors]
         return (RaceName(race_id=p[0], name=whitespaces_clean(p[1]).upper()) for p in pairs)
 
-    @override
-    def parse_lineup(self, *_, **__):
-        raise NotImplementedError
-
     ####################################################
     #                     GETTERS                      #
     ####################################################

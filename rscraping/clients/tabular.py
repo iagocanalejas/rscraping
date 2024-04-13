@@ -9,7 +9,7 @@ import pandas as pd
 from pyutils.shortcuts import only_one_not_none
 from pyutils.strings import roman_to_int
 from rscraping.data.checks import is_female
-from rscraping.data.models import Datasource, Lineup, Race, RaceName
+from rscraping.data.models import Datasource, Race, RaceName
 from rscraping.parsers.df import (
     COLUMN_CLUB,
     COLUMN_DATE,
@@ -26,7 +26,6 @@ from rscraping.parsers.df import (
     TabularDataFrameParser,
 )
 from rscraping.parsers.html import HtmlParser
-from rscraping.parsers.pdf import PdfParser
 
 from ._client import Client
 
@@ -175,21 +174,7 @@ class TabularDataClient(Client, source=Datasource.TABULAR):
     def _html_parser(self) -> HtmlParser:
         raise NotImplementedError
 
-    @property
-    @override
-    def _pdf_parser(self) -> PdfParser:
-        raise NotImplementedError
-
-    @override
-    def get_lineup_by_race_id(self, race_id: str, **kwargs) -> Generator[Lineup, Any, Any]:
-        raise NotImplementedError
-
     @override
     @staticmethod
     def get_races_url(year: int, **kwargs) -> str:
-        raise NotImplementedError
-
-    @override
-    @staticmethod
-    def get_lineup_url(race_id: str, **kwargs) -> str:
         raise NotImplementedError

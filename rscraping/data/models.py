@@ -45,27 +45,6 @@ class Datasource(StrEnum):
 
 
 @dataclass
-class Lineup:
-    race: str
-    club: str
-    coach: str
-    delegate: str
-    coxswain: str | None
-    starboard: list[str]
-    larboard: list[str]
-    substitute: list[str]
-    bow: str | None
-    images: list[str]
-
-    def __str__(self) -> str:
-        return self.to_json()
-
-    def to_json(self) -> str:
-        d = {k: v for k, v in self.__dict__.items()}
-        return json.dumps(d)
-
-
-@dataclass
 class Race:
     name: str
     date: str

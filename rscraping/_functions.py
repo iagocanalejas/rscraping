@@ -7,7 +7,7 @@ from simplemma.simplemma import text_lemmatizer
 from pyutils.strings import normalize_synonyms, remove_conjunctions, remove_symbols, unaccent
 from rscraping.clients import Client
 from rscraping.data.constants import SYNONYMS
-from rscraping.data.models import Datasource, Lineup, Race
+from rscraping.data.models import Datasource, Race
 from rscraping.ocr import ImageProcessor
 from rscraping.parsers.df import DataFrameParser
 
@@ -75,11 +75,6 @@ def parse_race_image(
         file_name=os.path.splitext(os.path.basename(path))[0],
         header=header_data,
     )
-
-
-def find_lineup(race_id: str, datasource: Datasource, is_female: bool) -> Generator[Lineup, Any, Any]:
-    client = Client(source=datasource, is_female=is_female)
-    return client.get_lineup_by_race_id(race_id)
 
 
 def lemmatize(phrase: str, lang: str = "es") -> list[str]:

@@ -27,12 +27,14 @@ python scripts/processcsv.py <sheet_id_or_file_path> <race_id?> <options>
     # --sheet_name=<bool>: Name of the sheet to be processed.
     # --save=<bool>: Saves the output to a csv file.
 
-python findrace.py act 1678276379 --female
+python processcsv.py --sheet-id=34619dlds0182348 --sheet-name="SHEET NAME"
 ```
+
+# Utils
 
 ## Download Images
 
-Downloads lineup images for a given rower in a given club (Only supports traineras.es).
+Downloads images for a given rower in a given club (Only supports traineras.es).
 
 ```sh
 python scripts/downloadimages.py <rower_id> <club_name> <options>
@@ -40,18 +42,6 @@ python scripts/downloadimages.py <rower_id> <club_name> <options>
     # --output=<str>: Folder where images will be uploaded.
 
 python downloadimages.py 2914 'PUEBLA' --year=2019 --output=out
-```
-
-## Find Lineup
-
-Tries to parse a line-up for a given race to retrieved all the participants.
-
-```sh
-python scripts/findlineup.py <datasource> <race_id> <options>
-    # --female=<bool>: Specifies if we need to search in the female pages.
-    # --save=<bool>: Saves the output to a csv file.
-
-python findlineup.py traineras 5756
 ```
 
 ## Parse Image
@@ -64,8 +54,6 @@ python scripts/parseimage.py <datasource> <path> <options>
     # --save=<bool>: Saves the output to a csv file.
     # --debug: Plot the image processing steps and dataframes transformations done.
 ```
-
-# Utils
 
 ## Lemmatize
 

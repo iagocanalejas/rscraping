@@ -18,7 +18,7 @@ from rscraping.data.constants import (
     RACE_TIME_TRIAL,
     RACE_TRAINERA,
 )
-from rscraping.data.models import Datasource, Lineup, Participant, Race, RaceName
+from rscraping.data.models import Datasource, Participant, Race, RaceName
 from rscraping.data.normalization import (
     find_league,
     find_race_sponsor,
@@ -186,38 +186,6 @@ class TrainerasHtmlParser(HtmlParser):
                     int(whitespaces_clean(parts[0])),
                 )
 
-    @override
-    def parse_lineup(self, selector: Selector, **_) -> Lineup:
-        def clean(w):
-            return whitespaces_clean(w)
-
-        return Lineup(
-            race=self.get_lineup_name(selector),
-            club=self.get_lineup_club_name(selector),
-            coach=clean(selector.xpath("/html/body/div[1]/main/div/div[2]/div[1]/div/span/a/text()").get("")),
-            delegate="",
-            coxswain=clean(selector.xpath("/html/body/div[1]/main/div/div[1]/div/div[15]/span/a/small/text()").get("")),
-            bow=clean(selector.xpath("/html/body/div[1]/main/div/div[1]/div/div[2]/span/a/small/text()").get("")),
-            starboard=[
-                clean(selector.xpath("/html/body/div[1]/main/div/div[1]/div/div[14]/span/a/small/text()").get("")),
-                clean(selector.xpath("/html/body/div[1]/main/div/div[1]/div/div[12]/span/a/small/text()").get("")),
-                clean(selector.xpath("/html/body/div[1]/main/div/div[1]/div/div[10]/span/a/small/text()").get("")),
-                clean(selector.xpath("/html/body/div[1]/main/div/div[1]/div/div[8]/span/a/small/text()").get("")),
-                clean(selector.xpath("/html/body/div[1]/main/div/div[1]/div/div[6]/span/a/small/text()").get("")),
-                clean(selector.xpath("/html/body/div[1]/main/div/div[1]/div/div[4]/span/a/small/text()").get("")),
-            ],
-            larboard=[
-                clean(selector.xpath("/html/body/div[1]/main/div/div[1]/div/div[13]/span/a/small/text()").get("")),
-                clean(selector.xpath("/html/body/div[1]/main/div/div[1]/div/div[11]/span/a/small/text()").get("")),
-                clean(selector.xpath("/html/body/div[1]/main/div/div[1]/div/div[9]/span/a/small/text()").get("")),
-                clean(selector.xpath("/html/body/div[1]/main/div/div[1]/div/div[7]/span/a/small/text()").get("")),
-                clean(selector.xpath("/html/body/div[1]/main/div/div[1]/div/div[5]/span/a/small/text()").get("")),
-                clean(selector.xpath("/html/body/div[1]/main/div/div[1]/div/div[3]/span/a/small/text()").get("")),
-            ],
-            substitute=[],
-            images=self.get_lineup_images(selector),
-        )
-
     def get_number_of_pages(self, selector: Selector) -> int:
         return len(selector.xpath("/html/body/div[1]/div[3]/nav/ul/li[*]").getall()) - 2
 
@@ -302,18 +270,6 @@ class TrainerasHtmlParser(HtmlParser):
     def get_series(self, participant: Selector) -> int:
         series = participant.xpath("//*/td[4]/text()").get()
         return int(series) if series else 0
-
-    def get_lineup_name(self, selector: Selector) -> str:
-        name = whitespaces_clean(selector.xpath("/html/body/div[1]/header/div/div[1]/h2/text()").get("")).upper()
-        name = " ".join(name.split()[:-1])
-        return name
-
-    def get_lineup_club_name(self, selector: Selector) -> str:
-        name = whitespaces_clean(selector.xpath("/html/body/div[1]/header/div/div[2]/h4/text()").get("")).upper()
-        return whitespaces_clean(name.split("(")[0])
-
-    def get_lineup_images(self, selector: Selector) -> list[str]:
-        return selector.xpath('//*[@id="fotografias"]/a/img/@src').getall()
 
     ####################################################
     #                     PRIVATE                      #

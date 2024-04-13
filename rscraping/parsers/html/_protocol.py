@@ -3,7 +3,7 @@ from typing import Any, Protocol
 
 from parsel.selector import Selector
 
-from rscraping.data.models import Datasource, Lineup, Race, RaceName
+from rscraping.data.models import Datasource, Race, RaceName
 
 
 class HtmlParser(Protocol):
@@ -42,17 +42,5 @@ class HtmlParser(Protocol):
             **kwargs: Additional keyword arguments.
 
         Yields: RaceName: The names of the races.
-        """
-        ...
-
-    def parse_lineup(self, selector: Selector, **kwargs) -> Lineup:
-        """
-        Parse the given Selector to retrieve the lineup object.
-
-        Args:
-            selector (Selector): The Selector to parse.
-            **kwargs: Additional keyword arguments.
-
-        Returns: Lineup: The lineup object.
         """
         ...

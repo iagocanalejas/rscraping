@@ -6,7 +6,6 @@ openpyxl==3.1.2
 pandas==2.2.1
 parsel==1.9.0
 pyarrow==15.0.2
-PyMuPDF==1.24.1
 pytesseract==0.3.10
 pyutils @ git+https://github.com/iagocanalejas/pyutils.git@master
 reportlab==4.1.0

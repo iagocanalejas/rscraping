@@ -4,14 +4,12 @@ from datetime import date
 from typing import Any, override
 
 import requests
-from fitz import fitz
 from parsel.selector import Selector
 
 from pyutils.strings import whitespaces_clean
 from rscraping.data.constants import HTTP_HEADERS
-from rscraping.data.models import Datasource, Lineup, Race, RaceName
+from rscraping.data.models import Datasource, Race, RaceName
 from rscraping.parsers.html import LGTHtmlParser
-from rscraping.parsers.pdf import LGTPdfParser
 
 from ._client import Client
 
@@ -80,19 +78,10 @@ class LGTClient(Client, source=Datasource.LGT):
     def _html_parser(self) -> LGTHtmlParser:
         return LGTHtmlParser()
 
-    @property
-    def _pdf_parser(self) -> LGTPdfParser:
-        return LGTPdfParser()
-
     @override
     @staticmethod
     def get_race_details_url(race_id: str, **_) -> str:
         return f"https://www.ligalgt.com/principal/regata/{race_id}"
-
-    @override
-    @staticmethod
-    def get_lineup_url(race_id: str, **_) -> str:
-        return f"https://www.ligalgt.com/pdf/alinacion.php?regata_id={race_id}"
 
     @staticmethod
     def get_results_selector(race_id: str) -> Selector:
@@ -211,20 +200,6 @@ class LGTClient(Client, source=Datasource.LGT):
         upper_race_id = right
 
         return (str(r) for r in range(lower_race_id, (upper_race_id + 1)) if r not in self._excluded_ids)
-
-    @override
-    def get_lineup_by_race_id(self, race_id: str, **_) -> Generator[Lineup, Any, Any]:
-        if race_id in self._excluded_ids:
-            return
-
-        url = self.get_lineup_url(race_id)
-        raw_pdf = requests.get(url=url, headers=HTTP_HEADERS()).content
-
-        with fitz.open("pdf", raw_pdf) as pdf:
-            for page_num in range(pdf.page_count):
-                lineup = self._pdf_parser.parse_lineup(page=pdf[page_num])
-                if lineup:
-                    yield lineup
 
     ####################################################
     #                      UTILS                       #
