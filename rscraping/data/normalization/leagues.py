@@ -31,9 +31,15 @@ def find_league(name: str) -> str | None:
     Find the league of a competition by its name.
     """
     if is_play_off(name):
+        if is_lgt(name):
+            return "LGT"
+        if is_arc(name):
+            return "ARC"
+        if is_act(name) or is_act(name, is_female=True) or ("ARC" in name and "LGT" in name):
+            return "ACT"
         return None
 
-    if is_lgt(name):
+    if is_lgt(name, "A"):
         return "LIGA A"
     if is_lgt(name, "B"):
         return "LIGA B"
@@ -46,7 +52,7 @@ def find_league(name: str) -> str | None:
     if is_arc(name, category=2):
         return "ASOCIACIÓN DE REMO DEL CANTÁBRICO 2"
     if is_arc(name):
-        return "ASOCIACIÓN DE REMO DEL CANTÁBRICO"
+        return "ASOCIACIÓN DE REMO DEL CANTÁBRICO 1"
     if is_ete(name):
         return "EMAKUMEZKO TRAINERUEN ELKARTEA"
     return None

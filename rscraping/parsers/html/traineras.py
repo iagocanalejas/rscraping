@@ -227,12 +227,12 @@ class TrainerasHtmlParser(HtmlParser):
         lanes = {int(lane) for lane in lanes if lane is not None}
         return len(lanes) if lanes else None
 
-    def get_race_laps(self, selector: Selector, table: int) -> int:
+    def get_race_laps(self, selector: Selector, table: int) -> int | None:
         cia = []
         for participant in self.get_participants(selector, table):
             participant_cia = participant.xpath("//*/td/text()").getall()
             cia.append([p for p in participant_cia if ":" in p])
-        return len(max(cia, key=len))
+        return len(max(cia, key=len)) if cia else None
 
     def is_cancelled(self, participants: list[Selector]) -> bool:
         # race_id=4061|211
