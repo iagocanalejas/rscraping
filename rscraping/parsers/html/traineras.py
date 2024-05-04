@@ -155,10 +155,11 @@ class TrainerasHtmlParser(HtmlParser):
             name = " ".join(n for n in name.split() if n != ttype)
             yield RaceName(race_id=row.xpath("//*/td[1]/a/@href").get("").split("/")[-1], name=name)
 
-    def parse_flag_race_ids(self, selector: Selector, gender: str) -> Generator[str, Any, Any]:
-        is_female = gender == GENDER_FEMALE  # TODO:
-        rows = selector.xpath(f"/html/body/main/div/div/div/div[{2 if is_female else 1}]/div/table/tr").getall()
-        return (Selector(row).xpath("//*/td[3]/a/@href").get("").split("/")[-1] for row in rows[1:])
+    def parse_flag_race_ids(self, selector: Selector, gender: str, category: str, **_) -> Generator[str, Any, Any]:
+        table = self._get_matching_flag_table(gender, category, selector)
+        if table:
+            rows = Selector(table).xpath("//*/tr").getall()
+            yield from (Selector(row).xpath("//*/td[3]/a/@href").get("").split("/")[-1] for row in rows[1:])
 
     def parse_club_race_ids(self, selector: Selector) -> Generator[str, Any, Any]:
         rows = selector.xpath("/html/body/div[1]/div[2]/div/table/tr").getall()
@@ -178,9 +179,10 @@ class TrainerasHtmlParser(HtmlParser):
     def parse_searched_flag_urls(self, selector: Selector) -> list[str]:
         return selector.xpath("/html/body/div[1]/div[2]/div/div/div[*]/div/div/div[2]/h5/a/@href").getall()
 
-    def parse_flag_editions(self, selector: Selector, gender: str) -> Generator[tuple[int, int], Any, Any]:
-        is_female = gender == GENDER_FEMALE  # TODO:
-        table = selector.xpath(f"/html/body/main/div/div/div/div[{2 if is_female else 1}]/div/table").get(None)
+    def parse_flag_editions(
+        self, selector: Selector, gender: str, category: str
+    ) -> Generator[tuple[int, int], Any, Any]:
+        table = self._get_matching_flag_table(gender, category, selector)
         if table:
             for row in Selector(table).xpath("//*/tr").getall()[1:]:
                 parts = Selector(row).xpath("//*/td/text()").getall()
@@ -299,6 +301,32 @@ class TrainerasHtmlParser(HtmlParser):
         if "TERESA" in name and "HERRERA" in name:
             return 1
         return table
+
+    def _get_matching_flag_table(self, gender: str, category: str, selector: Selector) -> str | None:
+        """
+        Returns the table that matches the gender|category combination we want.
+        """
+        words = []
+        if gender == GENDER_MALE:
+            if category == CATEGORY_ABSOLUT:
+                words = ["SÉNIOR", "MASCULINO"]
+            elif category == CATEGORY_VETERAN:
+                words = ["VETERANO", "MASCULINO"]
+            elif category == CATEGORY_SCHOOL:
+                words = ["JUVENIL", "MASCULINO"]
+        elif gender == GENDER_FEMALE:
+            if category == CATEGORY_ABSOLUT:
+                words = ["SÉNIOR", "FEMENINO"]
+            elif category == CATEGORY_VETERAN:
+                words = ["VETERANO", "FEMENINO"]
+            elif category == CATEGORY_SCHOOL:
+                words = ["JUVENIL", "FEMENINO"]
+        else:
+            words = ["MIXTO"]
+
+        titles = selector.xpath("/html/body/main/div/div/div/div[*]/h2/text()").getall()
+        idx = next((i for i, t in enumerate(titles) if all(w in t for w in words)), 0)
+        return selector.xpath(f"/html/body/main/div/div/div/div[{idx + 1}]/div/table").get(None)
 
     @staticmethod
     def _participants_path(selector: Selector) -> str:

@@ -6,6 +6,7 @@ import requests
 from parsel.selector import Selector
 
 from rscraping.data.constants import (
+    CATEGORY_ABSOLUT,
     CATEGORY_SCHOOL,
     CATEGORY_VETERAN,
     GENDER_FEMALE,
@@ -23,9 +24,9 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
     DATASOURCE = Datasource.TRAINERAS
     MALE_START = FEMALE_START = 1960
 
-    _category: str | None = None
+    _category: str = CATEGORY_ABSOLUT
 
-    def __init__(self, category: str | None = None, **kwargs) -> None:
+    def __init__(self, category: str = CATEGORY_ABSOLUT, **kwargs) -> None:
         self._category = category
         super().__init__(**kwargs)
 
@@ -95,7 +96,7 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
         """
         url = self.get_flag_url(flag_id)
         content = Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8"))
-        yield from self._html_parser.parse_flag_race_ids(content, gender=self._gender)
+        yield from self._html_parser.parse_flag_race_ids(content, gender=self._gender, category=self._category)
 
     @override
     def get_race_by_id(self, race_id: str, **kwargs) -> Race | None:
@@ -123,7 +124,7 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
 
         # the first flag should be an exact match of the given one, so we can use it to get the editions
         content = Selector(requests.get(url=flag_urls[0], headers=HTTP_HEADERS()).content.decode("utf-8"))
-        editions = self._html_parser.parse_flag_editions(content, gender=self._gender)
+        editions = self._html_parser.parse_flag_editions(content, gender=self._gender, category=self._category)
         edition = next((e for (y, e) in editions if y == race.year), None)
         if edition:
             race.normalized_names = [(n[0], edition) for n in race.normalized_names]

@@ -119,8 +119,8 @@ class TestTrainerasParser(unittest.TestCase):
     def test_parse_flag_race_ids(self):
         with open(os.path.join(self.fixtures, "traineras_flag.html")) as file:
             selector = Selector(file.read())
-            male_ids = self.parser.parse_flag_race_ids(selector, gender=GENDER_MALE)
-            female_ids = self.parser.parse_flag_race_ids(selector, gender=GENDER_FEMALE)
+            male_ids = self.parser.parse_flag_race_ids(selector, gender=GENDER_MALE, category=CATEGORY_ABSOLUT)
+            female_ids = self.parser.parse_flag_race_ids(selector, gender=GENDER_FEMALE, category=CATEGORY_VETERAN)
         self.assertEqual(list(male_ids), ["2476", "2477", "5814"])
         self.assertEqual(list(female_ids), ["2508", "5815"])
 
@@ -142,8 +142,8 @@ class TestTrainerasParser(unittest.TestCase):
     def test_parse_flag_editions(self):
         with open(os.path.join(self.fixtures, "traineras_flag_editions.html")) as file:
             content = Selector(file.read())
-            male_editions = self.parser.parse_flag_editions(content, gender=GENDER_MALE)
-            female_editions = self.parser.parse_flag_editions(content, gender=GENDER_FEMALE)
+            male_editions = self.parser.parse_flag_editions(content, gender=GENDER_MALE, category=CATEGORY_ABSOLUT)
+            female_editions = self.parser.parse_flag_editions(content, gender=GENDER_FEMALE, category=CATEGORY_ABSOLUT)
         self.assertEqual(list(male_editions), [(2007, 1), (2008, 2), (2011, 3), (2023, 14)])
         self.assertEqual(list(female_editions), [(2016, 1), (2017, 2), (2023, 8)])
 
