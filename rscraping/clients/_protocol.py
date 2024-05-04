@@ -1,6 +1,7 @@
 from collections.abc import Generator
 from typing import Any, Protocol
 
+from rscraping.data.constants import GENDER_MALE
 from rscraping.data.models import Datasource, Race, RaceName
 from rscraping.parsers.html import HtmlParser
 
@@ -10,7 +11,7 @@ class ClientProtocol(Protocol):
     FEMALE_START: int
     MALE_START: int
 
-    _is_female: bool = False
+    _gender: str = GENDER_MALE
 
     @property
     def _html_parser(self) -> HtmlParser: ...
@@ -111,4 +112,7 @@ class ClientProtocol(Protocol):
         """
         Return the URL for retrieving races in a specific year.
         """
+        ...
+
+    def _is_valid_gender(self, gender: str) -> bool:
         ...

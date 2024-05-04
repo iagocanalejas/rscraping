@@ -9,6 +9,7 @@ import pandas as pd
 from pyutils.shortcuts import only_one_not_none
 from pyutils.strings import roman_to_int
 from rscraping.data.checks import is_female
+from rscraping.data.constants import GENDER_FEMALE
 from rscraping.data.models import Datasource, Race, RaceName
 from rscraping.parsers.df import (
     COLUMN_CLUB,
@@ -82,13 +83,13 @@ class TabularDataClient(Client, source=Datasource.TABULAR):
         self.config = config
 
         if config.sheet_name and is_female(config.sheet_name.upper()):
-            self._is_female = True
+            self._gender = GENDER_FEMALE
 
         super().__init__(**kwargs)
 
     @override
     def validate_year(self, year: int):
-        since = self.FEMALE_START if self._is_female else self.MALE_START
+        since = self.FEMALE_START if self.is_female else self.MALE_START
         today = date.today().year
         if year < since or year > today:
             raise ValueError(f"invalid 'year', available values are [{since}, {today}]")
@@ -113,12 +114,12 @@ class TabularDataClient(Client, source=Datasource.TABULAR):
 
         Yields: Race: All the races in the DataFrame.
         """
-        return self._parser.parse_races(self._df, is_female=self._is_female, url=self._url)
+        return self._parser.parse_races(self._df, is_female=self.is_female, url=self._url)
 
     @override
     def get_race_by_id(self, race_id: str, *_, **kwargs) -> Race | None:
         race_row = self._df.iloc[int(race_id) - 1]
-        return self._parser.parse_race(race_row, is_female=self._is_female, url=self._url)
+        return self._parser.parse_race(race_row, is_female=self.is_female, url=self._url)
 
     @override
     def get_race_by_url(self, *_, race_id: str, **kwargs) -> Race | None:

@@ -132,7 +132,7 @@ class LGTClient(Client, source=Datasource.LGT):
                 yield from race_names
                 return
 
-        for id in self.get_race_ids_by_year(year, is_female=self._is_female):
+        for id in self.get_race_ids_by_year(year, is_female=self.is_female):
             if id in self._excluded_ids:
                 pass
 

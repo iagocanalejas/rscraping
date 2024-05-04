@@ -10,7 +10,7 @@ from rscraping.clients import (
     TabularDataClient,
     TrainerasClient,
 )
-from rscraping.data.constants import CATEGORY_VETERAN
+from rscraping.data.constants import CATEGORY_VETERAN, GENDER_FEMALE
 from rscraping.data.models import Datasource
 
 
@@ -23,12 +23,12 @@ class TestClient(unittest.TestCase):
         self.assertTrue(isinstance(Client(source=Datasource.LGT), LGTClient))
 
     def test_client_initialization_with_config(self):
-        self.assertTrue(isinstance(Client(source=Datasource.ACT, is_female=True), ACTClient))
-        self.assertTrue(isinstance(Client(source=Datasource.ARC, is_female=True), ARCClient))
-        self.assertTrue(isinstance(Client(source=Datasource.ABE, is_female=True), ABEClient))
-        self.assertTrue(isinstance(Client(source=Datasource.LGT, is_female=True), LGTClient))
+        self.assertTrue(isinstance(Client(source=Datasource.ACT, gender=GENDER_FEMALE), ACTClient))
+        self.assertTrue(isinstance(Client(source=Datasource.ARC, gender=GENDER_FEMALE), ARCClient))
+        self.assertTrue(isinstance(Client(source=Datasource.ABE, gender=GENDER_FEMALE), ABEClient))
+        self.assertTrue(isinstance(Client(source=Datasource.LGT, gender=GENDER_FEMALE), LGTClient))
 
-        client = Client(source=Datasource.TRAINERAS, is_female=True, category=CATEGORY_VETERAN)
+        client = Client(source=Datasource.TRAINERAS, gender=GENDER_FEMALE, category=CATEGORY_VETERAN)
         self.assertTrue(isinstance(client, TrainerasClient))
 
         with self.assertRaises(ValueError):
@@ -41,7 +41,7 @@ class TestClient(unittest.TestCase):
 
         client = Client(source=Datasource.TABULAR, config=TabularClientConfig(sheet_id="", sheet_name="femenina"))
         self.assertTrue(isinstance(client, TabularDataClient))
-        self.assertTrue(client._is_female)
+        self.assertTrue(client.is_female)
 
     # testing replacement for _load_dataframe
     def _load_dataframe(*_, **__):

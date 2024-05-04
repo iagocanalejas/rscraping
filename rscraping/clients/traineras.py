@@ -5,7 +5,14 @@ from typing import Any, override
 import requests
 from parsel.selector import Selector
 
-from rscraping.data.constants import CATEGORY_SCHOOL, CATEGORY_VETERAN, HTTP_HEADERS
+from rscraping.data.constants import (
+    CATEGORY_SCHOOL,
+    CATEGORY_VETERAN,
+    GENDER_FEMALE,
+    GENDER_MALE,
+    GENDER_MIX,
+    HTTP_HEADERS,
+)
 from rscraping.data.models import Datasource, Race, RaceName
 from rscraping.parsers.html import TrainerasHtmlParser
 
@@ -26,6 +33,10 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
     @override
     def _html_parser(self) -> TrainerasHtmlParser:
         return TrainerasHtmlParser()
+
+    @override
+    def _is_valid_gender(self, gender: str) -> bool:
+        return gender in [GENDER_MALE, GENDER_FEMALE, GENDER_MIX]
 
     @override
     @staticmethod
@@ -52,11 +63,11 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
     def get_club_races_url(self, club_id: str, year: int, **_) -> str:
         param = f"?anyo={year}"
         if self._category == CATEGORY_VETERAN:
-            extra = "VF" if self._is_female else "VM"
+            extra = "VF" if self.is_female else "VM"
         elif self._category == CATEGORY_SCHOOL:
-            extra = "JF" if self._is_female else "JM"
+            extra = "JF" if self.is_female else "JM"
         else:
-            extra = "SF" if self._is_female else "SM"
+            extra = "SF" if self.is_female else "SM"
         param = f"{param}-{extra}"
         return f"https://traineras.es/clubregatas/{club_id}{param}"
 
@@ -84,7 +95,7 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
         """
         url = self.get_flag_url(flag_id)
         content = Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8"))
-        yield from self._html_parser.parse_flag_race_ids(content, is_female=self._is_female)
+        yield from self._html_parser.parse_flag_race_ids(content, gender=self._gender)
 
     @override
     def get_race_by_id(self, race_id: str, **kwargs) -> Race | None:
@@ -112,7 +123,7 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
 
         # the first flag should be an exact match of the given one, so we can use it to get the editions
         content = Selector(requests.get(url=flag_urls[0], headers=HTTP_HEADERS()).content.decode("utf-8"))
-        editions = self._html_parser.parse_flag_editions(content, is_female=self._is_female)
+        editions = self._html_parser.parse_flag_editions(content, gender=self._gender)
         edition = next((e for (y, e) in editions if y == race.year), None)
         if edition:
             race.normalized_names = [(n[0], edition) for n in race.normalized_names]
@@ -123,13 +134,13 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
     def get_race_names_by_year(self, year: int, **_) -> Generator[RaceName, Any, Any]:
         self.validate_year(year)
         for page in self.get_pages(year):
-            yield from self._html_parser.parse_race_names(page, is_female=self._is_female, category=self._category)
+            yield from self._html_parser.parse_race_names(page, gender=self._gender, category=self._category)
 
     @override
     def get_race_ids_by_year(self, year: int, **_) -> Generator[str, Any, Any]:
         self.validate_year(year)
         for page in self.get_pages(year):
-            yield from self._html_parser.parse_race_ids(page, is_female=self._is_female, category=self._category)
+            yield from self._html_parser.parse_race_ids(page, gender=self._gender, category=self._category)
 
     @override
     def get_race_ids_by_club(self, club_id: str, year: int, **kwargs) -> Generator[str, Any, Any]:

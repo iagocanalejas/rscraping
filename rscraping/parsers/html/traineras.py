@@ -126,21 +126,22 @@ class TrainerasHtmlParser(HtmlParser):
     def parse_race_ids(
         self,
         selector: Selector,
-        is_female: bool | None = None,
+        gender: str | None = None,
         category: str | None = None,
         **_,
     ) -> Generator[str, Any, Any]:
-        for race in self.parse_race_names(selector, is_female=is_female, category=category):
+        for race in self.parse_race_names(selector, gender=gender, category=category):
             yield race.race_id
 
     @override
     def parse_race_names(
         self,
         selector: Selector,
-        is_female: bool | None = None,
+        gender: str | None = None,
         category: str | None = None,
         **_,
     ) -> Generator[RaceName, Any, Any]:
+        is_female = gender == GENDER_FEMALE  # TODO:
         if category and category not in [CATEGORY_ABSOLUT, CATEGORY_VETERAN, CATEGORY_SCHOOL]:
             raise ValueError(f"invalid {category=}")
 
@@ -154,7 +155,8 @@ class TrainerasHtmlParser(HtmlParser):
             name = " ".join(n for n in name.split() if n != ttype)
             yield RaceName(race_id=row.xpath("//*/td[1]/a/@href").get("").split("/")[-1], name=name)
 
-    def parse_flag_race_ids(self, selector: Selector, is_female: bool) -> Generator[str, Any, Any]:
+    def parse_flag_race_ids(self, selector: Selector, gender: str) -> Generator[str, Any, Any]:
+        is_female = gender == GENDER_FEMALE  # TODO:
         rows = selector.xpath(f"/html/body/main/div/div/div/div[{2 if is_female else 1}]/div/table/tr").getall()
         return (Selector(row).xpath("//*/td[3]/a/@href").get("").split("/")[-1] for row in rows[1:])
 
@@ -176,7 +178,8 @@ class TrainerasHtmlParser(HtmlParser):
     def parse_searched_flag_urls(self, selector: Selector) -> list[str]:
         return selector.xpath("/html/body/div[1]/div[2]/div/div/div[*]/div/div/div[2]/h5/a/@href").getall()
 
-    def parse_flag_editions(self, selector: Selector, is_female: bool) -> Generator[tuple[int, int], Any, Any]:
+    def parse_flag_editions(self, selector: Selector, gender: str) -> Generator[tuple[int, int], Any, Any]:
+        is_female = gender == GENDER_FEMALE  # TODO:
         table = selector.xpath(f"/html/body/main/div/div/div/div[{2 if is_female else 1}]/div/table").get(None)
         if table:
             for row in Selector(table).xpath("//*/tr").getall()[1:]:
