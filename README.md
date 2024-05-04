@@ -44,17 +44,6 @@ python scripts/downloadimages.py <rower_id> <club_name> <options>
 python downloadimages.py 2914 'PUEBLA' --year=2019 --output=out
 ```
 
-## Parse Image
-
-Tries to parse an Inforemo image to retrieve the race data and participants.
-
-```sh
-python scripts/parseimage.py <datasource> <path> <options>
-    # --header=<int>: Indicates the ammount of the image used for the header (default = 3) representing 1/3.
-    # --save=<bool>: Saves the output to a csv file.
-    # --debug: Plot the image processing steps and dataframes transformations done.
-```
-
 ## Lemmatize
 
 Create a list of lemmas for the given phrase.

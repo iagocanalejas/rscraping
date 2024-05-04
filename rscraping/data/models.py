@@ -16,16 +16,11 @@ class Datasource(StrEnum):
     ARC = auto()
     ABE = auto()
     TRAINERAS = auto()
-    INFOREMO = auto()
     TABULAR = auto()
 
     @classmethod
     def has_value(cls, value: str) -> bool:
         return value is not None and value.lower() in [d for d in cls]
-
-    @classmethod
-    def is_OCR(cls, value: str) -> bool:
-        return value is not None and value.lower() in [cls.INFOREMO]
 
     @classmethod
     def _missing_(cls, value) -> "Datasource | None":

@@ -1,6 +1,5 @@
 from ._parser import DataFrameParser as DataFrameParser
 from ._protocol import DataFrameParserProtocol as DataFrameParserProtocol
-from .inforemo import InforemoDataFrameParser as InforemoDataFrameParser
 from .tabular import (
     TabularDataFrameParser as TabularDataFrameParser,
     COLUMN_CLUB as COLUMN_CLUB,
