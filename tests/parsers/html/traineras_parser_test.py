@@ -12,7 +12,7 @@ from rscraping.data.constants import (
     RACE_TIME_TRIAL,
     RACE_TRAINERA,
 )
-from rscraping.data.models import Datasource, Participant, Race, RaceName
+from rscraping.data.models import Club, Datasource, Participant, Race, RaceName
 from rscraping.parsers.html.traineras import MultiRaceException, TrainerasHtmlParser
 
 
@@ -133,6 +133,11 @@ class TestTrainerasParser(unittest.TestCase):
         with open(os.path.join(self.fixtures, "traineras_rower.html")) as file:
             ids = self.parser.parse_rower_race_ids(Selector(file.read()))
         self.assertEqual(list(ids), ["732", "3041", "1981", "733", "570", "516", "3309"])
+
+    def test_parse_club_details(self):
+        with open(os.path.join(self.fixtures, "traineras_club_details.html")) as file:
+            club = self.parser.parse_club_details(Selector(file.read()))
+        self.assertEqual(club, self._CLUB)
 
     def test_parse_search_flags(self):
         with open(os.path.join(self.fixtures, "traineras_search_flags.html")) as file:
@@ -530,3 +535,5 @@ class TestTrainerasParser(unittest.TestCase):
     _FEMALE_RACE_NAMES = [
         RaceName(race_id="5456", name="MEMORIAL PEPE O RUSO"),
     ]
+
+    _CLUB = Club(name="ZUMAIA A.E.", normalized_name="ZUMAIA", datasource="traineras", founding_year="1975")

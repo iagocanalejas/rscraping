@@ -129,3 +129,11 @@ class Participant:
 
         participant = Participant(**values)
         return participant
+
+
+@dataclass
+class Club:
+    name: str
+    normalized_name: str
+    datasource: str
+    founding_year: str | None

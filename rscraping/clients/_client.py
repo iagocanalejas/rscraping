@@ -60,7 +60,7 @@ class Client(ClientProtocol):
         return self.get_race_by_url(url, race_id=race_id, **kwargs)
 
     @override
-    def get_race_by_url(self, url: str, race_id: str, **kwargs):
+    def get_race_by_url(self, url: str, race_id: str, **kwargs) -> Race | None:
         self.validate_url(url)
         race = self._html_parser.parse_race(
             selector=Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8")),

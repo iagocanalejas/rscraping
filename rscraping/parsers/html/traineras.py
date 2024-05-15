@@ -18,7 +18,7 @@ from rscraping.data.constants import (
     RACE_TIME_TRIAL,
     RACE_TRAINERA,
 )
-from rscraping.data.models import Datasource, Participant, Race, RaceName
+from rscraping.data.models import Club, Datasource, Participant, Race, RaceName
 from rscraping.data.normalization import (
     find_league,
     find_race_sponsor,
@@ -174,6 +174,23 @@ class TrainerasHtmlParser(HtmlParser):
             Selector(r).xpath("//*/td/a/@href").get("").split("/")[-1]
             for r in rows
             if year in selector.xpath("//*/td[2]/text()").get("")
+        )
+
+    def parse_club_details(self, selector: Selector, **_) -> Club | None:
+        name = whitespaces_clean(selector.xpath("/html/body/main/section[1]/div/div[2]/h1/text()").get("").upper())
+        if not name:
+            return None
+
+        year = selector.xpath("/html/body/main/section[1]/div/div[2]/div[1]/div[1]/span/text()").get("")
+        year = whitespaces_clean(year)
+        if not year.isdigit():
+            year = None
+
+        return Club(
+            name=name,
+            normalized_name=normalize_club_name(name),
+            datasource=self.DATASOURCE.value,
+            founding_year=year,
         )
 
     def parse_searched_flag_urls(self, selector: Selector) -> list[str]:

@@ -14,7 +14,7 @@ from rscraping.data.constants import (
     GENDER_MIX,
     HTTP_HEADERS,
 )
-from rscraping.data.models import Datasource, Race, RaceName
+from rscraping.data.models import Club, Datasource, Race, RaceName
 from rscraping.parsers.html import TrainerasHtmlParser
 
 from ._client import Client
@@ -161,6 +161,10 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
         """
         content = requests.get(url=self.get_rower_url(rower_id), headers=HTTP_HEADERS()).content.decode("utf-8")
         yield from self._html_parser.parse_rower_race_ids(Selector(content), year=year)
+
+    def get_club_details_by_url(self, url: str, **kwargs) -> Club | None:
+        selector = Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8"))
+        return self._html_parser.parse_club_details(selector, **kwargs)
 
     def get_pages(self, year: int) -> Generator[Selector, Any, Any]:
         """
