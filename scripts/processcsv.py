@@ -5,10 +5,7 @@ import logging
 import os
 import sys
 
-from rscraping.clients import Client, TabularClientConfig, TabularDataClient
-from rscraping.data.functions import save_csv, sys_print_items
-from rscraping.data.models import Datasource
-
+sys.path[0] = os.path.join(os.path.dirname(__file__), "..")
 logger = logging.getLogger(__name__)
 
 
@@ -57,6 +54,10 @@ def main(
 
 
 if __name__ == "__main__":
+    from rscraping.clients import Client, TabularClientConfig, TabularDataClient
+    from rscraping.data.functions import save_csv, sys_print_items
+    from rscraping.data.models import Datasource
+
     args = _parse_arguments()
     logger.info(f"{os.path.basename(__file__)}:: args -> {args.__dict__}")
 

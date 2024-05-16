@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
-
 import argparse
 import logging
 import os
+import sys
 
-from rscraping import find_race
-from rscraping.data.functions import save_csv, sys_print_items
-from rscraping.data.models import Datasource
-
+sys.path[0] = os.path.join(os.path.dirname(__file__), "..")
 logger = logging.getLogger(__name__)
 
 
@@ -48,6 +45,10 @@ def main(race_id: str, datasource: str, is_female: bool, save: bool, table: int 
 
 
 if __name__ == "__main__":
+    from rscraping import find_race
+    from rscraping.data.functions import save_csv, sys_print_items
+    from rscraping.data.models import Datasource
+
     args = _parse_arguments()
     logger.info(f"{os.path.basename(__file__)}:: args -> {args.__dict__}")
 

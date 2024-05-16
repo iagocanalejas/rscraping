@@ -3,10 +3,9 @@
 import argparse
 import logging
 import os
+import sys
 
-from rscraping import lemmatize
-from rscraping.data.functions import sys_print_items
-
+sys.path[0] = os.path.join(os.path.dirname(__file__), "..")
 logger = logging.getLogger(__name__)
 
 
@@ -21,6 +20,9 @@ def main(phrase: str):
 
 
 if __name__ == "__main__":
+    from rscraping import lemmatize
+    from rscraping.data.functions import sys_print_items
+
     args = _parse_arguments()
     logger.info(f"{os.path.basename(__file__)}:: args -> {args.__dict__}")
 

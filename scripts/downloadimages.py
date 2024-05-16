@@ -3,18 +3,15 @@
 import argparse
 import logging
 import os
+import sys
 import time
 
 import requests
 from parsel.selector import Selector
 
 from pyutils.strings import find_date
-from rscraping.clients import Client
-from rscraping.clients.traineras import TrainerasClient
-from rscraping.data.constants import HTTP_HEADERS
-from rscraping.data.models import Datasource
-from rscraping.parsers.html.traineras import TrainerasHtmlParser
 
+sys.path[0] = os.path.join(os.path.dirname(__file__), "..")
 logger = logging.getLogger(__name__)
 
 
@@ -64,6 +61,12 @@ def _parse_arguments():
 
 
 if __name__ == "__main__":
+    from rscraping.clients import Client
+    from rscraping.clients.traineras import TrainerasClient
+    from rscraping.data.constants import HTTP_HEADERS
+    from rscraping.data.models import Datasource
+    from rscraping.parsers.html.traineras import TrainerasHtmlParser
+
     args = _parse_arguments()
     logger.info(f"{os.path.basename(__file__)}:: args -> {args.__dict__}")
 
