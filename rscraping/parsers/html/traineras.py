@@ -1,7 +1,7 @@
 import logging
 import os
 from collections.abc import Generator
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any, override
 
 from parsel.selector import Selector
@@ -49,7 +49,6 @@ class TrainerasHtmlParser(HtmlParser):
     _FEMALE = ["SF", "VF", "JF", "F"]
     _VETERAN = ["VF", "VM"]
     _SCHOOL = ["M", "JM", "JF", "CM", "CF"]
-    _FILTERS = ["MEMORIAL", "CONTRARRELOJ", "DESCENSO", "ASCENSO", "CAMPEONATO", "TERESA HERRERA", "CONCHA"]
 
     @override
     def parse_race(self, selector: Selector, *, race_id: str, table: int | None = None, **_) -> Race | None:
@@ -84,7 +83,7 @@ class TrainerasHtmlParser(HtmlParser):
 
         race = Race(
             name=name,
-            normalized_names=[(self._normalize_race_name(normalize_race_name(name), name), None)],
+            normalized_names=[(self._normalize_race_name(normalize_race_name(name), name, t_date), None)],
             date=t_date.strftime("%d/%m/%Y"),
             type=ttype,
             day=self._clean_day(table, name),
@@ -280,14 +279,14 @@ class TrainerasHtmlParser(HtmlParser):
         return int(part.replace(" metros", "")) if part is not None else None
 
     def get_laps(self, participant: Selector) -> list[str]:
-        laps = [e for e in participant.xpath("//*/td/text()").getall() if ":" in e]
+        laps = [e for e in participant.xpath("//*/td/text()").getall() if any(c in e for c in [":", "."])]
         return [t.strftime("%M:%S.%f") for t in [normalize_lap_time(e) for e in laps if e] if t is not None]
 
     def is_disqualified(self, participant: Selector) -> bool:
         # race_id=5360|5535
         # try to find the "Desc." text in the final crono
         laps = participant.xpath("//*/td/text()").getall()[2:-4]
-        return any("Desc." in lap or "FR" in lap for lap in laps)
+        return any(w in lap for w in ["Desc.", "FR", "Ret."] for lap in laps)
 
     def get_series(self, participant: Selector) -> int:
         series = participant.xpath("//*/td[4]/text()").get()
@@ -354,9 +353,12 @@ class TrainerasHtmlParser(HtmlParser):
         return path
 
     @staticmethod
-    def _normalize_race_name(name: str, original_name: str) -> str:
+    def _normalize_race_name(name: str, original_name: str, t_date: date) -> str:
         if all(n in name for n in ["ILLA", "SAMERTOLAMEU"]) and "FANDICOSTA" in original_name:
             # HACK: this is a weird flag case in witch Meira restarted the edition for his 'B' team.
             return "BANDERA ILLA DO SAMERTOLAMEU - FANDICOSTA"
+
+        if all(n in name for n in ["TERESA", "HERRERA"]):
+            return "TROFEO TERESA HERRERA" if t_date.isoweekday() == 7 else "TROFEO TERESA HERRERA (CLASIFICATORIA)"
 
         return name

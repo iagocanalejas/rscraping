@@ -28,7 +28,7 @@ def normalize_lap_time(value: str) -> time | None:
         # try to fix '2102:48' | '25:2257' page errors
         if len(parts[0]) == 3:
             # try to fix '028:24' page errors
-            parts[0] = "0" + parts[0]
+            parts[0] = parts[0][1:]
         if len(parts[1]) == 3:
             # try to fix '00:009' page errors
             parts[1] = parts[1][:-1]
