@@ -14,27 +14,23 @@ def normalize_lap_time(value: str) -> time | None:
     4. Try to fix '00:009'
     """
     if value.startswith(":"):
-        # try to fix ':18,62' | ':45' page errors
+        # try to fix ':18,62' | ':45'
         value = "00" + value
     parts = re.findall(r"\d+", value)
     if all(p == "00" for p in parts):
         return None
-    if len(parts) == 1:
-        # try to fix '20.55.07' page errors
-        dot_parts = value.split(".")
-        if len(dot_parts) == 3:
-            return datetime.strptime(f"{dot_parts[0]}:{dot_parts[1]}.{dot_parts[2]}", "%M:%S.%f").time()
     if len(parts) == 2:
-        # try to fix '2102:48' | '25:2257' page errors
         if len(parts[0]) == 3:
-            # try to fix '028:24' page errors
+            # try to fix '028:24'
             parts[0] = parts[0][1:]
         if len(parts[1]) == 3:
-            # try to fix '00:009' page errors
+            # try to fix '00:009'
             parts[1] = parts[1][:-1]
         if len(parts[0]) == 4:
+            # try to fix '2102:48'
             return datetime.strptime(f"{parts[0][0:2]}:{parts[0][2:]},{parts[1]}", "%M:%S,%f").time()
         if len(parts[1]) == 4:
+            # try to fix '25:2257'
             return datetime.strptime(f"{parts[0]}:{parts[1][0:2]},{parts[1][2:]}", "%M:%S,%f").time()
         return datetime.strptime(f"{parts[0]}:{parts[1]}", "%M:%S").time()
     if len(parts) == 3:

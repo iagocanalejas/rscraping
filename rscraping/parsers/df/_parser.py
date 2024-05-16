@@ -13,7 +13,7 @@ class DataFrameParser(DataFrameParserProtocol, ABC):
     DATASOURCE: Datasource
     _registry = {}
 
-    def __init_subclass__(cls, **kwargs):
+    def __init_subclass__(cls, **kwargs):  # pragma: no cover
         source = kwargs.pop("source")
         super().__init_subclass__(**kwargs)
         cls._registry[source] = cls
