@@ -63,6 +63,7 @@ class Race:
     participants: list["Participant"]
 
     # not available in all the datasource
+    race_notes: str | None = None
     race_laps: int | None = None
     race_lanes: int | None = None
     cancelled: bool = False

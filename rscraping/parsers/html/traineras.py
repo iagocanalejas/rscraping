@@ -79,7 +79,6 @@ class TrainerasHtmlParser(HtmlParser):
         participants = self.get_participants(selector, table)
         ttype = self.get_type(participants)
         ttype = ttype if not should_be_time_trial(name, t_date) else RACE_TIME_TRIAL
-        category = self.get_category(selector)
 
         race = Race(
             name=name,
@@ -99,9 +98,11 @@ class TrainerasHtmlParser(HtmlParser):
             cancelled=self.is_cancelled(participants),
             race_laps=self.get_race_laps(selector, table),
             race_lanes=self.get_race_lanes(participants),
+            race_notes=self.get_race_notes(selector),
             participants=[],
         )
 
+        category = self.get_category(selector)
         for row in participants:
             race.participants.append(
                 Participant(
@@ -291,6 +292,10 @@ class TrainerasHtmlParser(HtmlParser):
     def get_series(self, participant: Selector) -> int:
         series = participant.xpath("//*/td[4]/text()").get()
         return int(series) if series else 0
+
+    def get_race_notes(self, selector: Selector) -> str | None:
+        notes = selector.xpath("/html/body/div[1]/main/div[2]/div[2]/div/text()").get(None)
+        return whitespaces_clean(notes) if notes else None
 
     ####################################################
     #                     PRIVATE                      #
