@@ -76,7 +76,6 @@ class TestLGTParser(unittest.TestCase):
             handicap=None,
             participant="MUROS",
             race=_RACE,
-            disqualified=False,
         ),
         Participant(
             gender=GENDER_MALE,
@@ -89,7 +88,6 @@ class TestLGTParser(unittest.TestCase):
             handicap=None,
             participant="CABO DA CRUZ",
             race=_RACE,
-            disqualified=False,
         ),
         Participant(
             gender=GENDER_MALE,
@@ -102,7 +100,6 @@ class TestLGTParser(unittest.TestCase):
             handicap=None,
             participant="TIRÁN",
             race=_RACE,
-            disqualified=False,
         ),
     ]
     _RACE_NAMES = [

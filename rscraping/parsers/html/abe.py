@@ -82,7 +82,6 @@ class ABEHtmlParser(HtmlParser):
                     handicap=self.get_handicap(row),
                     participant=normalize_club_name(self.get_club_name(row)),
                     race=race,
-                    disqualified=False,
                 )
             )
 

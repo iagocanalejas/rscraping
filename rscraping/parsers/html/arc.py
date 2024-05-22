@@ -17,7 +17,7 @@ from rscraping.data.constants import (
     RACE_TIME_TRIAL,
     RACE_TRAINERA,
 )
-from rscraping.data.models import Datasource, Participant, Race, RaceName
+from rscraping.data.models import Datasource, Participant, Penalty, Race, RaceName
 from rscraping.data.normalization.clubs import normalize_club_name
 from rscraping.data.normalization.races import (
     find_race_sponsor,
@@ -77,6 +77,8 @@ class ARCHtmlParser(HtmlParser):
         )
 
         for row in participants:
+            disqualified = self.is_disqualified(selector, row)
+            penalty = Penalty(reason=None, disqualification=disqualified) if disqualified else None
             race.participants.append(
                 Participant(
                     gender=gender,
@@ -89,7 +91,7 @@ class ARCHtmlParser(HtmlParser):
                     handicap=None,
                     participant=normalize_club_name(self.get_club_name(row)),
                     race=race,
-                    disqualified=self.is_disqualified(selector, row),
+                    penalty=penalty,
                 )
             )
 

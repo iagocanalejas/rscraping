@@ -20,8 +20,8 @@ def main(phrase: str):
 
 
 if __name__ == "__main__":
-    from rscraping import lemmatize
     from rscraping.data.functions import sys_print_items
+    from rscraping.data.normalization import lemmatize
 
     args = _parse_arguments()
     logger.info(f"{os.path.basename(__file__)}:: args -> {args.__dict__}")

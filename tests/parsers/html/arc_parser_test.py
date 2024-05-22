@@ -73,7 +73,6 @@ class TestARCParser(unittest.TestCase):
             handicap=None,
             participant="RASPAS",
             race=_RACE,
-            disqualified=False,
         ),
         Participant(
             gender=GENDER_MALE,
@@ -86,7 +85,6 @@ class TestARCParser(unittest.TestCase):
             handicap=None,
             participant="MUNDAKA",
             race=_RACE,
-            disqualified=False,
         ),
     ]
     _RACE_NAMES = [

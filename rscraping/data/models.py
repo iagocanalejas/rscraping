@@ -39,6 +39,35 @@ class Datasource(StrEnum):
         return self.__str__()
 
 
+PenaltyDict = dict[str, tuple[str | None, "Penalty | None"]]
+
+
+@dataclass
+class Penalty:
+    disqualification: bool
+    reason: str | None
+    penalty: int = 0
+
+    @classmethod
+    def merge(
+        cls,
+        penalties: PenaltyDict,
+        club_name: str | None = None,
+        time: str | None = None,
+        penalty: "Penalty | None" = None,
+    ) -> PenaltyDict:
+        if not club_name and len(penalties.keys()) == 1:
+            club_name = list(penalties.keys())[0]
+        if not club_name:
+            return penalties
+
+        if club_name in penalties:
+            penalties[club_name] = (time or penalties[club_name][0], penalty or penalties[club_name][1])
+        else:
+            penalties[club_name] = (time, penalty)
+        return penalties
+
+
 @dataclass
 class Race:
     name: str
@@ -111,7 +140,7 @@ class Participant:
 
     race: Race
 
-    disqualified: bool = False
+    penalty: Penalty | None = None
 
     def __str__(self) -> str:
         return self.to_json()

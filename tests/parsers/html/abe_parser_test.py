@@ -73,7 +73,6 @@ class TestABEParser(unittest.TestCase):
             handicap="00:14.000000",
             participant="FORTUNA",
             race=_RACE,
-            disqualified=False,
         ),
         Participant(
             gender=GENDER_MALE,
@@ -86,7 +85,6 @@ class TestABEParser(unittest.TestCase):
             handicap="00:14.000000",
             participant="PONTEJOS",
             race=_RACE,
-            disqualified=False,
         ),
         Participant(
             gender=GENDER_MALE,
@@ -99,7 +97,6 @@ class TestABEParser(unittest.TestCase):
             handicap=None,
             participant="BADOK 13",
             race=_RACE,
-            disqualified=False,
         ),
     ]
     _RACE_NAMES = [

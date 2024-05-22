@@ -94,7 +94,6 @@ class TestTabularDataParser(unittest.TestCase):
         distance=5556,
         handicap=None,
         participant="PUEBLA",
-        disqualified=False,
         race=_RACE,
     )
 
@@ -192,7 +191,6 @@ class TestTabularDataParser(unittest.TestCase):
             distance=5556,
             handicap=None,
             participant="PUEBLA",
-            disqualified=False,
             race=_RACES[0],
         ),
         Participant(
@@ -205,7 +203,6 @@ class TestTabularDataParser(unittest.TestCase):
             distance=5628,
             handicap=None,
             participant="PUEBLA",
-            disqualified=False,
             race=_RACES[1],
         ),
         Participant(
@@ -218,7 +215,6 @@ class TestTabularDataParser(unittest.TestCase):
             distance=5800,
             handicap=None,
             participant="PUEBLA",
-            disqualified=False,
             race=_RACES[2],
         ),
         Participant(
@@ -231,7 +227,6 @@ class TestTabularDataParser(unittest.TestCase):
             distance=5556,
             handicap=None,
             participant="PUEBLA",
-            disqualified=False,
             race=_RACES[3],
         ),
     ]

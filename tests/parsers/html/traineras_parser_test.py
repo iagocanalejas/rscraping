@@ -189,7 +189,6 @@ class TestTrainerasParser(unittest.TestCase):
             handicap=None,
             participant="ARES",
             race=_RACE,
-            disqualified=False,
         ),
         Participant(
             gender=GENDER_MALE,
@@ -202,7 +201,6 @@ class TestTrainerasParser(unittest.TestCase):
             handicap=None,
             participant="BUEU",
             race=_RACE,
-            disqualified=False,
         ),
     ]
 
@@ -239,7 +237,6 @@ class TestTrainerasParser(unittest.TestCase):
             handicap=None,
             participant="CAMARGO",
             race=_RACE_LABEL,
-            disqualified=False,
         ),
         Participant(
             gender=GENDER_MALE,
@@ -252,7 +249,6 @@ class TestTrainerasParser(unittest.TestCase):
             handicap=None,
             participant="PEDREÑA",
             race=_RACE_LABEL,
-            disqualified=False,
         ),
         Participant(
             gender=GENDER_MALE,
@@ -265,7 +261,6 @@ class TestTrainerasParser(unittest.TestCase):
             handicap=None,
             participant="ASTILLERO",
             race=_RACE_LABEL,
-            disqualified=False,
         ),
     ]
 
@@ -325,7 +320,6 @@ class TestTrainerasParser(unittest.TestCase):
                 handicap=None,
                 participant="CESANTES",
                 race=_RACES_DOUBLE[0],
-                disqualified=False,
             ),
             Participant(
                 gender=GENDER_MALE,
@@ -338,7 +332,6 @@ class TestTrainerasParser(unittest.TestCase):
                 handicap=None,
                 participant="PUEBLA",
                 race=_RACES_DOUBLE[0],
-                disqualified=False,
             ),
         ],
         [
@@ -353,7 +346,6 @@ class TestTrainerasParser(unittest.TestCase):
                 handicap=None,
                 participant="CESANTES",
                 race=_RACES_DOUBLE[1],
-                disqualified=False,
             ),
             Participant(
                 gender=GENDER_MALE,
@@ -366,7 +358,6 @@ class TestTrainerasParser(unittest.TestCase):
                 handicap=None,
                 participant="PUEBLA",
                 race=_RACES_DOUBLE[1],
-                disqualified=False,
             ),
         ],
     ]
@@ -447,7 +438,6 @@ class TestTrainerasParser(unittest.TestCase):
                 handicap=None,
                 participant="MECOS",
                 race=_RACES_TRIPLE[0],
-                disqualified=False,
             ),
             Participant(
                 gender=GENDER_MALE,
@@ -460,7 +450,6 @@ class TestTrainerasParser(unittest.TestCase):
                 handicap=None,
                 participant="PERILLO",
                 race=_RACES_TRIPLE[0],
-                disqualified=False,
             ),
         ],
         [
@@ -475,7 +464,6 @@ class TestTrainerasParser(unittest.TestCase):
                 handicap=None,
                 participant="SAMERTOLAMEU",
                 race=_RACES_TRIPLE[1],
-                disqualified=False,
             ),
             Participant(
                 gender=GENDER_MALE,
@@ -488,7 +476,6 @@ class TestTrainerasParser(unittest.TestCase):
                 handicap=None,
                 participant="AMEGROVE",
                 race=_RACES_TRIPLE[1],
-                disqualified=False,
             ),
         ],
         [
@@ -503,7 +490,6 @@ class TestTrainerasParser(unittest.TestCase):
                 handicap=None,
                 participant="AMEGROVE",
                 race=_RACES_TRIPLE[2],
-                disqualified=False,
             ),
             Participant(
                 gender=GENDER_MALE,
@@ -516,7 +502,6 @@ class TestTrainerasParser(unittest.TestCase):
                 handicap=None,
                 participant="SAMERTOLAMEU",
                 race=_RACES_TRIPLE[2],
-                disqualified=False,
             ),
         ],
     ]

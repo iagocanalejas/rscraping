@@ -105,7 +105,6 @@ class TabularDataFrameParser(DataFrameParserProtocol):
                 handicap=None,
                 participant=normalize_club_name(str(row[COLUMN_CLUB])),
                 race=race,
-                disqualified=False,
             )
         ]
 

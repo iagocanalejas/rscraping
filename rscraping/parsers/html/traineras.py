@@ -18,12 +18,13 @@ from rscraping.data.constants import (
     RACE_TIME_TRIAL,
     RACE_TRAINERA,
 )
-from rscraping.data.models import Club, Datasource, Participant, Race, RaceName
+from rscraping.data.models import Club, Datasource, Participant, Penalty, Race, RaceName
 from rscraping.data.normalization import (
     find_league,
     find_race_sponsor,
     normalize_club_name,
     normalize_lap_time,
+    normalize_penalty,
     normalize_race_name,
     normalize_town,
 )
@@ -79,6 +80,7 @@ class TrainerasHtmlParser(HtmlParser):
         participants = self.get_participants(selector, table)
         ttype = self.get_type(participants)
         ttype = ttype if not should_be_time_trial(name, t_date) else RACE_TIME_TRIAL
+        race_notes = self.get_race_notes(selector)
 
         race = Race(
             name=name,
@@ -98,12 +100,27 @@ class TrainerasHtmlParser(HtmlParser):
             cancelled=self.is_cancelled(participants),
             race_laps=self.get_race_laps(selector, table),
             race_lanes=self.get_race_lanes(participants),
-            race_notes=self.get_race_notes(selector),
+            race_notes=race_notes,
             participants=[],
         )
 
         category = self.get_category(selector)
+        penalties = normalize_penalty(race_notes)
+        if race_notes and not penalties:
+            logging.warning(f"{self.DATASOURCE}: no penalties found for note:\n\t{race_notes}")
+
         for row in participants:
+            laps = self.get_laps(row)
+            time, penalty = penalties.get(normalize_club_name(self.get_club_name(row)), (None, None))
+
+            if time:
+                laps.append(time)
+
+            if penalty:
+                penalty.disqualification = penalty.disqualification or self.is_disqualified(row)
+            elif self.is_disqualified(row):
+                penalty = Penalty(reason=None, disqualification=True)
+
             race.participants.append(
                 Participant(
                     gender=gender,
@@ -111,12 +128,12 @@ class TrainerasHtmlParser(HtmlParser):
                     club_name=self.get_club_name(row),
                     lane=self.get_lane(row) if ttype == RACE_CONVENTIONAL else 1,
                     series=self.get_series(row) if ttype == RACE_CONVENTIONAL else 1,
-                    laps=self.get_laps(row),
+                    laps=laps,
                     distance=distance,
                     handicap=None,
                     participant=normalize_club_name(self.get_club_name(row)),
                     race=race,
-                    disqualified=self.is_disqualified(row),
+                    penalty=penalty,
                 )
             )
 

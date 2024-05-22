@@ -20,7 +20,7 @@ from rscraping.data.constants import (
     SYNONYM_FEMALE,
     SYNONYMS,
 )
-from rscraping.data.models import Datasource, Participant, Race, RaceName
+from rscraping.data.models import Datasource, Participant, Penalty, Race, RaceName
 from rscraping.data.normalization import (
     find_race_sponsor,
     normalize_club_name,
@@ -95,6 +95,8 @@ class LGTHtmlParser(HtmlParser):
         )
 
         for row in participants:
+            disqualified = self.is_disqualified(row)
+            penalty = Penalty(reason=None, disqualification=disqualified) if disqualified else None
             race.participants.append(
                 Participant(
                     gender=gender,
@@ -107,7 +109,7 @@ class LGTHtmlParser(HtmlParser):
                     handicap=None,
                     participant=normalize_club_name(self.get_club_name(row)),
                     race=race,
-                    disqualified=self.is_disqualified(row),
+                    penalty=penalty,
                 )
             )
 
