@@ -100,6 +100,12 @@ class ClientProtocol(Protocol):
         """
         ...
 
+    def get_races_url(self, year: int, **kwargs) -> str:
+        """
+        Return the URL for retrieving races in a specific year.
+        """
+        ...
+
     @staticmethod
     def get_race_details_url(race_id: str, **kwargs) -> str:
         """
@@ -107,12 +113,4 @@ class ClientProtocol(Protocol):
         """
         ...
 
-    @staticmethod
-    def get_races_url(year: int, **kwargs) -> str:
-        """
-        Return the URL for retrieving races in a specific year.
-        """
-        ...
-
-    def _is_valid_gender(self, gender: str) -> bool:
-        ...
+    def _is_valid_gender(self, gender: str) -> bool: ...

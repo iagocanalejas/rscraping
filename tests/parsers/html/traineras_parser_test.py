@@ -94,27 +94,15 @@ class TestTrainerasParser(unittest.TestCase):
         with open(os.path.join(self.fixtures, "traineras_results.html")) as file:
             data = file.read()
 
-        race_names = self.parser.parse_race_names(Selector(data), gender=GENDER_MALE)
-        self.assertEqual(list(race_names), self._MALE_RACE_NAMES)
-
-        race_names = self.parser.parse_race_names(Selector(data), gender=GENDER_MALE, category=CATEGORY_VETERAN)
-        self.assertEqual(list(race_names), self._VETERAN_RACE_NAMES)
-
-        race_names = self.parser.parse_race_names(Selector(data), gender=GENDER_FEMALE)
-        self.assertEqual(list(race_names), self._FEMALE_RACE_NAMES)
+        race_names = self.parser.parse_race_names(Selector(data))
+        self.assertEqual(list(race_names), self._RACE_NAMES)
 
     def test_parse_race_ids(self):
         with open(os.path.join(self.fixtures, "traineras_results.html")) as file:
             data = Selector(file.read())
 
-        ids = self.parser.parse_race_ids(data, gender=GENDER_MALE)
-        self.assertEqual(list(ids), ["5455", "5457", "5458", "5535", "5536"])
-
-        ids = self.parser.parse_race_ids(data, gender=GENDER_MALE, category=CATEGORY_VETERAN)
-        self.assertEqual(list(ids), ["5457", "5536"])
-
-        ids = self.parser.parse_race_ids(data, gender=GENDER_FEMALE)
-        self.assertEqual(list(ids), ["5456"])
+        ids = self.parser.parse_race_ids(data)
+        self.assertEqual(list(ids), ["5455", "5456", "5457", "5458", "5535", "5536"])
 
     def test_parse_flag_race_ids(self):
         with open(os.path.join(self.fixtures, "traineras_flag.html")) as file:
@@ -506,19 +494,13 @@ class TestTrainerasParser(unittest.TestCase):
         ],
     ]
 
-    _MALE_RACE_NAMES = [
+    _RACE_NAMES = [
         RaceName(race_id="5455", name="MEMORIAL PEPE O RUSO"),
+        RaceName(race_id="5456", name="MEMORIAL PEPE O RUSO"),
         RaceName(race_id="5457", name="MEMORIAL PEPE O RUSO"),
         RaceName(race_id="5458", name="MEMORIAL PEPE O RUSO"),
         RaceName(race_id="5535", name="MEMORIAL AURORA TRUEBA"),
         RaceName(race_id="5536", name="MEMORIAL AURORA TRUEBA"),
-    ]
-    _VETERAN_RACE_NAMES = [
-        RaceName(race_id="5457", name="MEMORIAL PEPE O RUSO"),
-        RaceName(race_id="5536", name="MEMORIAL AURORA TRUEBA"),
-    ]
-    _FEMALE_RACE_NAMES = [
-        RaceName(race_id="5456", name="MEMORIAL PEPE O RUSO"),
     ]
 
     _CLUB = Club(name="ZUMAIA A.E.", normalized_name="ZUMAIA", datasource="traineras", founding_year="1975")

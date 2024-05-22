@@ -31,6 +31,15 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
         super().__init__(**kwargs)
 
     @property
+    def tag(self) -> str:
+        if self._category == CATEGORY_VETERAN:
+            return "VF" if self.is_female else "VM"
+        elif self._category == CATEGORY_SCHOOL:
+            return "JF" if self.is_female else "JM"
+        else:
+            return "SF" if self.is_female else "SM"
+
+    @property
     @override
     def _html_parser(self) -> TrainerasHtmlParser:
         return TrainerasHtmlParser()
@@ -45,9 +54,8 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
         return f"https://traineras.es/clasificaciones/{race_id}"
 
     @override
-    @staticmethod
-    def get_races_url(year: int, page: int = 1, **_) -> str:
-        return f"https://traineras.es/regatas/{year}?page={page}"
+    def get_races_url(self, year: int, page: int = 1, **_) -> str:
+        return f"https://traineras.es/regatas/{year}?page={page}&cat={self.tag}"
 
     @staticmethod
     def get_search_races_url(name: str) -> str:
@@ -62,15 +70,7 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
         return f"https://traineras.es/personas/{rower_id}"
 
     def get_club_races_url(self, club_id: str, year: int, **_) -> str:
-        param = f"?anyo={year}"
-        if self._category == CATEGORY_VETERAN:
-            extra = "VF" if self.is_female else "VM"
-        elif self._category == CATEGORY_SCHOOL:
-            extra = "JF" if self.is_female else "JM"
-        else:
-            extra = "SF" if self.is_female else "SM"
-        param = f"{param}-{extra}"
-        return f"https://traineras.es/clubregatas/{club_id}{param}"
+        return f"https://traineras.es/clubregatas/{club_id}?anyo={year}-{self.tag}"
 
     @override
     def validate_url(self, url: str):
@@ -135,13 +135,13 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
     def get_race_names_by_year(self, year: int, **_) -> Generator[RaceName, Any, Any]:
         self.validate_year(year)
         for page in self.get_pages(year):
-            yield from self._html_parser.parse_race_names(page, gender=self._gender, category=self._category)
+            yield from self._html_parser.parse_race_names(page)
 
     @override
     def get_race_ids_by_year(self, year: int, **_) -> Generator[str, Any, Any]:
         self.validate_year(year)
         for page in self.get_pages(year):
-            yield from self._html_parser.parse_race_ids(page, gender=self._gender, category=self._category)
+            yield from self._html_parser.parse_race_ids(page)
 
     @override
     def get_race_ids_by_club(self, club_id: str, year: int, **kwargs) -> Generator[str, Any, Any]:

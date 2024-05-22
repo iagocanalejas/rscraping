@@ -23,8 +23,7 @@ class ARCClient(Client, source=Datasource.ARC):
         return f"https://www.{host}.com/es/regata/{race_id}/unknown"
 
     @override
-    @staticmethod
-    def get_races_url(year: int, *, is_female: bool, **_) -> str:
+    def get_races_url(self, year: int, *, is_female: bool, **_) -> str:
         host = "ligaete" if is_female else "liga-arc"
         return f"https://www.{host}.com/es/calendario/{year}"
 

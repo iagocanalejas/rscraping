@@ -103,8 +103,7 @@ class Client(ClientProtocol):
         raise NotImplementedError
 
     @override
-    @staticmethod
-    def get_races_url(year: int, **kwargs) -> str:
+    def get_races_url(self, year: int, **kwargs) -> str:
         raise NotImplementedError
 
     @override

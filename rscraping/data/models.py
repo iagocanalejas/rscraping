@@ -14,7 +14,6 @@ class Datasource(StrEnum):
     ACT = auto()
     LGT = auto()
     ARC = auto()
-    ABE = auto()
     TRAINERAS = auto()
     TABULAR = auto()
 

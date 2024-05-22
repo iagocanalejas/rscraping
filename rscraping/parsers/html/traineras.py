@@ -140,34 +140,14 @@ class TrainerasHtmlParser(HtmlParser):
         return race
 
     @override
-    def parse_race_ids(
-        self,
-        selector: Selector,
-        gender: str | None = None,
-        category: str | None = None,
-        **_,
-    ) -> Generator[str, Any, Any]:
-        for race in self.parse_race_names(selector, gender=gender, category=category):
-            yield race.race_id
+    def parse_race_ids(self, selector: Selector, **_) -> Generator[str, Any, Any]:
+        return (race.race_id for race in self.parse_race_names(selector))
 
     @override
-    def parse_race_names(
-        self,
-        selector: Selector,
-        gender: str | None = None,
-        category: str | None = None,
-        **_,
-    ) -> Generator[RaceName, Any, Any]:
-        is_female = gender == GENDER_FEMALE  # TODO:
-        if category and category not in [CATEGORY_ABSOLUT, CATEGORY_VETERAN, CATEGORY_SCHOOL]:
-            raise ValueError(f"invalid {category=}")
-
+    def parse_race_names(self, selector: Selector, **_) -> Generator[RaceName, Any, Any]:
         rows = [Selector(r) for r in selector.xpath("/html/body/div[1]/div[2]/table/tbody/tr").getall()]
         for row in rows:
             ttype = row.xpath("//*/td[2]/text()").get("")
-            if not self._has_gender(is_female, ttype) or not self._has_type(category, ttype):
-                continue
-
             name = whitespaces_clean(row.xpath("//*/td[1]/a/text()").get("").upper())
             name = " ".join(n for n in name.split() if n != ttype)
             yield RaceName(race_id=row.xpath("//*/td[1]/a/@href").get("").split("/")[-1], name=name)
