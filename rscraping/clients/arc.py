@@ -17,8 +17,7 @@ class ARCClient(Client, source=Datasource.ARC):
         return ARCHtmlParser()
 
     @override
-    @staticmethod
-    def get_race_details_url(race_id: str, *, is_female: bool, **_) -> str:
+    def get_race_details_url(self, race_id: str, *, is_female: bool, **_) -> str:
         host = "ligaete" if is_female else "liga-arc"
         return f"https://www.{host}.com/es/regata/{race_id}/unknown"
 

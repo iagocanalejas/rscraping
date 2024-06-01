@@ -32,6 +32,8 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
 
     @property
     def tag(self) -> str:
+        if self._gender == GENDER_MIX:
+            return "M"
         if self._category == CATEGORY_VETERAN:
             return "VF" if self.is_female else "VM"
         elif self._category == CATEGORY_SCHOOL:
@@ -49,8 +51,7 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
         return gender in [GENDER_MALE, GENDER_FEMALE, GENDER_MIX]
 
     @override
-    @staticmethod
-    def get_race_details_url(race_id: str, **_) -> str:
+    def get_race_details_url(self, race_id: str, **_) -> str:
         return f"https://traineras.es/clasificaciones/{race_id}"
 
     @override
@@ -134,13 +135,13 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
     @override
     def get_race_names_by_year(self, year: int, **_) -> Generator[RaceName, Any, Any]:
         self.validate_year(year)
-        for page in self.get_pages(year):
+        for page in self._get_pages(year):
             yield from self._html_parser.parse_race_names(page)
 
     @override
     def get_race_ids_by_year(self, year: int, **_) -> Generator[str, Any, Any]:
         self.validate_year(year)
-        for page in self.get_pages(year):
+        for page in self._get_pages(year):
             yield from self._html_parser.parse_race_ids(page)
 
     @override
@@ -166,7 +167,7 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
         selector = Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8"))
         return self._html_parser.parse_club_details(selector, **kwargs)
 
-    def get_pages(self, year: int) -> Generator[Selector, Any, Any]:
+    def _get_pages(self, year: int) -> Generator[Selector, Any, Any]:
         """
         Generate Selector objects for each page of races in a specific year.
 

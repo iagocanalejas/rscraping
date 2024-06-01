@@ -76,6 +76,17 @@ _TEMPLATES = {
 
 
 def normalize_penalty(text: str | None) -> PenaltyDict:
+    """
+    Retrieve a dict of penalties in the format {club_name: (time, penalty)} from a text.
+
+    1. Normalize the text by replacing known common patters.
+    2. Split the text by "." as penalties use to be separated by a colon.
+    3. For each note, check if it is a time note or a penalty note.
+    4. If it is a time note, add the time to the penalties dict.
+    5. If it is a penalty note, check if it matches any of the known penalty templates.
+    6. If it matches, retrieve the club name and add the penalty to the penalties dict.
+    """
+
     penalties: PenaltyDict = {}
     if not text:
         return penalties
@@ -98,7 +109,7 @@ def normalize_penalty(text: str | None) -> PenaltyDict:
             # note that provides a club time fon an existing penalty
             time = find_time(note)
             if time:
-                penalties = Penalty.merge(penalties, time=time.strftime("%M:%S.%f"))
+                penalties = Penalty.push(penalties, time=time.strftime("%M:%S.%f"))
             continue
 
         note_lemmas = lemmatize(remove_parenthesis(note))
@@ -108,7 +119,7 @@ def normalize_penalty(text: str | None) -> PenaltyDict:
                     continue
                 for name in _retrieve_club_names(note, penalty_str):
                     penalty = Penalty(reason=penalty_str, disqualification=True)
-                    penalties = Penalty.merge(penalties, name, penalty=penalty)
+                    penalties = Penalty.push(penalties, name, penalty=penalty)
                 break
 
     return penalties
@@ -135,7 +146,7 @@ def _process_time_note(note: str, penalties: PenaltyDict) -> tuple[PenaltyDict, 
 
     club_name, time = normalize_club_name(parts[0].upper()), find_time(parts[1])
     if time:
-        penalties = Penalty.merge(penalties, club_name, time.strftime("%M:%S.%f"))
+        penalties = Penalty.push(penalties, club_name, time.strftime("%M:%S.%f"))
 
     return penalties, new_note
 

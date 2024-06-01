@@ -15,6 +15,7 @@ class ClientProtocol(Protocol):
 
     @property
     def _html_parser(self) -> HtmlParser: ...
+    def _is_valid_gender(self, gender: str) -> bool: ...
 
     def validate_year(self, year: int):
         """
@@ -106,11 +107,8 @@ class ClientProtocol(Protocol):
         """
         ...
 
-    @staticmethod
-    def get_race_details_url(race_id: str, **kwargs) -> str:
+    def get_race_details_url(self, race_id: str, **kwargs) -> str:
         """
         Return the URL for retrieving details of a specific race.
         """
         ...
-
-    def _is_valid_gender(self, gender: str) -> bool: ...

@@ -79,8 +79,7 @@ class LGTClient(Client, source=Datasource.LGT):
         return LGTHtmlParser()
 
     @override
-    @staticmethod
-    def get_race_details_url(race_id: str, **_) -> str:
+    def get_race_details_url(self, race_id: str, **_) -> str:
         return f"https://www.ligalgt.com/principal/regata/{race_id}"
 
     @staticmethod
@@ -133,9 +132,6 @@ class LGTClient(Client, source=Datasource.LGT):
                 return
 
         for id in self.get_race_ids_by_year(year, is_female=self.is_female):
-            if id in self._excluded_ids:
-                pass
-
             url = self.get_race_details_url(id)
             selector = Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8"))
             if self._html_parser.is_valid_race(selector):
@@ -171,7 +167,7 @@ class LGTClient(Client, source=Datasource.LGT):
         self.validate_year(year)
         since = self.MALE_START
 
-        # asume 30 races per year for lower bound and 50 for the upper bound
+        # asume 20 races per year for lower bound and 50 for the upper bound
         left, right = (year - since) * 20, (today - since + 1) * 50
         while left <= right:
             mid = left + (right - left) // 2
@@ -212,7 +208,6 @@ class LGTClient(Client, source=Datasource.LGT):
             return self._RACE_YEARS[race_id]
 
         url = self.get_race_details_url(race_id)
-
         selector = Selector(requests.get(url=url, headers=HTTP_HEADERS()).text)
         if not self._html_parser.is_valid_race(selector):
             self._RACE_YEARS[race_id] = None

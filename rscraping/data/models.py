@@ -48,7 +48,7 @@ class Penalty:
     penalty: int = 0
 
     @classmethod
-    def merge(
+    def push(
         cls,
         penalties: PenaltyDict,
         club_name: str | None = None,

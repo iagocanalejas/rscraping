@@ -20,19 +20,6 @@ class Client(ClientProtocol):
     FEMALE_START: int
     MALE_START: int
 
-    @property
-    @override
-    def _html_parser(self) -> HtmlParser:
-        raise NotImplementedError
-
-    @override
-    def _is_valid_gender(self, gender: str) -> bool:
-        return gender in [GENDER_MALE, GENDER_FEMALE]
-
-    @property
-    def is_female(self) -> bool:
-        return self._gender == GENDER_FEMALE
-
     def __init_subclass__(cls, **kwargs):
         source = kwargs.pop("source", None)
         super().__init_subclass__(**kwargs)
@@ -46,6 +33,19 @@ class Client(ClientProtocol):
             raise ValueError(f"invalid {gender}")
         final_obj._gender = gender
         return final_obj
+
+    @property
+    @override
+    def _html_parser(self) -> HtmlParser:
+        raise NotImplementedError
+
+    @override
+    def _is_valid_gender(self, gender: str) -> bool:
+        return gender in [GENDER_MALE, GENDER_FEMALE]
+
+    @property
+    def is_female(self) -> bool:
+        return self._gender == GENDER_FEMALE
 
     @override
     def validate_year(self, year: int):
@@ -107,8 +107,7 @@ class Client(ClientProtocol):
         raise NotImplementedError
 
     @override
-    @staticmethod
-    def get_race_details_url(race_id: str, **kwargs) -> str:
+    def get_race_details_url(self, race_id: str, **kwargs) -> str:
         raise NotImplementedError
 
     @override

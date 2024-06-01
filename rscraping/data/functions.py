@@ -3,8 +3,6 @@ import os
 import sys
 from typing import Any
 
-import cv2
-
 from rscraping.data.models import Race
 
 
@@ -38,10 +36,3 @@ def sys_print_items(items: list[Any]):
             sys.stdout.write(",")
     sys.stdout.write("]\n")
     sys.stdout.flush()
-
-
-def draw_bounding_boxes(image, detections, threshold=0.25):
-    for bbox, text, score in detections:
-        if score > threshold:
-            cv2.rectangle(image, tuple(map(int, bbox[0])), tuple(map(int, bbox[2])), (0, 255, 0), 5)
-            cv2.putText(image, text, tuple(map(int, bbox[0])), cv2.FONT_HERSHEY_COMPLEX_SMALL, 0.65, (255, 0, 0), 2)

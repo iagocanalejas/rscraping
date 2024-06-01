@@ -17,8 +17,7 @@ class ACTClient(Client, source=Datasource.ACT):
         return ACTHtmlParser()
 
     @override
-    @staticmethod
-    def get_race_details_url(race_id: str, *, is_female: bool, **_) -> str:
+    def get_race_details_url(self, race_id: str, *, is_female: bool, **_) -> str:
         female = "/femenina" if is_female else ""
         return f"https://www.euskolabelliga.com{female}/resultados/ver.php?r={race_id}"
 

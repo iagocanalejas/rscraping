@@ -64,6 +64,17 @@ class TabularDataClient(Client, source=Datasource.TABULAR):
         COLUMN_LANE: lambda x: str(x) if x else None,
     }
 
+    def __init__(self, *_, config: TabularClientConfig, **kwargs) -> None:
+        if not only_one_not_none(config.file_path, config.sheet_id, config.sheet_url):
+            raise ValueError("sheet_id, sheet_url and file_path are mutually exclusive")
+        self._df = self._load_dataframe(config)
+        self.config = config
+
+        if config.sheet_name and is_female(config.sheet_name.upper()):
+            self._gender = GENDER_FEMALE
+
+        super().__init__(**kwargs)
+
     @property
     def _parser(self) -> TabularDataFrameParser:
         return TabularDataFrameParser()
@@ -75,17 +86,6 @@ class TabularDataClient(Client, source=Datasource.TABULAR):
         if sheet_name:
             url += f"&sheet={sheet_name.replace(' ', '+')}"
         return url
-
-    def __init__(self, *_, config: TabularClientConfig, **kwargs) -> None:
-        if not only_one_not_none(config.file_path, config.sheet_id, config.sheet_url):
-            raise ValueError("sheet_id, sheet_url and file_path are mutually exclusive")
-        self._df = self._load_dataframe(config)
-        self.config = config
-
-        if config.sheet_name and is_female(config.sheet_name.upper()):
-            self._gender = GENDER_FEMALE
-
-        super().__init__(**kwargs)
 
     @override
     def validate_year(self, year: int):

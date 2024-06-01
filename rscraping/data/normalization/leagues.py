@@ -29,6 +29,9 @@ def normalize_league_name(name: str, is_female: bool = False) -> str:
 def find_league(name: str) -> str | None:
     """
     Find the league of a competition by its name.
+
+    1. Play-offs
+    2. Leagues
     """
     if is_play_off(name):
         if is_act(name) or is_act(name, is_female=True) or ("ARC" in name and "LGT" in name):
