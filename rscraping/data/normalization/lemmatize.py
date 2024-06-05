@@ -1,4 +1,4 @@
-from simplemma.simplemma import text_lemmatizer
+from simplemma.lemmatizer import text_lemmatizer
 
 from pyutils.strings import normalize_synonyms, remove_conjunctions, remove_symbols, unaccent
 from rscraping.data.constants import SYNONYMS

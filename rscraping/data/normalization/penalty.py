@@ -74,6 +74,19 @@ _TEMPLATES = {
     WRONG_ROUTE: [],
 }
 
+_CANCELLED = [
+    "se suspendió",
+    "tanda no salió",
+    "anular la regata",
+]
+
+
+def is_cancelled(text: str | None) -> bool:
+    """
+    Check if a text contains any of the known patterns for a cancelled race
+    """
+    return text is not None and any(w in text for w in _CANCELLED)
+
 
 def normalize_penalty(text: str | None) -> PenaltyDict:
     """

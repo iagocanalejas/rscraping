@@ -28,6 +28,7 @@ from rscraping.data.normalization import (
     normalize_race_name,
     normalize_town,
 )
+from rscraping.data.normalization.penalty import is_cancelled
 
 from ._protocol import HtmlParser
 
@@ -97,7 +98,7 @@ class TrainerasHtmlParser(HtmlParser):
             url=None,
             gender=gender,
             datasource=self.DATASOURCE.value,
-            cancelled=self.is_cancelled(participants),
+            cancelled=self.is_cancelled(participants) or is_cancelled(race_notes),
             race_laps=self.get_race_laps(selector, table),
             race_lanes=self.get_race_lanes(participants),
             race_notes=race_notes,
