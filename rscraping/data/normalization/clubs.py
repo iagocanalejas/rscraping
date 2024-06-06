@@ -5,6 +5,7 @@ from rscraping.data.checks import is_branch_club
 
 _ENTITY_TITLES_SHORT = [
     "CR",
+    "RC",
     "SD",
     "SDR",
     "CM",

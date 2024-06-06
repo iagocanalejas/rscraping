@@ -57,6 +57,7 @@ class TestPenaltyNormalization(unittest.TestCase):
         notes = [
             "San Simón fue descalificado por dejar por estribor una baliza del recorrido y la meta.",
             "San Simón y A Cabana pasaron la baliza de meta por estribor. El tiempo de San Simón había sido de 24:34.29 y el de A Cabana de 24:30.41.",  # noqa: E501
+            "Cesantes y el Náutico de Vigo dejaron la baliza de meta por estribor. El tiempo de Cesantes había sido de 21:52.58 y el del Náutico de Vigo de 21:39.47.",  # noqa: E501
             "Castropol entró a meta fuera de línea (la línea de meta entre la baliza uno y la cinco). Su tiempo había sido de 24:52.57.",  # noqa: E501
             "Tirán fue descalificada por entrar en meta dejando la boya por estribor. Su tiempo había sido de 21:58.00.",  # noqa: E501
             "El tiempo de Tirán había sido 19:15.32, pero fue descalificado por dejar su baliza por estribor a la entrada a meta.",  # noqa: E501
@@ -68,6 +69,10 @@ class TestPenaltyNormalization(unittest.TestCase):
             {
                 "SAN SIMÓN": ("24:34.290000", Penalty(disqualification=True, reason=OFF_THE_FIELD)),
                 "A CABANA": ("24:30.410000", Penalty(disqualification=True, reason=OFF_THE_FIELD)),
+            },
+            {
+                "CESANTES": ("21:52.580000", Penalty(disqualification=True, reason=OFF_THE_FIELD)),
+                "NÁUTICO DE VIGO": ("21:39.470000", Penalty(disqualification=True, reason=OFF_THE_FIELD)),
             },
             {
                 "CASTROPOL": ("24:52.570000", Penalty(disqualification=True, reason=OFF_THE_FIELD)),

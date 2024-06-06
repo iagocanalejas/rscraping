@@ -55,7 +55,7 @@ _TEMPLATES = {
     ],
     OFF_THE_FIELD: [
         r"(.*) entró a meta fuera de linea.*",
-        r"(.*) pas(ó|aron) la baliza de meta por estribor",
+        r"(.*) (pas(ó|aron)|dej(ó|aron)) la baliza de meta por estribor",
         r"(.*) fue descalificad(o|a) por entrar en meta dejando la boya por estribor",
         r"(.*) fue descalificad(o|a) por dejar por estribor una baliza .* meta",
         r"(.*) pero fue descalificado por dejar su baliza por estribor a la entrada a meta",
@@ -140,13 +140,14 @@ def normalize_penalty(text: str | None) -> PenaltyDict:
 
 def _process_time_note(note: str, penalties: PenaltyDict) -> tuple[PenaltyDict, str | None]:
     new_note = None
-    parts = (
-        note.replace("El tiempo de ", "")
+    clean_note = (
+        note.replace("El tiempo del ", "")
+        .replace("El tiempo de ", "")
         .replace(" había sido de ", ", ")
         .replace(" había sido ", ", ")
-        .replace(" de ", ", ")
-        .split(", ")
     )
+    clean_note = re.sub(r" de ([\d:.]+)", r", \1", clean_note)
+    parts = clean_note.split(", ")
 
     if len(parts) > 2:
         club_name, time = parts[0], parts[1]
@@ -172,4 +173,4 @@ def _retrieve_club_names(note: str, penalty: str) -> Generator[str, None, None]:
             club_name = match.group(1)
             break
     if club_name:
-        yield from normalize_club_name(club_name.upper()).split(" Y ")
+        yield from normalize_club_name(club_name.upper()).replace(" Y EL ", " Y ").split(" Y ")

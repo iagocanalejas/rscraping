@@ -66,6 +66,20 @@ class Penalty:
             penalties[club_name] = (time, penalty)
         return penalties
 
+    def __str__(self) -> str:
+        return self.to_json()
+
+    @staticmethod
+    def from_json(json_str: str) -> "Penalty":
+        values = json.loads(json_str)
+        return Penalty(**values)
+
+    def to_dict(self) -> dict:
+        return {k: v for k, v in self.__dict__.items()}
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_dict())
+
 
 @dataclass
 class Race:
@@ -103,14 +117,6 @@ class Race:
     def __str__(self) -> str:
         return self.to_json()
 
-    def to_dict(self) -> dict:
-        d = {k: v for k, v in self.__dict__.items()}
-        d["participants"] = [p.to_dict() for p in d["participants"]]
-        return d
-
-    def to_json(self) -> str:
-        return json.dumps(self.to_dict())
-
     @staticmethod
     def from_json(json_str: str) -> "Race":
         values = json.loads(json_str)
@@ -121,6 +127,14 @@ class Race:
         if participants:
             race.participants = [Participant(**p, race=race) for p in participants]
         return race
+
+    def to_dict(self) -> dict:
+        d = {k: v for k, v in self.__dict__.items()}
+        d["participants"] = [p.to_dict() for p in d["participants"]]
+        return d
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_dict())
 
 
 @dataclass
@@ -144,20 +158,20 @@ class Participant:
     def __str__(self) -> str:
         return self.to_json()
 
-    def to_dict(self) -> dict:
-        return {k: v for k, v in self.__dict__.items() if k not in ["race"]}
-
-    def to_json(self) -> str:
-        return json.dumps(self.to_dict())
-
     @staticmethod
     def from_json(json_str: str) -> "Participant":
         values = json.loads(json_str)
         if "race" not in values:
             values["race"] = None
+        return Participant(**values)
 
-        participant = Participant(**values)
-        return participant
+    def to_dict(self) -> dict:
+        d = {k: v for k, v in self.__dict__.items() if k not in ["race"]}
+        d["penalty"] = self.penalty.to_dict() if self.penalty else None
+        return d
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_dict())
 
 
 @dataclass
