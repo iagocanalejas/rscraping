@@ -59,6 +59,7 @@ class TestLGTParser(unittest.TestCase):
         url=None,
         datasource=Datasource.LGT.value,
         gender=GENDER_MALE,
+        category=CATEGORY_ABSOLUT,
         participants=[],
         race_laps=4,
         race_lanes=4,

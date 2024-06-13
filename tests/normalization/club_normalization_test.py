@@ -10,6 +10,7 @@ class TestClubNormalization(unittest.TestCase):
             "CCD CESANTES - RODAVIGO",
             "C.R. CABANA FERROL B",
             "C.R. PUEBLA B",
+            "C.R.O. ARRAUN LAGUNAK",
         ]
 
     def test_club_name_normalization(self):
@@ -18,6 +19,7 @@ class TestClubNormalization(unittest.TestCase):
             "CESANTES",
             "A CABANA B",
             "PUEBLA B",
+            "ARRAUN LAGUNAK",
         ]
 
         for idx, club_name in enumerate(self.NAMES):

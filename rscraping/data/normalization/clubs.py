@@ -4,24 +4,25 @@ from pyutils.strings import match_normalization, remove_parenthesis, whitespaces
 from rscraping.data.checks import is_branch_club
 
 _ENTITY_TITLES_SHORT = [
-    "CR",
-    "RC",
-    "SD",
-    "SDR",
-    "CM",
-    "CR",
     "AD",
-    "CC",
-    "CRC",
-    "CDM",
+    "AE",
+    "AN",
+    "AR",
+    "AT",
     "CCD",
+    "CDM",
+    "CRC",
     "CRN",
     "CRO",
-    "FEM",
-    "AN",
-    "AE",
+    "CC",
+    "CM",
     "CN",
-    "AR",
+    "CR",
+    "FEM",
+    "RC",
+    "SDR",
+    "SD",
+    "SR",
 ]
 
 _ENTITY_TITLES = [
@@ -46,7 +47,9 @@ _ENTITY_TITLES = [
     "CLUB DE MAR",
     "REMO CLUB",
     "CLUB REMO",
+    "TRAINERA DE",  # this will convert 'TRAINERA DE SAN JUAN' to 'SAN JUAN' matching the old town boats into club ones
     "ARRAUN",
+    "LICEO DE",
     "LICEO",
 ]
 
@@ -110,6 +113,7 @@ _KNOWN_SPONSORS = [
     "TECCARSA",
     "NATURHOUSE",
     "SALEGI JATETXEA",
+    "MICHELIN",
 ]
 
 
@@ -149,7 +153,7 @@ def deacronym_club_name(name: str) -> str:
 def remove_club_title(name: str) -> str:
     name = " ".join(w for w in name.split() if w not in _ENTITY_TITLES_SHORT)
     for title in _ENTITY_TITLES:
-        if "DONOSTI" in name and title == "ARRAUN LAGUNAK":
+        if "DONOSTI" in name and title == "ARRAUN LAGUNAK" or name == "ARRAUN LAGUNAK":
             # edge case, need to avoid removing 'ARRAUN LAGUNAK' from 'DONOSTIA ARRAUN LAGUNAK'
             continue
         name = name.replace(title, "")

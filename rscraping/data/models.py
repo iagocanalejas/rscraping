@@ -101,6 +101,7 @@ class Race:
     url: str | None
     datasource: str
     gender: str | None
+    category: str | None
 
     participants: list["Participant"]
 

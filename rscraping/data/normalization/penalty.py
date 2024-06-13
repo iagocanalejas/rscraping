@@ -65,7 +65,7 @@ _TEMPLATES = {
         r"(.*) se hundió .*",
     ],
     STARBOARD_TACK: [
-        r"(.*) realizó (la primera|una) ciaboga por estribor",
+        r"(.*) realiz(i)?ó (la primera|una) ciaboga por estribor",
         r"(.*) fue descalificado por dejar por estribor una baliza .*",
     ],
     WRONG_LINEUP: [
@@ -78,6 +78,8 @@ _CANCELLED = [
     "se suspendió",
     "tanda no salió",
     "anular la regata",
+    "regata se anuló",
+    "fue anulada",
 ]
 
 

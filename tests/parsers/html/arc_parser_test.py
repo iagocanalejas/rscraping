@@ -55,6 +55,7 @@ class TestARCParser(unittest.TestCase):
         race_ids=["1234"],
         url=None,
         gender=GENDER_MALE,
+        category=CATEGORY_ABSOLUT,
         datasource=Datasource.ARC.value,
         participants=[],
         race_laps=4,

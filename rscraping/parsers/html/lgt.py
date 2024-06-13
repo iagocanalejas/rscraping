@@ -88,6 +88,7 @@ class LGTHtmlParser(HtmlParser):
             url=None,
             datasource=self.DATASOURCE.value,
             gender=gender,
+            category=CATEGORY_ABSOLUT,
             cancelled=self.is_cancelled(participants),
             race_laps=race_laps,
             race_lanes=self.get_race_lanes(participants),

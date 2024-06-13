@@ -10,7 +10,7 @@ from rscraping.data.constants import (
     WRONG_LINEUP,
 )
 from rscraping.data.models import Penalty
-from rscraping.data.normalization.penalty import normalize_penalty
+from rscraping.data.normalization.penalty import is_cancelled, normalize_penalty
 
 
 class TestPenaltyNormalization(unittest.TestCase):
@@ -41,6 +41,7 @@ class TestPenaltyNormalization(unittest.TestCase):
         notes = [
             "Vila de Cangas realizó la primera ciaboga por estribor.",
             "Ría de Marín realizó una ciaboga por estribor.",
+            "Fortuna realizió una ciaboga por estribor",
         ]
         results = [
             {
@@ -48,6 +49,9 @@ class TestPenaltyNormalization(unittest.TestCase):
             },
             {
                 "RÍA DE MARÍN": (None, Penalty(disqualification=True, reason=STARBOARD_TACK)),
+            },
+            {
+                "FORTUNA": (None, Penalty(disqualification=True, reason=STARBOARD_TACK)),
             },
         ]
         for idx, text in enumerate(notes):
@@ -175,3 +179,11 @@ class TestPenaltyNormalization(unittest.TestCase):
         ]
         for idx, text in enumerate(notes):
             self.assertEqual(normalize_penalty(text), results[idx])
+
+    def test_is_race_cancelled(self):
+        notes = [
+            "La regata se anuló después de que Elantxobe impugnara porque una embarcación que cruzó el campo de regateo les molestó",  # noqa: E501
+            "La regata fue anulada tras reclamar todos los equipos de la calle 5",  # noqa: E501
+        ]
+        for _, text in enumerate(notes):
+            self.assertTrue(is_cancelled(text))

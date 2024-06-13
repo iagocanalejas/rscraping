@@ -69,6 +69,7 @@ class ARCHtmlParser(HtmlParser):
             race_ids=[race_id],
             url=None,
             gender=gender,
+            category=CATEGORY_ABSOLUT,
             datasource=self.DATASOURCE.value,
             cancelled=self.is_cancelled(selector),
             race_laps=self.get_race_laps(selector),

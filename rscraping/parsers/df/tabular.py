@@ -86,6 +86,7 @@ class TabularDataFrameParser(DataFrameParserProtocol):
             race_ids=[row.name],  # pyright: ignore
             url=url,
             gender=GENDER_FEMALE if is_female else GENDER_MALE,
+            category=CATEGORY_ABSOLUT,
             datasource=Datasource.TABULAR.value,
             cancelled=False,
             race_laps=int_or_none(str(row[COLUMN_NUMBER_LAPS])),

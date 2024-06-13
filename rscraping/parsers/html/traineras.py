@@ -67,6 +67,7 @@ class TrainerasHtmlParser(HtmlParser):
         path = "div[1]/h2" if table == 1 else f"div[2]/h2[{table - 1}]"
         t_date = find_date(selector.xpath(f"/html/body/div[1]/main/div/div/div/{path}/text()").get(""))
         gender = self.get_gender(selector)
+        category = self.get_category(selector)
         distance = self.get_distance(selector)
 
         if not t_date:
@@ -97,6 +98,7 @@ class TrainerasHtmlParser(HtmlParser):
             race_ids=[race_id],
             url=None,
             gender=gender,
+            category=category,
             datasource=self.DATASOURCE.value,
             cancelled=self.is_cancelled(participants) or is_cancelled(race_notes),
             race_laps=self.get_race_laps(selector, table),
@@ -105,7 +107,6 @@ class TrainerasHtmlParser(HtmlParser):
             participants=[],
         )
 
-        category = self.get_category(selector)
         penalties = normalize_penalty(race_notes)
         if race_notes and not penalties:
             logging.warning(f"{self.DATASOURCE}: no penalties found for note:\n\t{race_notes}")
