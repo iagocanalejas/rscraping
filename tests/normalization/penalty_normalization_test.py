@@ -3,6 +3,7 @@ import unittest
 from rscraping.data.constants import (
     BOAT_WEIGHT_LIMIT,
     COLLISION,
+    LACK_OF_COMPETITIVENESS,
     NULL_START,
     OFF_THE_FIELD,
     SINKING,
@@ -19,6 +20,7 @@ class TestPenaltyNormalization(unittest.TestCase):
             "El tiempo de Rianxo había sido de 19:39.13.",
             "El tiempo de Tirán había sido de 19:23.52, el de Mecos de 19:31.32 y el de Cabo da Cruz de 19:13.70.",
             "El tiempo de Coruxo había sido de 22:32.16. El tiempo de Puebla había sido de 22:16.98.",
+            "Donostia Arraun Lagunak fue descalificado, su tiempo había sido de 20:58.16.",
         ]
         results = [
             {
@@ -32,6 +34,9 @@ class TestPenaltyNormalization(unittest.TestCase):
             {
                 "CORUXO": ("22:32.160000", None),
                 "PUEBLA": ("22:16.980000", None),
+            },
+            {
+                "DONOSTIA ARRAUN LAGUNAK": ("20:58.160000", None),
             },
         ]
         for idx, text in enumerate(notes):
@@ -91,10 +96,23 @@ class TestPenaltyNormalization(unittest.TestCase):
         for idx, text in enumerate(notes):
             self.assertEqual(normalize_penalty(text), results[idx])
 
+    def test_lack_of_competitiveness_normalization(self):
+        notes = [
+            "Se consideró que a Ondarroa le faltó voluntad de competir, infringiendo el artículo 39 del vigente Código de Regatas, que obliga a toda tripulación que tome la salida a remar a ritmo de regata hasta terminar.",  # noqa: E501
+        ]
+        results = [
+            {
+                "ONDARROA": (None, Penalty(disqualification=True, reason=LACK_OF_COMPETITIVENESS)),
+            }
+        ]
+        for idx, text in enumerate(notes):
+            self.assertEqual(normalize_penalty(text), results[idx])
+
     def test_null_start_normalization(self):
         notes = [
             "Virxe da Guía tuvo dos salidas nulas.",
             "Tirán compitió fuera de regata por salidas nulas. Su tiempo había sido de 20:55.",
+            "Fortuna quedó fuera de regata en la primera jornada por llegar tarde a la salida.",
         ]
         results = [
             {
@@ -102,6 +120,9 @@ class TestPenaltyNormalization(unittest.TestCase):
             },
             {
                 "TIRÁN": ("20:55.000000", Penalty(disqualification=True, reason=NULL_START)),
+            },
+            {
+                "FORTUNA": (None, Penalty(disqualification=True, reason=NULL_START)),
             },
         ]
         for idx, text in enumerate(notes):
@@ -115,6 +136,8 @@ class TestPenaltyNormalization(unittest.TestCase):
             "Samertolameu estorbó a Bueu en la tercera virada. Su tiempo había sido el mejor con 19:07.89.",
             "Cabo da Cruz y Mecos no disputaban la Bandera sino la clasificatoria. Puebla salió muy abierta en la segunda ciaboga, lo que molestó a Chapela. Su tiempo había sido de 21:25.02.",  # noqa: E501
             "El tiempo de Amegrove había sido de 20:09.33, pero fue descalificada por invasión de la calle del Náutico de Vigo a la salida de la segunda ciaboga.",  # noqa: E501
+            "En la segunda jornada Donibaneko fue descalificado por invadir la calle de Santurtzi en la segunda ciaboga. Terminó con un tiempo de 20:59,35.",  # noqa: E501
+            "Trintxerpe se chocó contra una roca.",
         ]
         results = [
             {
@@ -134,6 +157,12 @@ class TestPenaltyNormalization(unittest.TestCase):
             },
             {
                 "AMEGROVE": ("20:09.330000", Penalty(disqualification=True, reason=COLLISION)),
+            },
+            {
+                "DONIBANEKO": ("20:59.350000", Penalty(disqualification=True, reason=COLLISION)),
+            },
+            {
+                "TRINTXERPE": (None, Penalty(disqualification=True, reason=COLLISION)),
             },
         ]
         for idx, text in enumerate(notes):

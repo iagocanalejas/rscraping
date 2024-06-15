@@ -7,6 +7,7 @@ from rscraping.data.constants import (
     COLLISION,
     COVID_ABSENCE,
     COXWAIN_WEIGHT_LIMIT,
+    LACK_OF_COMPETITIVENESS,
     NO_LINE_START,
     NULL_START,
     OFF_THE_FIELD,
@@ -22,11 +23,21 @@ from .lemmatize import lemmatize
 
 _LEMMAS = {
     BOAT_WEIGHT_LIMIT: [["pesar", "embarcacion"]],
-    COLLISION: [["abordar"], ["demasiado", "abrir"], ["delante"], ["estorbo"], ["molesto"], ["invasion"]],
+    COLLISION: [
+        ["abordar"],
+        ["demasiado", "abrir"],
+        ["delante"],
+        ["estorbo"],
+        ["molesto"],
+        ["invasion"],
+        ["invadir"],
+        ["chocar"],
+    ],
     COVID_ABSENCE: [],
     COXWAIN_WEIGHT_LIMIT: [],
+    LACK_OF_COMPETITIVENESS: [["falto", "voluntad", "competir"]],
     NO_LINE_START: [],
-    NULL_START: [["nulo", "salida"]],
+    NULL_START: [["nulo", "salida"], ["tarde", "salida"]],
     OFF_THE_FIELD: [["estribor", "meta"], ["meta", "entrar"]],
     SINKING: [["hundio"]],
     STARBOARD_TACK: [["estribor", "ciaboga"]],
@@ -45,13 +56,19 @@ _TEMPLATES = {
         r"(.*) fue descalificado por ponerse delante de .*",
         r"(.*) estorbó a .* en la .*",
         r"(.*) pero fue descalificada por invasión .*",
+        r".* jornada (.*) fue descalificado por invadir .*",
+        r"(.*) se chocó .*",
     ],
     COVID_ABSENCE: [],
     COXWAIN_WEIGHT_LIMIT: [],
+    LACK_OF_COMPETITIVENESS: [
+        r"Se consideró que a (.*) le faltó voluntad de competir.*",
+    ],
     NO_LINE_START: [],
     NULL_START: [
         r"(.*) tuvo .* salida(s)? nula(s)?",
         r"(.*) compitió fuera de regata por salida(s)? nula(s)?",
+        r"(.*) quedó fuera .* tarde a la salida",
     ],
     OFF_THE_FIELD: [
         r"(.*) entró a meta fuera de linea.*",
@@ -81,7 +98,6 @@ _CANCELLED = [
     "regata se anuló",
     "fue anulada",
 ]
-
 
 def is_cancelled(text: str | None) -> bool:
     """
@@ -120,11 +136,22 @@ def normalize_penalty(text: str | None) -> PenaltyDict:
                 notes.append(new_note)
             continue
 
-        if any(w in note for w in ["Su tiempo", "un tiempo de"]):
-            # note that provides a club time fon an existing penalty
-            time = find_time(note)
+        if any(w in note.lower() for w in ["su tiempo", "un tiempo de"]):
+            # note that provides a club time for an existing penalty
+            match = re.match(r"(.*) fue descalificado.* había sido de (.*)", note, flags=re.IGNORECASE | re.UNICODE)
+            if not match:
+                time = find_time(note)
+                if time:
+                    penalties = Penalty.push(penalties, time=time.strftime("%M:%S.%f"))
+                continue
+
+            if len(match.groups()) != 2:
+                continue
+
+            club_name, maybe_time = match.groups()
+            time = find_time(maybe_time)
             if time:
-                penalties = Penalty.push(penalties, time=time.strftime("%M:%S.%f"))
+                penalties = Penalty.push(penalties, club_name.upper(), time.strftime("%M:%S.%f"))
             continue
 
         note_lemmas = lemmatize(remove_parenthesis(note))
