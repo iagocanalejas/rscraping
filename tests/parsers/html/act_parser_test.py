@@ -74,6 +74,8 @@ class TestACTParser(unittest.TestCase):
             handicap=None,
             participant="GETARIA",
             race=_RACE,
+            absent=False,
+            retired=False,
         ),
         Participant(
             gender=GENDER_MALE,
@@ -86,6 +88,8 @@ class TestACTParser(unittest.TestCase):
             handicap=None,
             participant="ZIERBENA",
             race=_RACE,
+            absent=False,
+            retired=False,
         ),
         Participant(
             gender=GENDER_MALE,
@@ -98,6 +102,8 @@ class TestACTParser(unittest.TestCase):
             handicap=None,
             participant="HONDARRIBIA",
             race=_RACE,
+            absent=False,
+            retired=False,
         ),
     ]
     _RACE_NAMES = [

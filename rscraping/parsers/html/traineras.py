@@ -136,6 +136,8 @@ class TrainerasHtmlParser(HtmlParser):
                     participant=normalize_club_name(self.get_club_name(row)),
                     race=race,
                     penalty=penalty,
+                    retired=self.has_retired(row),
+                    absent=False,
                 )
             )
 
@@ -286,7 +288,13 @@ class TrainerasHtmlParser(HtmlParser):
         # race_id=5360|5535
         # try to find the "Desc." text in the final crono
         laps = participant.xpath("//*/td/text()").getall()[2:-4]
-        return any(w in lap for w in ["Desc.", "FR", "Ret."] for lap in laps)
+        return any(w in lap for w in ["Desc.", "FR"] for lap in laps)
+
+    def has_retired(self, participant: Selector) -> bool:
+        # race_id=5360|5535
+        # try to find the "Desc." text in the final crono
+        laps = participant.xpath("//*/td/text()").getall()[2:-4]
+        return any(w in lap for w in ["Ret."] for lap in laps)
 
     def get_series(self, participant: Selector) -> int:
         series = participant.xpath("//*/td[4]/text()").get()

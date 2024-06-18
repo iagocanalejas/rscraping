@@ -111,6 +111,8 @@ class LGTHtmlParser(HtmlParser):
                     participant=normalize_club_name(self.get_club_name(row)),
                     race=race,
                     penalty=penalty,
+                    absent=False,
+                    retired=False,
                 )
             )
 

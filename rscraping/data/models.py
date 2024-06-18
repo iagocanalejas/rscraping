@@ -149,6 +149,9 @@ class Participant:
     distance: int | None
     handicap: str | None
 
+    retired: bool
+    absent: bool
+
     # normalized fields
     participant: str
 

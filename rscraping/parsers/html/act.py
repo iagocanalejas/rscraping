@@ -100,6 +100,8 @@ class ACTHtmlParser(HtmlParser):
                     participant=normalize_club_name(self.get_club_name(row)).replace("ACT | ", ""),
                     race=race,
                     penalty=penalty,
+                    absent=False,
+                    retired=False,
                 )
             )
 

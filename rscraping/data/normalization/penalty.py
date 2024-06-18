@@ -5,7 +5,6 @@ from pyutils.strings import find_time, remove_parenthesis
 from rscraping.data.constants import (
     BOAT_WEIGHT_LIMIT,
     COLLISION,
-    COVID_ABSENCE,
     COXWAIN_WEIGHT_LIMIT,
     LACK_OF_COMPETITIVENESS,
     NO_LINE_START,
@@ -33,7 +32,6 @@ _LEMMAS = {
         ["invadir"],
         ["chocar"],
     ],
-    COVID_ABSENCE: [],
     COXWAIN_WEIGHT_LIMIT: [],
     LACK_OF_COMPETITIVENESS: [["falto", "voluntad", "competir"]],
     NO_LINE_START: [],
@@ -59,7 +57,6 @@ _TEMPLATES = {
         r".* jornada (.*) fue descalificado por invadir .*",
         r"(.*) se chocó .*",
     ],
-    COVID_ABSENCE: [],
     COXWAIN_WEIGHT_LIMIT: [],
     LACK_OF_COMPETITIVENESS: [
         r"Se consideró que a (.*) le faltó voluntad de competir.*",
@@ -98,6 +95,7 @@ _CANCELLED = [
     "regata se anuló",
     "fue anulada",
 ]
+
 
 def is_cancelled(text: str | None) -> bool:
     """

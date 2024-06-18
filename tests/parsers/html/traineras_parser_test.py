@@ -178,6 +178,8 @@ class TestTrainerasParser(unittest.TestCase):
             handicap=None,
             participant="ARES",
             race=_RACE,
+            absent=False,
+            retired=False,
         ),
         Participant(
             gender=GENDER_MALE,
@@ -190,6 +192,8 @@ class TestTrainerasParser(unittest.TestCase):
             handicap=None,
             participant="BUEU",
             race=_RACE,
+            absent=False,
+            retired=False,
         ),
     ]
 
@@ -227,6 +231,8 @@ class TestTrainerasParser(unittest.TestCase):
             handicap=None,
             participant="CAMARGO",
             race=_RACE_LABEL,
+            absent=False,
+            retired=False,
         ),
         Participant(
             gender=GENDER_MALE,
@@ -239,6 +245,8 @@ class TestTrainerasParser(unittest.TestCase):
             handicap=None,
             participant="PEDREÑA",
             race=_RACE_LABEL,
+            absent=False,
+            retired=False,
         ),
         Participant(
             gender=GENDER_MALE,
@@ -251,6 +259,8 @@ class TestTrainerasParser(unittest.TestCase):
             handicap=None,
             participant="ASTILLERO",
             race=_RACE_LABEL,
+            absent=False,
+            retired=False,
         ),
     ]
 
@@ -312,6 +322,8 @@ class TestTrainerasParser(unittest.TestCase):
                 handicap=None,
                 participant="CESANTES",
                 race=_RACES_DOUBLE[0],
+                absent=False,
+                retired=False,
             ),
             Participant(
                 gender=GENDER_MALE,
@@ -324,6 +336,8 @@ class TestTrainerasParser(unittest.TestCase):
                 handicap=None,
                 participant="PUEBLA",
                 race=_RACES_DOUBLE[0],
+                absent=False,
+                retired=False,
             ),
         ],
         [
@@ -338,6 +352,8 @@ class TestTrainerasParser(unittest.TestCase):
                 handicap=None,
                 participant="CESANTES",
                 race=_RACES_DOUBLE[1],
+                absent=False,
+                retired=False,
             ),
             Participant(
                 gender=GENDER_MALE,
@@ -350,6 +366,8 @@ class TestTrainerasParser(unittest.TestCase):
                 handicap=None,
                 participant="PUEBLA",
                 race=_RACES_DOUBLE[1],
+                absent=False,
+                retired=False,
             ),
         ],
     ]
@@ -433,6 +451,8 @@ class TestTrainerasParser(unittest.TestCase):
                 handicap=None,
                 participant="MECOS",
                 race=_RACES_TRIPLE[0],
+                absent=False,
+                retired=False,
             ),
             Participant(
                 gender=GENDER_MALE,
@@ -445,6 +465,8 @@ class TestTrainerasParser(unittest.TestCase):
                 handicap=None,
                 participant="PERILLO",
                 race=_RACES_TRIPLE[0],
+                absent=False,
+                retired=False,
             ),
         ],
         [
@@ -459,6 +481,8 @@ class TestTrainerasParser(unittest.TestCase):
                 handicap=None,
                 participant="SAMERTOLAMEU",
                 race=_RACES_TRIPLE[1],
+                absent=False,
+                retired=False,
             ),
             Participant(
                 gender=GENDER_MALE,
@@ -471,6 +495,8 @@ class TestTrainerasParser(unittest.TestCase):
                 handicap=None,
                 participant="AMEGROVE",
                 race=_RACES_TRIPLE[1],
+                absent=False,
+                retired=False,
             ),
         ],
         [
@@ -485,6 +511,8 @@ class TestTrainerasParser(unittest.TestCase):
                 handicap=None,
                 participant="AMEGROVE",
                 race=_RACES_TRIPLE[2],
+                absent=False,
+                retired=False,
             ),
             Participant(
                 gender=GENDER_MALE,
@@ -497,6 +525,8 @@ class TestTrainerasParser(unittest.TestCase):
                 handicap=None,
                 participant="SAMERTOLAMEU",
                 race=_RACES_TRIPLE[2],
+                absent=False,
+                retired=False,
             ),
         ],
     ]
