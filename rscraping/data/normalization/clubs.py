@@ -1,6 +1,11 @@
 import re
 
-from pyutils.strings import match_normalization, remove_parenthesis, whitespaces_clean
+from pyutils.strings import (
+    CONJUNCTIONS,
+    match_normalization,
+    remove_parenthesis,
+    whitespaces_clean,
+)
 from rscraping.data.checks import is_branch_club
 
 _ENTITY_TITLES_SHORT = [
@@ -16,8 +21,11 @@ _ENTITY_TITLES_SHORT = [
     "CRO",
     "CC",
     "CM",
-    "CN",
     "CR",
+    "CN",
+    "CD",
+    "CP",
+    "ED",
     "FEM",
     "RC",
     "SDR",
@@ -127,7 +135,8 @@ def normalize_club_name(name: str) -> str:
     4. Remove dots
     5. Remove club titles
     6. Remove club sponsors
-    7. Specific known club normalizations
+    7. Remove remaining conjunctions at the beginning
+    8. Specific known club normalizations
     """
     name = whitespaces_clean(remove_parenthesis(name.upper()))
     name = deacronym_club_name(name)
@@ -135,6 +144,8 @@ def normalize_club_name(name: str) -> str:
     name = name.replace(".", "")
     name = remove_club_title(name)
     name = remove_club_sponsor(name)
+
+    name = " ".join(name.split()[1:]) if name.split() and name.split()[0] in CONJUNCTIONS else name
 
     is_B_team, is_C_team = is_branch_club(name), is_branch_club(name, letter="C")  # never saw more than a C
     name = match_normalization(name, _NORMALIZED_ENTITIES)
@@ -153,7 +164,7 @@ def deacronym_club_name(name: str) -> str:
 def remove_club_title(name: str) -> str:
     name = " ".join(w for w in name.split() if w not in _ENTITY_TITLES_SHORT)
     for title in _ENTITY_TITLES:
-        if "DONOSTI" in name and title == "ARRAUN LAGUNAK" or name == "ARRAUN LAGUNAK":
+        if "DONOSTI" in name and (title == "ARRAUN LAGUNAK" or title == "ARRAUN") or name == "ARRAUN LAGUNAK":
             # edge case, need to avoid removing 'ARRAUN LAGUNAK' from 'DONOSTIA ARRAUN LAGUNAK'
             continue
         name = name.replace(title, "")

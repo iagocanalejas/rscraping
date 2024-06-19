@@ -24,13 +24,17 @@ _LEMMAS = {
     BOAT_WEIGHT_LIMIT: [["pesar", "embarcacion"]],
     COLLISION: [
         ["abordar"],
+        ["abordo"],
         ["demasiado", "abrir"],
         ["delante"],
+        ["estorbar"],
         ["estorbo"],
+        ["molestar"],
         ["molesto"],
-        ["invasion"],
         ["invadir"],
+        ["invasion"],
         ["chocar"],
+        ["choco"],
     ],
     COXWAIN_WEIGHT_LIMIT: [],
     LACK_OF_COMPETITIVENESS: [["falto", "voluntad", "competir"]],
@@ -49,13 +53,14 @@ _TEMPLATES = {
     ],
     COLLISION: [
         r"(.*) salió (demasiado|muy) abiert(o|a)",
-        r".* fue abordado por (.*) en .*",
-        r"(.*) se puso delante de .*",
-        r"(.*) fue descalificado por ponerse delante de .*",
-        r"(.*) estorbó a .* en la .*",
-        r"(.*) pero fue descalificada por invasión .*",
-        r".* jornada (.*) fue descalificado por invadir .*",
-        r"(.*) se chocó .*",
+        r".*fue abordado por (.*) en.*",
+        r"(.*) se puso delante de.*",
+        r"(.*) fue descalificado por ponerse delante de.*",
+        r"(.*) estorbó a.*en la.*",
+        r"(.*) pero fue descalificada por invasión.*",
+        r".* jornada (.*) fue descalificado por invadir.*",
+        r"(.*) se chocó.*",
+        r".*, (.*) había.*pero abordó.*descalificado.*",
     ],
     COXWAIN_WEIGHT_LIMIT: [],
     LACK_OF_COMPETITIVENESS: [
@@ -63,27 +68,28 @@ _TEMPLATES = {
     ],
     NO_LINE_START: [],
     NULL_START: [
-        r"(.*) tuvo .* salida(s)? nula(s)?",
+        r"(.*) tuvo.*salida(s)? nula(s)?",
         r"(.*) compitió fuera de regata por salida(s)? nula(s)?",
-        r"(.*) quedó fuera .* tarde a la salida",
+        r"(.*) quedó fuera.*tarde a la salida",
     ],
     OFF_THE_FIELD: [
         r"(.*) entró a meta fuera de linea.*",
         r"(.*) (pas(ó|aron)|dej(ó|aron)) la baliza de meta por estribor",
         r"(.*) fue descalificad(o|a) por entrar en meta dejando la boya por estribor",
-        r"(.*) fue descalificad(o|a) por dejar por estribor una baliza .* meta",
+        r"(.*) fue descalificad(o|a) por dejar por estribor una baliza.*meta",
         r"(.*) pero fue descalificado por dejar su baliza por estribor a la entrada a meta",
         r"(.*) entró a meta fuera de línea",
     ],
     SINKING: [
-        r"(.*) se hundió .*",
+        r"(.*) se hundió.*",
     ],
     STARBOARD_TACK: [
         r"(.*) realiz(i)?ó (la primera|una) ciaboga por estribor",
-        r"(.*) fue descalificado por dejar por estribor una baliza .*",
+        r"(.*) fue descalificado por dejar por estribor una baliza.*",
+        r"(.*) había dado.*estribor",
     ],
     WRONG_LINEUP: [
-        r"(.*) quedó fuera de regata (por alineación indebida|después de una reclamación por problemas con) .*",
+        r"(.*) quedó fuera de regata (por alineación indebida|después de una reclamación por problemas con).*",
     ],
     WRONG_ROUTE: [],
 }
@@ -120,14 +126,16 @@ def normalize_penalty(text: str | None) -> PenaltyDict:
     if not text:
         return penalties
 
-    text = text.replace(", el de", ". El tiempo de").replace("y el de", ". El tiempo de")  # normalize time notes
+    text = (
+        text.replace(", el de", ". El tiempo de").replace("y el de", ". El tiempo de").replace(", siendo", ". ")
+    )  # normalize time notes
     notes = text.split(". ")
 
     for note in notes:
         if note.endswith("."):
             note = note[:-1]
 
-        if "El tiempo" in note:
+        if any(pattern in note.lower() for pattern in ["el tiempo", "había realizado un tiempo de"]):
             # note that just provides a club time without any other information
             penalties, new_note = _process_time_note(note, penalties)
             if new_note:
@@ -149,7 +157,8 @@ def normalize_penalty(text: str | None) -> PenaltyDict:
             club_name, maybe_time = match.groups()
             time = find_time(maybe_time)
             if time:
-                penalties = Penalty.push(penalties, club_name.upper(), time.strftime("%M:%S.%f"))
+                club_name = normalize_club_name(club_name.upper())
+                penalties = Penalty.push(penalties, club_name, time.strftime("%M:%S.%f"))
             continue
 
         note_lemmas = lemmatize(remove_parenthesis(note))
@@ -172,6 +181,7 @@ def _process_time_note(note: str, penalties: PenaltyDict) -> tuple[PenaltyDict, 
         .replace("El tiempo de ", "")
         .replace(" había sido de ", ", ")
         .replace(" había sido ", ", ")
+        .replace(" había realizado un tiempo de ", ", ")
     )
     clean_note = re.sub(r" de ([\d:.]+)", r", \1", clean_note)
     parts = clean_note.split(", ")
@@ -193,11 +203,11 @@ def _process_time_note(note: str, penalties: PenaltyDict) -> tuple[PenaltyDict, 
 
 
 def _retrieve_club_names(note: str, penalty: str) -> Generator[str, None, None]:
-    club_name = None
+    club_name: str | None = None
     for r in _TEMPLATES[penalty]:
         match = re.match(r, note, flags=re.IGNORECASE | re.UNICODE)
         if match:
-            club_name = match.group(1)
+            club_name = match.group(1).upper().replace(" Y EL ", " Y ")
             break
     if club_name:
-        yield from normalize_club_name(club_name.upper()).replace(" Y EL ", " Y ").split(" Y ")
+        yield from (normalize_club_name(club) for club in club_name.split(" Y "))

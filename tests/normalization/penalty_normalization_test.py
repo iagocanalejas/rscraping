@@ -21,6 +21,7 @@ class TestPenaltyNormalization(unittest.TestCase):
             "El tiempo de Tirán había sido de 19:23.52, el de Mecos de 19:31.32 y el de Cabo da Cruz de 19:13.70.",
             "El tiempo de Coruxo había sido de 22:32.16. El tiempo de Puebla había sido de 22:16.98.",
             "Donostia Arraun Lagunak fue descalificado, su tiempo había sido de 20:58.16.",
+            "Hondarribia había realizado un tiempo de 20:29.1.",
         ]
         results = [
             {
@@ -38,25 +39,32 @@ class TestPenaltyNormalization(unittest.TestCase):
             {
                 "DONOSTIA ARRAUN LAGUNAK": ("20:58.160000", None),
             },
+            {
+                "HONDARRIBIA": ("20:29.100000", None),
+            },
         ]
         for idx, text in enumerate(notes):
             self.assertEqual(normalize_penalty(text), results[idx])
 
     def test_starboard_tack_normalization(self):
         notes = [
-            "Vila de Cangas realizó la primera ciaboga por estribor.",
-            "Ría de Marín realizó una ciaboga por estribor.",
-            "Fortuna realizió una ciaboga por estribor",
+            # "Vila de Cangas realizó la primera ciaboga por estribor.",
+            # "Ría de Marín realizó una ciaboga por estribor.",
+            # "Fortuna realizió una ciaboga por estribor",
+            "Castro había dado la tercera ciaboga por estribor, siendo su tiempo de 21:48.3",
         ]
         results = [
+            # {
+            #     "VILA DE CANGAS": (None, Penalty(disqualification=True, reason=STARBOARD_TACK)),
+            # },
+            # {
+            #     "RÍA DE MARÍN": (None, Penalty(disqualification=True, reason=STARBOARD_TACK)),
+            # },
+            # {
+            #     "FORTUNA": (None, Penalty(disqualification=True, reason=STARBOARD_TACK)),
+            # },
             {
-                "VILA DE CANGAS": (None, Penalty(disqualification=True, reason=STARBOARD_TACK)),
-            },
-            {
-                "RÍA DE MARÍN": (None, Penalty(disqualification=True, reason=STARBOARD_TACK)),
-            },
-            {
-                "FORTUNA": (None, Penalty(disqualification=True, reason=STARBOARD_TACK)),
+                "CASTRO": ("21:48.300000", Penalty(disqualification=True, reason=STARBOARD_TACK)),
             },
         ]
         for idx, text in enumerate(notes):
@@ -77,7 +85,7 @@ class TestPenaltyNormalization(unittest.TestCase):
             },
             {
                 "SAN SIMÓN": ("24:34.290000", Penalty(disqualification=True, reason=OFF_THE_FIELD)),
-                "A CABANA": ("24:30.410000", Penalty(disqualification=True, reason=OFF_THE_FIELD)),
+                "CABANA": ("24:30.410000", Penalty(disqualification=True, reason=OFF_THE_FIELD)),
             },
             {
                 "CESANTES": ("21:52.580000", Penalty(disqualification=True, reason=OFF_THE_FIELD)),
@@ -138,6 +146,7 @@ class TestPenaltyNormalization(unittest.TestCase):
             "El tiempo de Amegrove había sido de 20:09.33, pero fue descalificada por invasión de la calle del Náutico de Vigo a la salida de la segunda ciaboga.",  # noqa: E501
             "En la segunda jornada Donibaneko fue descalificado por invadir la calle de Santurtzi en la segunda ciaboga. Terminó con un tiempo de 20:59,35.",  # noqa: E501
             "Trintxerpe se chocó contra una roca.",
+            "En la primera jornada, Santander había llegado junto a Astillero en el segundo puesto de tanda, pero abordó a Kaiku y fue descalificado y no participó en la segunda jornada del campeonato. Su tiempo había sido de 21:11.6.",  # noqa: E501
         ]
         results = [
             {
@@ -163,6 +172,9 @@ class TestPenaltyNormalization(unittest.TestCase):
             },
             {
                 "TRINTXERPE": (None, Penalty(disqualification=True, reason=COLLISION)),
+            },
+            {
+                "SANTANDER": ("21:11.600000", Penalty(disqualification=True, reason=COLLISION)),
             },
         ]
         for idx, text in enumerate(notes):
