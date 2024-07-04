@@ -3,6 +3,7 @@ from .clubs import (
     deacronym_club_name as deacronym_club_name,
     remove_club_title as remove_club_title,
     remove_club_sponsor as remove_club_sponsor,
+    ensure_b_teams_have_the_main_team_racing as ensure_b_teams_have_the_main_team_racing,
 )
 from .races import (
     normalize_race_name as normalize_race_name,

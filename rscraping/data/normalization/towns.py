@@ -45,6 +45,7 @@ _NORMALIZED_TOWNS = {
         ["PEDRAS", "NEGRAS"],
         ["GROVE"],
     ],
+    "ASTILLERO": [["EL", "ASTILLERO"]],
 }
 
 _PROVINCES = [

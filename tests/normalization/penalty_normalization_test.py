@@ -147,6 +147,8 @@ class TestPenaltyNormalization(unittest.TestCase):
             "En la segunda jornada Donibaneko fue descalificado por invadir la calle de Santurtzi en la segunda ciaboga. Terminó con un tiempo de 20:59,35.",  # noqa: E501
             "Trintxerpe se chocó contra una roca.",
             "En la primera jornada, Santander había llegado junto a Astillero en el segundo puesto de tanda, pero abordó a Kaiku y fue descalificado y no participó en la segunda jornada del campeonato. Su tiempo había sido de 21:11.6.",  # noqa: E501
+            "Ur-Kirolak fue descalificado por abordar a Astillero en una ciaboga. Su tiempo había sido de 20:54.44.",
+            "Santander fue descalificado por abordaje. Su tiempo había sido de 21:41.00",
         ]
         results = [
             {
@@ -175,6 +177,12 @@ class TestPenaltyNormalization(unittest.TestCase):
             },
             {
                 "SANTANDER": ("21:11.600000", Penalty(disqualification=True, reason=COLLISION)),
+            },
+            {
+                "UR KIROLAK": ("20:54.440000", Penalty(disqualification=True, reason=COLLISION)),
+            },
+            {
+                "SANTANDER": ("21:41.000000", Penalty(disqualification=True, reason=COLLISION)),
             },
         ]
         for idx, text in enumerate(notes):

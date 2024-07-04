@@ -20,15 +20,16 @@ from rscraping.data.constants import (
 )
 from rscraping.data.models import Club, Datasource, Participant, Penalty, Race, RaceName
 from rscraping.data.normalization import (
+    ensure_b_teams_have_the_main_team_racing,
     find_league,
     find_race_sponsor,
+    is_cancelled,
     normalize_club_name,
     normalize_lap_time,
     normalize_penalty,
     normalize_race_name,
     normalize_town,
 )
-from rscraping.data.normalization.penalty import is_cancelled
 
 from ._protocol import HtmlParser
 
@@ -140,6 +141,8 @@ class TrainerasHtmlParser(HtmlParser):
                     absent=False,
                 )
             )
+
+        ensure_b_teams_have_the_main_team_racing(race)
 
         return race
 
@@ -372,5 +375,8 @@ class TrainerasHtmlParser(HtmlParser):
 
         if all(n in name for n in ["TERESA", "HERRERA"]):
             return "TROFEO TERESA HERRERA" if t_date.isoweekday() == 7 else "TROFEO TERESA HERRERA (CLASIFICATORIA)"
+
+        if all(n in name for n in ["GRAN", "PREMIO", "ASTILLERO"]) and t_date.year > 2018:
+            return "BANDERA DEL REAL ASTILLERO DE GUARNIZO"
 
         return name

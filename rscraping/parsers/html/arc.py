@@ -18,15 +18,16 @@ from rscraping.data.constants import (
     RACE_TRAINERA,
 )
 from rscraping.data.models import Datasource, Participant, Penalty, Race, RaceName
-from rscraping.data.normalization.clubs import normalize_club_name
-from rscraping.data.normalization.races import (
+from rscraping.data.normalization import (
+    ensure_b_teams_have_the_main_team_racing,
     find_race_sponsor,
+    normalize_club_name,
+    normalize_lap_time,
     normalize_name_parts,
     normalize_race_name,
+    normalize_town,
     remove_day_indicator,
 )
-from rscraping.data.normalization.times import normalize_lap_time
-from rscraping.data.normalization.towns import normalize_town
 
 from ._protocol import HtmlParser
 
@@ -97,6 +98,8 @@ class ARCHtmlParser(HtmlParser):
                     retired=False,
                 )
             )
+
+        ensure_b_teams_have_the_main_team_racing(race)
 
         return race
 

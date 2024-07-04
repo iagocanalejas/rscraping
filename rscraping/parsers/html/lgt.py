@@ -22,6 +22,8 @@ from rscraping.data.constants import (
 )
 from rscraping.data.models import Datasource, Participant, Penalty, Race, RaceName
 from rscraping.data.normalization import (
+    ensure_b_teams_have_the_main_team_racing,
+    find_edition,
     find_race_sponsor,
     normalize_club_name,
     normalize_lap_time,
@@ -30,7 +32,6 @@ from rscraping.data.normalization import (
     normalize_town,
     remove_day_indicator,
 )
-from rscraping.data.normalization.races import find_edition
 
 from ._protocol import HtmlParser
 
@@ -115,6 +116,8 @@ class LGTHtmlParser(HtmlParser):
                     retired=False,
                 )
             )
+
+        ensure_b_teams_have_the_main_team_racing(race)
 
         return race
 

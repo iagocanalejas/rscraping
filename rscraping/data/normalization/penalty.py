@@ -23,6 +23,7 @@ from .lemmatize import lemmatize
 _LEMMAS = {
     BOAT_WEIGHT_LIMIT: [["pesar", "embarcacion"]],
     COLLISION: [
+        ["abordaje"],
         ["abordar"],
         ["abordo"],
         ["demasiado", "abrir"],
@@ -61,6 +62,7 @@ _TEMPLATES = {
         r".* jornada (.*) fue descalificado por invadir.*",
         r"(.*) se chocó.*",
         r".*, (.*) había.*pero abordó.*descalificado.*",
+        r"(.*) fue descalificado por aborda.*",
     ],
     COXWAIN_WEIGHT_LIMIT: [],
     LACK_OF_COMPETITIVENESS: [

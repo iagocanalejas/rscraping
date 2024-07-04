@@ -7,6 +7,7 @@ from pyutils.strings import (
     whitespaces_clean,
 )
 from rscraping.data.checks import is_branch_club
+from rscraping.data.models import Race
 
 _ENTITY_TITLES_SHORT = [
     "AD",
@@ -98,30 +99,34 @@ _NORMALIZED_ENTITIES = {
 }
 
 _KNOWN_SPONSORS = [
-    "BAHIAS DE BIZKAIA",
-    "UROLA KOSTA",
-    "PEREIRA",
-    "MATRIX",
-    "BIZKAIA",
-    "FANDICOSTA",
-    "CIKAUTXO",
-    "ORIALKI",
     "AMENABAR",
-    "ELECNOR",
-    "BEREZ GALANTA",
-    "JAMONES ANCIN",
-    "NORTINDAL",
-    "BERTAKO IGOGAILUAK",
-    "GESALAGA OKELAN",
     "ANTTON BILBAO",
+    "BAHIAS DE BIZKAIA",
+    "BEREZ GALANTA",
+    "BERTAKO IGOGAILUAK",
+    "BIZKAIA",
+    "CIKAUTXO",
     "CMO VALVES",
-    "RODAVIGO",
-    "NORTEGAS",
-    "SIMEI",
-    "TECCARSA",
-    "NATURHOUSE",
-    "SALEGI JATETXEA",
+    "DELTECO",
+    "ELECNOR",
+    "FANDICOSTA",
+    "GESALAGA OKELAN",
+    "JAMONES ANCIN",
+    "MATRIX",
     "MICHELIN",
+    "MITXELENA MEKANIZATUAK",
+    "NATURHOUSE",
+    "NORTEGAS",
+    "NORTINDAL",
+    "ORIALKI",
+    "PEREIRA",
+    "RODAVIGO",
+    "SALEGI JATETXEA",
+    "SIMEI",
+    "SUSPERREGI EDUKIONTZIAK",
+    "TECCARSA",
+    "UROLA KOSTA",
+    "ÉNERYT SERVICIOS",
 ]
 
 
@@ -177,3 +182,14 @@ def remove_club_sponsor(name: str) -> str:
     if name.endswith(" - ") or name.startswith(" - "):
         name = name.replace(" - ", "")
     return whitespaces_clean(name)
+
+
+def ensure_b_teams_have_the_main_team_racing(race: Race):
+    """
+    Ensure that if a B team is racing, the main team is also racing
+    """
+    for i, p in enumerate(race.participants):
+        if is_branch_club(p.participant) or is_branch_club(p.participant, letter="C"):
+            main_team = p.participant.replace(" B", "").replace(" C", "")
+            if not any(mt.participant == main_team for mt in race.participants):
+                race.participants[i].participant = main_team
