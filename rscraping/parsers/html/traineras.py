@@ -30,6 +30,7 @@ from rscraping.data.normalization import (
     normalize_race_name,
     normalize_town,
 )
+from rscraping.data.normalization.races import normalize_name_parts
 
 from ._protocol import HtmlParser
 
@@ -85,9 +86,15 @@ class TrainerasHtmlParser(HtmlParser):
         ttype = ttype if not should_be_time_trial(name, t_date) else RACE_TIME_TRIAL
         race_notes = self.get_race_notes(selector)
 
+        normalized_names = normalize_name_parts(normalize_race_name(name))
+        if len(normalized_names) == 0:
+            logger.error(f"{self.DATASOURCE}: unable to normalize {name=}")
+            return None
+        normalized_names = [(self._normalize_race_name(n, name, t_date), e) for (n, e) in normalized_names]
+
         race = Race(
             name=name,
-            normalized_names=[(self._normalize_race_name(normalize_race_name(name), name, t_date), None)],
+            normalized_names=normalized_names,
             date=t_date.strftime("%d/%m/%Y"),
             type=ttype,
             day=self._clean_day(table, name),

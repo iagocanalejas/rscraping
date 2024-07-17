@@ -118,6 +118,7 @@ _KNOWN_SPONSORS = [
     "NATURHOUSE",
     "NORTEGAS",
     "NORTINDAL",
+    "OCCIDENT",
     "ORIALKI",
     "PEREIRA",
     "RODAVIGO",

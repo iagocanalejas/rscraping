@@ -13,6 +13,7 @@ class TestRaceNormalization(unittest.TestCase):
             "XVII BANDEIRA CIDADE DE FERROL III MEMORIAL MIGUEL DERUNGS CRIADO",
             "X BANDERA ILLA DO SAMERTOLAMEU-FANDICOSTA",
             "CAMPEONATO DE GUIPÚZCOA",
+            "BANDERA CONCELLO DE BUEU (ACT)",
         ]
 
     def test_race_name_normalization(self):
@@ -24,6 +25,7 @@ class TestRaceNormalization(unittest.TestCase):
             "XVII BANDEIRA CIDADE DE FERROL III MEMORIAL MIGUEL DERUNGS CRIADO",
             "X BANDEIRA ILLA DO SAMERTOLAMEU - FANDICOSTA",
             "CAMPEONATO DE GIPÚZKOA",
+            "BANDERA CONCELLO DE BUEU (ACT)",
         ]
 
         for idx, race_name in enumerate(self.NAMES):
@@ -38,6 +40,7 @@ class TestRaceNormalization(unittest.TestCase):
             [("BANDEIRA CIDADE DE FERROL", 17), ("MEMORIAL MIGUEL DERUNGS CRIADO", 3)],
             [("BANDEIRA ILLA DO SAMERTOLAMEU - FANDICOSTA", 10)],
             [("CAMPEONATO DE GIPÚZKOA", None)],
+            [("BANDERA CONCELLO DE BUEU", None)],
         ]
 
         races = [normalize_race_name(n) for n in self.NAMES]
