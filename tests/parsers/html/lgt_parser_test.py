@@ -1,5 +1,6 @@
 import os
 import unittest
+from datetime import datetime
 
 from parsel.selector import Selector
 
@@ -37,6 +38,15 @@ class TestLGTParser(unittest.TestCase):
             ids = self.parser.parse_race_ids(Selector(file.read()))
 
         self.assertEqual(list(ids), ["152", "153", "154"])
+
+    def test_parse_race_ids_by_days(self):
+        with open(os.path.join(self.fixtures, "lgt_calendar.html")) as file:
+            ids = self.parser.parse_race_ids_by_days(
+                Selector(file.read()),
+                days=[datetime.strptime("03/08/2024", "%d/%m/%Y")],
+            )
+
+        self.assertEqual(list(ids), ["209", "210"])
 
     def test_parse_race_names(self):
         with open(os.path.join(self.fixtures, "lgt_races.html")) as file:

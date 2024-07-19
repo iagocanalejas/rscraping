@@ -101,6 +101,14 @@ class ClientProtocol(Protocol):
         """
         ...
 
+    def get_last_weekend_race_ids(self, **kwargs) -> Generator[str, Any, Any]:
+        """
+        Find the IDs for the races that took place the last weekend.
+
+        Yields: str: Race IDs.
+        """
+        ...
+
     def get_races_url(self, year: int, **kwargs) -> str:
         """
         Return the URL for retrieving races in a specific year.

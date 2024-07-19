@@ -158,6 +158,19 @@ class TrainerasHtmlParser(HtmlParser):
         return (race.race_id for race in self.parse_race_names(selector))
 
     @override
+    def parse_race_ids_by_days(self, selector: Selector, days: list[datetime], **kwargs) -> Generator[str, Any, Any]:
+        assert len(days) > 0, "days must have at least one element"
+        assert all(d.year == days[0].year for d in days), "all days must be from the same year"
+
+        rows = [Selector(r) for r in selector.xpath("/html/body/div[1]/div[2]/table/tbody/tr").getall()]
+        for row in rows:
+            ttype = row.xpath("//*/td[2]/text()").get("")
+            name = whitespaces_clean(row.xpath("//*/td[1]/a/text()").get("").upper())
+            name = " ".join(n for n in name.split() if n != ttype)
+            if datetime.strptime(row.xpath("//*/td[5]/text()").get(""), "%d-%m-%Y") in days:
+                yield row.xpath("//*/td[1]/a/@href").get("").split("/")[-1]
+
+    @override
     def parse_race_names(self, selector: Selector, **_) -> Generator[RaceName, Any, Any]:
         rows = [Selector(r) for r in selector.xpath("/html/body/div[1]/div[2]/table/tbody/tr").getall()]
         for row in rows:

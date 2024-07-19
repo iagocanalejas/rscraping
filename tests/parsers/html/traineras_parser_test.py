@@ -1,5 +1,6 @@
 import os
 import unittest
+from datetime import datetime
 
 from parsel.selector import Selector
 
@@ -103,6 +104,13 @@ class TestTrainerasParser(unittest.TestCase):
 
         ids = self.parser.parse_race_ids(data)
         self.assertEqual(list(ids), ["5455", "5456", "5457", "5458", "5535", "5536"])
+
+    def test_parse_race_ids_by_days(self):
+        with open(os.path.join(self.fixtures, "traineras_results.html")) as file:
+            data = Selector(file.read())
+
+        ids = self.parser.parse_race_ids_by_days(data, days=[datetime.strptime("15-01-2023", "%d-%m-%Y")])
+        self.assertEqual(list(ids), ["5455", "5456", "5457", "5458"])
 
     def test_parse_flag_race_ids(self):
         with open(os.path.join(self.fixtures, "traineras_flag.html")) as file:

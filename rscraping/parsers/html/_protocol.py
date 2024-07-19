@@ -1,4 +1,5 @@
 from collections.abc import Generator
+from datetime import datetime
 from typing import Any, Protocol
 
 from parsel.selector import Selector
@@ -27,6 +28,19 @@ class HtmlParser(Protocol):
 
         Args:
             selector (Selector): The Selector to parse.
+            **kwargs: Additional keyword arguments.
+
+        Yields: str: The IDs of the races.
+        """
+        ...
+
+    def parse_race_ids_by_days(self, selector: Selector, days: list[datetime], **kwargs) -> Generator[str, Any, Any]:
+        """
+        Parse the given Selector to retrieve the IDs of the races that took place on the given days.
+
+        Args:
+            selector (Selector): The Selector to parse.
+            days (list[datetime]): The days to filter
             **kwargs: Additional keyword arguments.
 
         Yields: str: The IDs of the races.

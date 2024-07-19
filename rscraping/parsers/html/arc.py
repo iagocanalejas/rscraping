@@ -7,7 +7,7 @@ from typing import Any, override
 
 from parsel.selector import Selector
 
-from pyutils.strings import remove_parenthesis, whitespaces_clean
+from pyutils.strings import find_date, remove_parenthesis, whitespaces_clean
 from rscraping.data.checks import is_play_off
 from rscraping.data.constants import (
     CATEGORY_ABSOLUT,
@@ -111,6 +111,24 @@ class ARCHtmlParser(HtmlParser):
             else selector.xpath('//*[@id="main"]/div[4]/table/tbody/tr[*]/td[2]/span/a/@href').getall()
         )
         return (url_parts[-2] for url_parts in (url.split("/") for url in urls))
+
+    @override
+    def parse_race_ids_by_days(self, selector: Selector, days: list[datetime], **kwargs) -> Generator[str, Any, Any]:
+        assert len(days) > 0, "days must have at least one element"
+        assert all(d.year == days[0].year for d in days), "all days must be from the same year"
+
+        def _find_date(s: Selector) -> datetime | None:
+            maybe_date = f"{whitespaces_clean(s.xpath("//*/td[1]/span/text()").get("")).upper()} {days[0].year}"
+            found_date = find_date(maybe_date, day_first=True)
+            return datetime.combine(found_date, datetime.min.time()) if found_date else None
+
+        rows = (
+            selector.xpath('//*[@id="main"]/div[6]/table/tbody/tr[*]').getall()
+            if selector.xpath('//*[@id="proximas-regatas"]').get()
+            else selector.xpath('//*[@id="main"]/div[4]/table/tbody/tr[*]').getall()
+        )
+        selectors = [Selector(h) for h in rows]
+        return (s.xpath("//*/td[2]/span/a/@href").get("").split("/")[-2] for s in selectors if _find_date(s) in days)
 
     @override
     def parse_race_names(self, selector: Selector, **_) -> Generator[RaceName, Any, Any]:

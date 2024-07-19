@@ -2,6 +2,7 @@ import logging
 import os
 import re
 from collections.abc import Generator
+from datetime import datetime
 from typing import Any, override
 
 from parsel.selector import Selector
@@ -114,6 +115,19 @@ class ACTHtmlParser(HtmlParser):
     def parse_race_ids(self, selector: Selector, **_) -> Generator[str, Any, Any]:
         urls = selector.xpath('//*[@id="col-a"]/div/section/div[5]/table/tbody/tr[*]/td[*]/a/@href').getall()
         return (url_parts[-1] for url_parts in (url.split("r=") for url in urls))
+
+    @override
+    def parse_race_ids_by_days(self, selector: Selector, days: list[datetime], **kwargs) -> Generator[str, Any, Any]:
+        assert len(days) > 0, "days must have at least one element"
+        assert all(d.year == days[0].year for d in days), "all days must be from the same year"
+
+        rows = selector.xpath('//*[@id="col-a"]/div/section/div[5]/table/tbody/tr[*]').getall()
+        selectors = [Selector(r) for r in rows]
+        return (
+            s.xpath("//*/td[2]/a/@href").get("").split("r=")[-1]
+            for s in selectors
+            if datetime.strptime(s.xpath("//*/td[4]/text()").get(""), "%d-%m-%Y") in days
+        )
 
     @override
     def parse_race_names(self, selector: Selector, **_) -> Generator[RaceName, Any, Any]:

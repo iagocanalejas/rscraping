@@ -1,5 +1,6 @@
 import os
 import unittest
+from datetime import datetime
 
 from parsel.selector import Selector
 
@@ -34,6 +35,15 @@ class TestARCParser(unittest.TestCase):
             ids = self.parser.parse_race_ids(Selector(file.read()))
 
         self.assertEqual(list(ids), ["446", "474", "475"])
+
+    def test_parse_race_ids_by_days(self):
+        with open(os.path.join(self.fixtures, "arc_races.html")) as file:
+            ids = self.parser.parse_race_ids_by_days(
+                Selector(file.read()),
+                days=[datetime.strptime(f"19 JUNE {datetime.now().year}", "%d %B %Y")],
+            )
+
+        self.assertEqual(list(ids), ["446"])
 
     def test_parse_race_names(self):
         with open(os.path.join(self.fixtures, "arc_races.html")) as file:

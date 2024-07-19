@@ -1,5 +1,5 @@
 from collections.abc import Generator
-from datetime import date
+from datetime import date, datetime, timedelta
 from typing import Any, override
 
 import requests
@@ -80,6 +80,23 @@ class Client(ClientProtocol):
         yield from self._html_parser.parse_race_ids(
             selector=Selector(requests.get(url=url, headers=HTTP_HEADERS()).text),
             is_female=self.is_female,
+            **kwargs,
+        )
+
+    @override
+    def get_last_weekend_race_ids(self, **kwargs) -> Generator[str, Any, Any]:
+        today = datetime.today()
+        last_saturday = today - timedelta(days=(today.weekday() + 1) % 7 + 1)
+        last_sunday = today - timedelta(days=(today.weekday()) % 7 + 1)
+
+        url = self.get_races_url(today.year, is_female=self.is_female)
+        yield from self._html_parser.parse_race_ids_by_days(
+            selector=Selector(requests.get(url=url, headers=HTTP_HEADERS()).text),
+            is_female=self.is_female,
+            days=[
+                datetime.combine(last_saturday.date(), datetime.min.time()),
+                datetime.combine(last_sunday.date(), datetime.min.time()),
+            ],
             **kwargs,
         )
 

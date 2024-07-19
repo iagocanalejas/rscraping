@@ -1,6 +1,6 @@
 import re
 from collections.abc import Generator
-from datetime import date
+from datetime import date, datetime, timedelta
 from typing import Any, override
 
 import requests
@@ -196,6 +196,22 @@ class LGTClient(Client, source=Datasource.LGT):
         upper_race_id = right
 
         return (str(r) for r in range(lower_race_id, (upper_race_id + 1)) if r not in self._excluded_ids)
+
+    @override
+    def get_last_weekend_race_ids(self, **kwargs) -> Generator[str, Any, Any]:
+        today = datetime.today()
+        last_saturday = today - timedelta(days=(today.weekday() + 1) % 7 + 1)
+        last_sunday = today - timedelta(days=(today.weekday()) % 7 + 1)
+
+        yield from self._html_parser.parse_race_ids_by_days(
+            selector=self.get_calendar_selector(),
+            is_female=self.is_female,
+            days=[
+                datetime.combine(last_saturday.date(), datetime.min.time()),
+                datetime.combine(last_sunday.date(), datetime.min.time()),
+            ],
+            **kwargs,
+        )
 
     ####################################################
     #                      UTILS                       #

@@ -8,7 +8,7 @@ from typing import Any, override
 from parsel.selector import Selector
 
 from pyutils.shortcuts import none
-from pyutils.strings import whitespaces_clean
+from pyutils.strings import find_date, whitespaces_clean
 from rscraping.data.checks import is_female, is_play_off
 from rscraping.data.constants import (
     CATEGORY_ABSOLUT,
@@ -127,6 +127,32 @@ class LGTHtmlParser(HtmlParser):
         return (u.split("/")[-1].split("-")[0] for u in urls[0:])
 
     @override
+    def parse_race_ids_by_days(self, selector: Selector, days: list[datetime], **kwargs) -> Generator[str, Any, Any]:
+        assert len(days) > 0, "days must have at least one element"
+        assert all(d.year == days[0].year for d in days), "all days must be from the same year"
+
+        year, month, day = days[0].year, None, None
+        divs = [Selector(s) for s in selector.xpath("/html/body/div/div/div[*]").getall()]
+
+        for div in divs:
+            maybe_month = whitespaces_clean(div.xpath("//*/div/div/text()").get(""))
+            if maybe_month:
+                month = whitespaces_clean(maybe_month.upper())
+                continue
+
+            maybe_day = whitespaces_clean(div.xpath("//*/div/div/table/tr[1]/td[1]/text()").get(""))
+            if maybe_day:
+                day = int(maybe_day.upper().replace("D", "").replace("S", ""))
+                found_date = find_date(f"{day} {month} {year}", day_first=True)
+
+                if (
+                    found_date
+                    and datetime.combine(found_date, datetime.min.time()) in days
+                    and div.xpath("//*/div/a/@href").get(None)
+                ):
+                    yield div.xpath("//*/div/a/@href").get("").split("/")[-1].split("-")[0]
+
+    @override
     def parse_race_names(self, selector: Selector, **_) -> Generator[RaceName, Any, Any]:
         values = [Selector(u) for u in selector.xpath("//*/div/div/div[*]/div").getall()]
         return (
@@ -135,6 +161,7 @@ class LGTHtmlParser(HtmlParser):
                 name=u.xpath("//*/table/tr/td[2]/text()").get(""),
             )
             for u in values
+            if u.xpath("//*/a/@href").get(None)
         )
 
     ####################################################
