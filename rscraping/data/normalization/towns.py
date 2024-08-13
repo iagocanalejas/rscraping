@@ -8,44 +8,8 @@ from pyutils.strings import (
 from rscraping.data.constants import SYNONYM_PORT, SYNONYMS
 
 _NORMALIZED_TOWNS = {
-    "VILAGARCÍA DE AROUSA": [
-        ["VILAXOAN"],
-        ["VILAXOÁN"],
-        ["VILAGARCIA"],
-    ],
-    "DONOSTI": [
-        ["SAN", "SEBASTIAN"],
-        ["SAN", "SEBASTIÁN"],
-        ["DONOSTIA"],
-    ],
-    "PASAIA": [
-        ["PASAI", "DONIBANE"],
-        ["PASAI", "SAN", "JUAN"],
-        ["PASAI", "SAN", "PEDRO"],
-        ["SAN", "JUAN"],
-        ["SAN", "PEDRO"],
-    ],
-    "REDONDELA": [
-        ["CHAPELA"],
-        ["CESANTES"],
-    ],
-    "FERROL": [["CABANA"]],
-    "A CORUÑA": [["ORZAN"]],
     "A POBRA DO CARAMIÑAL": [["POBRA"], ["PUEBLA"]],
-    "MOAÑA": [
-        ["MEIRA"],
-        ["TIRAN"],
-        ["TIRÁN"],
-    ],
-    "MUROS": [["MUROS"], ["ESTEIRO"]],
-    "BOIRO": [["CABO", "CRUZ"]],
-    "OLEIROS": [["PERILLO"], ["MERA"]],
-    "RIVEIRA": [["RIVEIRA"], ["RIBEIRA"], ["AGUIÑO"]],
-    "O GROVE": [
-        ["PEDRAS", "NEGRAS"],
-        ["GROVE"],
-    ],
-    "ASTILLERO": [["EL", "ASTILLERO"]],
+    "RIVEIRA": [["RIVEIRA"], ["RIBEIRA"]],
 }
 
 _PROVINCES = [
