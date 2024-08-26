@@ -198,7 +198,8 @@ class LGTHtmlParser(HtmlParser):
     def get_league(self, selector: Selector) -> str | None:
         if is_play_off(self.get_name(selector)):
             return "LGT"
-        return whitespaces_clean(selector.xpath('//*[@id="regata"]/div/div/div[3]/div[2]/p[3]/span/text()').get(""))
+        league = whitespaces_clean(selector.xpath('//*[@id="regata"]/div/div/div[3]/div[2]/p[3]/span/text()').get(""))
+        return league if "LIGA" in league else None
 
     def get_town(self, selector: Selector) -> str:
         value = selector.xpath('//*[@id="regata"]/div/div/div[3]/div[2]/p[1]/text()').get("")
