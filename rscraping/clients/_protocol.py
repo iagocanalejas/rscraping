@@ -1,5 +1,5 @@
 from collections.abc import Generator
-from typing import Any, Protocol
+from typing import Protocol
 
 from rscraping.data.constants import GENDER_MALE
 from rscraping.data.models import Datasource, Race, RaceName
@@ -64,7 +64,7 @@ class ClientProtocol(Protocol):
         """
         ...
 
-    def get_race_names_by_year(self, year: int, **kwargs) -> Generator[RaceName, Any, Any]:
+    def get_race_names_by_year(self, year: int, **kwargs) -> Generator[RaceName]:
         """
         Find the names of the races that took place in a given year.
 
@@ -76,7 +76,7 @@ class ClientProtocol(Protocol):
         """
         ...
 
-    def get_race_ids_by_year(self, year: int, **kwargs) -> Generator[str, Any, Any]:
+    def get_race_ids_by_year(self, year: int, **kwargs) -> Generator[str]:
         """
         Find the IDs of the races that took place in a given year.
 
@@ -88,7 +88,7 @@ class ClientProtocol(Protocol):
         """
         ...
 
-    def get_race_ids_by_club(self, club_id: str, year: int, **kwargs) -> Generator[str, Any, Any]:
+    def get_race_ids_by_club(self, club_id: str, year: int, **kwargs) -> Generator[str]:
         """
         Find the IDs for the races in witch a given club participated in a given year.
 
@@ -101,7 +101,7 @@ class ClientProtocol(Protocol):
         """
         ...
 
-    def get_last_weekend_race_ids(self, **kwargs) -> Generator[str, Any, Any]:
+    def get_last_weekend_race_ids(self, **kwargs) -> Generator[str]:
         """
         Find the IDs for the races that took place the last weekend.
 

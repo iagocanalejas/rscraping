@@ -108,7 +108,7 @@ class TabularDataClient(Client, source=Datasource.TABULAR):
         if not pattern.match(url):
             raise ValueError(f"invalid {url=}")
 
-    def get_races(self, **kwargs) -> Generator[Race, Any, Any]:
+    def get_races(self, **kwargs) -> Generator[Race]:
         """
         Retrieve all the race details in the current DataFrame.
 
@@ -126,11 +126,11 @@ class TabularDataClient(Client, source=Datasource.TABULAR):
         return self.get_race_by_id(race_id=race_id, **kwargs)
 
     @override
-    def get_race_names_by_year(self, year: int, *_, **kwargs) -> Generator[RaceName, Any, Any]:
+    def get_race_names_by_year(self, year: int, *_, **kwargs) -> Generator[RaceName]:
         return self._parser.parse_race_names(self._df, year)
 
     @override
-    def get_race_ids_by_year(self, year: int, *_, **kwargs) -> Generator[str, Any, Any]:
+    def get_race_ids_by_year(self, year: int, *_, **kwargs) -> Generator[str]:
         return self._parser.parse_race_ids(self._df, year)
 
     ################################################

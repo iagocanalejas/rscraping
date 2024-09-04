@@ -1,7 +1,7 @@
 import re
 from collections.abc import Generator
 from datetime import date, datetime, timedelta
-from typing import Any, override
+from typing import override
 
 import requests
 from parsel.selector import Selector
@@ -123,7 +123,7 @@ class LGTClient(Client, source=Datasource.LGT):
         return super().get_race_by_url(url, race_id, **kwargs)
 
     @override
-    def get_race_names_by_year(self, year: int, **_) -> Generator[RaceName, Any, Any]:
+    def get_race_names_by_year(self, year: int, **_) -> Generator[RaceName]:
         today = date.today().year
         if today == year:
             race_names = self._html_parser.parse_race_names(selector=self.get_calendar_selector())
@@ -139,7 +139,7 @@ class LGTClient(Client, source=Datasource.LGT):
                 yield RaceName(race_id=id, name=whitespaces_clean(name).upper())
 
     @override
-    def get_race_ids_by_year(self, year: int, **_) -> Generator[str, Any, Any]:
+    def get_race_ids_by_year(self, year: int, **_) -> Generator[str]:
         """
         Find the IDs of the races that took place in a given year.
 
@@ -198,7 +198,7 @@ class LGTClient(Client, source=Datasource.LGT):
         return (str(r) for r in range(lower_race_id, (upper_race_id + 1)) if r not in self._excluded_ids)
 
     @override
-    def get_last_weekend_race_ids(self, **kwargs) -> Generator[str, Any, Any]:
+    def get_last_weekend_race_ids(self, **kwargs) -> Generator[str]:
         today = datetime.today()
         last_saturday = today - timedelta(days=(today.weekday() + 1) % 7 + 1)
         last_sunday = today - timedelta(days=(today.weekday()) % 7 + 1)

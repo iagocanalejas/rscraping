@@ -1,5 +1,5 @@
 from collections.abc import Generator
-from typing import Any, Protocol
+from typing import Protocol
 
 from pandas import DataFrame
 
@@ -7,7 +7,7 @@ from rscraping.data.models import Race
 
 
 class DataFrameParserProtocol(Protocol):
-    def parse_races(self, data: DataFrame, **kwargs) -> Generator[Race, Any, Any]:
+    def parse_races(self, data: DataFrame, **kwargs) -> Generator[Race]:
         """
         Parse the given DataFrame to retrieve the Race objects.
 

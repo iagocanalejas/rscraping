@@ -1,6 +1,6 @@
 from abc import ABC
 from collections.abc import Generator
-from typing import Any, override
+from typing import override
 
 from pandas import DataFrame
 
@@ -25,5 +25,5 @@ class DataFrameParser(DataFrameParserProtocol, ABC):
         return final_obj
 
     @override
-    def parse_races(self, data: DataFrame, **kwargs) -> Generator[Race, Any, Any]:
+    def parse_races(self, data: DataFrame, **kwargs) -> Generator[Race]:
         raise NotImplementedError

@@ -1,6 +1,6 @@
 from collections.abc import Generator
 from datetime import date, datetime, timedelta
-from typing import Any, override
+from typing import override
 
 import requests
 from parsel.selector import Selector
@@ -73,7 +73,7 @@ class Client(ClientProtocol):
         return race
 
     @override
-    def get_race_ids_by_year(self, year: int, **kwargs) -> Generator[str, Any, Any]:
+    def get_race_ids_by_year(self, year: int, **kwargs) -> Generator[str]:
         self.validate_year(year)
 
         url = self.get_races_url(year, is_female=self.is_female)
@@ -84,7 +84,7 @@ class Client(ClientProtocol):
         )
 
     @override
-    def get_last_weekend_race_ids(self, **kwargs) -> Generator[str, Any, Any]:
+    def get_last_weekend_race_ids(self, **kwargs) -> Generator[str]:
         today = datetime.today()
         last_saturday = today - timedelta(days=(today.weekday() + 1) % 7 + 1)
         last_sunday = today - timedelta(days=(today.weekday()) % 7 + 1)
@@ -101,7 +101,7 @@ class Client(ClientProtocol):
         )
 
     @override
-    def get_race_names_by_year(self, year: int, **kwargs) -> Generator[RaceName, Any, Any]:
+    def get_race_names_by_year(self, year: int, **kwargs) -> Generator[RaceName]:
         self.validate_year(year)
 
         url = self.get_races_url(year, is_female=self.is_female)
@@ -128,5 +128,5 @@ class Client(ClientProtocol):
         raise NotImplementedError
 
     @override
-    def get_race_ids_by_club(self, club_id: str, year: int, **kwargs) -> Generator[str, Any, Any]:
+    def get_race_ids_by_club(self, club_id: str, year: int, **kwargs) -> Generator[str]:
         raise NotImplementedError

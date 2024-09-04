@@ -1,6 +1,6 @@
 import re
 from collections.abc import Generator
-from typing import Any, override
+from typing import override
 
 import requests
 from parsel.selector import Selector
@@ -85,7 +85,7 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
         if not pattern.match(url):
             raise ValueError(f"invalid {url=}")
 
-    def get_race_ids_by_flag(self, flag_id: str) -> Generator[str, Any, Any]:
+    def get_race_ids_by_flag(self, flag_id: str) -> Generator[str]:
         """
         Find the IDs of the race editions for a given flag.
 
@@ -133,24 +133,24 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
         return race
 
     @override
-    def get_race_names_by_year(self, year: int, **_) -> Generator[RaceName, Any, Any]:
+    def get_race_names_by_year(self, year: int, **_) -> Generator[RaceName]:
         self.validate_year(year)
         for page in self._get_pages(year):
             yield from self._html_parser.parse_race_names(page)
 
     @override
-    def get_race_ids_by_year(self, year: int, **_) -> Generator[str, Any, Any]:
+    def get_race_ids_by_year(self, year: int, **_) -> Generator[str]:
         self.validate_year(year)
         for page in self._get_pages(year):
             yield from self._html_parser.parse_race_ids(page)
 
     @override
-    def get_race_ids_by_club(self, club_id: str, year: int, **kwargs) -> Generator[str, Any, Any]:
+    def get_race_ids_by_club(self, club_id: str, year: int, **kwargs) -> Generator[str]:
         content = requests.get(url=self.get_club_races_url(club_id, year), headers=HTTP_HEADERS())
         content = content.content.decode("utf-8")
         return self._html_parser.parse_club_race_ids(Selector(content))
 
-    def get_race_ids_by_rower(self, rower_id: str, year: str | None = None, **_) -> Generator[str, Any, Any]:
+    def get_race_ids_by_rower(self, rower_id: str, year: str | None = None, **_) -> Generator[str]:
         """
         Find the race IDs associated with a specific rower.
 
@@ -167,7 +167,7 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
         selector = Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8"))
         return self._html_parser.parse_club_details(selector, **kwargs)
 
-    def _get_pages(self, year: int) -> Generator[Selector, Any, Any]:
+    def _get_pages(self, year: int) -> Generator[Selector]:
         """
         Generate Selector objects for each page of races in a specific year.
 

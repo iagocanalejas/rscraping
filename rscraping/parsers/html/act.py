@@ -3,7 +3,7 @@ import os
 import re
 from collections.abc import Generator
 from datetime import datetime
-from typing import Any, override
+from typing import override
 
 from parsel.selector import Selector
 
@@ -112,12 +112,12 @@ class ACTHtmlParser(HtmlParser):
         return race
 
     @override
-    def parse_race_ids(self, selector: Selector, **_) -> Generator[str, Any, Any]:
+    def parse_race_ids(self, selector: Selector, **_) -> Generator[str]:
         urls = selector.xpath('//*[@id="col-a"]/div/section/div[5]/table/tbody/tr[*]/td[*]/a/@href').getall()
         return (url_parts[-1] for url_parts in (url.split("r=") for url in urls))
 
     @override
-    def parse_race_ids_by_days(self, selector: Selector, days: list[datetime], **kwargs) -> Generator[str, Any, Any]:
+    def parse_race_ids_by_days(self, selector: Selector, days: list[datetime], **kwargs) -> Generator[str]:
         assert len(days) > 0, "days must have at least one element"
         assert all(d.year == days[0].year for d in days), "all days must be from the same year"
 
@@ -130,7 +130,7 @@ class ACTHtmlParser(HtmlParser):
         )
 
     @override
-    def parse_race_names(self, selector: Selector, **_) -> Generator[RaceName, Any, Any]:
+    def parse_race_names(self, selector: Selector, **_) -> Generator[RaceName]:
         hrefs = selector.xpath('//*[@id="col-a"]/div/section/div[5]/table/tbody/tr[*]/td[*]/a').getall()
         selectors = [Selector(h) for h in hrefs]
         return (

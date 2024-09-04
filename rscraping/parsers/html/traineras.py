@@ -2,7 +2,7 @@ import logging
 import os
 from collections.abc import Generator
 from datetime import date, datetime
-from typing import Any, override
+from typing import override
 
 from parsel.selector import Selector
 
@@ -154,11 +154,11 @@ class TrainerasHtmlParser(HtmlParser):
         return race
 
     @override
-    def parse_race_ids(self, selector: Selector, **_) -> Generator[str, Any, Any]:
+    def parse_race_ids(self, selector: Selector, **_) -> Generator[str]:
         return (race.race_id for race in self.parse_race_names(selector))
 
     @override
-    def parse_race_ids_by_days(self, selector: Selector, days: list[datetime], **kwargs) -> Generator[str, Any, Any]:
+    def parse_race_ids_by_days(self, selector: Selector, days: list[datetime], **kwargs) -> Generator[str]:
         assert len(days) > 0, "days must have at least one element"
         assert all(d.year == days[0].year for d in days), "all days must be from the same year"
 
@@ -171,7 +171,7 @@ class TrainerasHtmlParser(HtmlParser):
                 yield row.xpath("//*/td[1]/a/@href").get("").split("/")[-1]
 
     @override
-    def parse_race_names(self, selector: Selector, **_) -> Generator[RaceName, Any, Any]:
+    def parse_race_names(self, selector: Selector, **_) -> Generator[RaceName]:
         rows = [Selector(r) for r in selector.xpath("/html/body/div[1]/div[2]/table/tbody/tr").getall()]
         for row in rows:
             ttype = row.xpath("//*/td[2]/text()").get("")
@@ -179,17 +179,17 @@ class TrainerasHtmlParser(HtmlParser):
             name = " ".join(n for n in name.split() if n != ttype)
             yield RaceName(race_id=row.xpath("//*/td[1]/a/@href").get("").split("/")[-1], name=name)
 
-    def parse_flag_race_ids(self, selector: Selector, gender: str, category: str, **_) -> Generator[str, Any, Any]:
+    def parse_flag_race_ids(self, selector: Selector, gender: str, category: str, **_) -> Generator[str]:
         table = self._get_matching_flag_table(gender, category, selector)
         if table:
             rows = Selector(table).xpath("//*/tr").getall()
             yield from (Selector(row).xpath("//*/td[3]/a/@href").get("").split("/")[-1] for row in rows[1:])
 
-    def parse_club_race_ids(self, selector: Selector) -> Generator[str, Any, Any]:
+    def parse_club_race_ids(self, selector: Selector) -> Generator[str]:
         rows = selector.xpath("/html/body/div[1]/div[2]/div/table/tr").getall()
         return (Selector(row).xpath("//*/td[1]/a/@href").get("").split("/")[-1] for row in rows[1:])
 
-    def parse_rower_race_ids(self, selector: Selector, year: str | None = None) -> Generator[str, Any, Any]:
+    def parse_rower_race_ids(self, selector: Selector, year: str | None = None) -> Generator[str]:
         rows = selector.xpath("/html/body/main/section[2]/div/div/div[1]/div/table/tr/td/table/tr").getall()
         if not year:
             return (Selector(r).xpath("//*/td/a/@href").get("").split("/")[-1] for r in rows)
@@ -220,9 +220,7 @@ class TrainerasHtmlParser(HtmlParser):
     def parse_searched_flag_urls(self, selector: Selector) -> list[str]:
         return selector.xpath("/html/body/div[1]/div[2]/div/div/div[*]/div/div/div[2]/h5/a/@href").getall()
 
-    def parse_flag_editions(
-        self, selector: Selector, gender: str, category: str
-    ) -> Generator[tuple[int, int], Any, Any]:
+    def parse_flag_editions(self, selector: Selector, gender: str, category: str) -> Generator[tuple[int, int]]:
         table = self._get_matching_flag_table(gender, category, selector)
         if table:
             for row in Selector(table).xpath("//*/tr").getall()[1:]:

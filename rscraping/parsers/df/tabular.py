@@ -1,6 +1,6 @@
 from collections.abc import Generator
 from datetime import date
-from typing import Any, override
+from typing import override
 
 from pandas import DataFrame, Series
 
@@ -48,16 +48,13 @@ class TabularDataFrameParser(DataFrameParserProtocol):
         is_female: bool = False,
         url: str | None = None,
         **__,
-    ) -> Generator[Race, Any, Any]:
+    ) -> Generator[Race]:
         for _, row in data.iterrows():
             race = self.parse_race(row, is_female=is_female, url=url)
             if race:
                 yield race
 
     def parse_race(self, row: Series, is_female: bool = False, url: str | None = None) -> Race | None:
-        if not isinstance(row, Series):
-            return None
-
         normalized_name = self._normalize_race_name(
             normalize_race_name(str(row[COLUMN_NAME])),
             str(row[COLUMN_LEAGUE]).upper() if str(row[COLUMN_LEAGUE]) else None,
@@ -113,11 +110,11 @@ class TabularDataFrameParser(DataFrameParserProtocol):
 
         return race
 
-    def parse_race_ids(self, data: DataFrame, year: int) -> Generator[str, Any, Any]:
+    def parse_race_ids(self, data: DataFrame, year: int) -> Generator[str]:
         df = data[data[COLUMN_DATE].dt.year == year]
         return (str(row.name) for _, row in df.iterrows())
 
-    def parse_race_names(self, data: DataFrame, year: int) -> Generator[RaceName, Any, Any]:
+    def parse_race_names(self, data: DataFrame, year: int) -> Generator[RaceName]:
         df = data[data[COLUMN_DATE].dt.year == year]
         return (RaceName(race_id=str(row.name), name=str(row[COLUMN_NAME])) for _, row in df.iterrows())
 

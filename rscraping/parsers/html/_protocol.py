@@ -1,6 +1,6 @@
 from collections.abc import Generator
 from datetime import datetime
-from typing import Any, Protocol
+from typing import Protocol
 
 from parsel.selector import Selector
 
@@ -22,7 +22,7 @@ class HtmlParser(Protocol):
         """
         ...
 
-    def parse_race_ids(self, selector: Selector, **kwargs) -> Generator[str, Any, Any]:
+    def parse_race_ids(self, selector: Selector, **kwargs) -> Generator[str]:
         """
         Parse the given Selector to retrieve the IDs of the races.
 
@@ -34,7 +34,7 @@ class HtmlParser(Protocol):
         """
         ...
 
-    def parse_race_ids_by_days(self, selector: Selector, days: list[datetime], **kwargs) -> Generator[str, Any, Any]:
+    def parse_race_ids_by_days(self, selector: Selector, days: list[datetime], **kwargs) -> Generator[str]:
         """
         Parse the given Selector to retrieve the IDs of the races that took place on the given days.
 
@@ -47,7 +47,7 @@ class HtmlParser(Protocol):
         """
         ...
 
-    def parse_race_names(self, selector: Selector, **kwargs) -> Generator[RaceName, Any, Any]:
+    def parse_race_names(self, selector: Selector, **kwargs) -> Generator[RaceName]:
         """
         Parse the given Selector to retrieve the names of the races.
 
