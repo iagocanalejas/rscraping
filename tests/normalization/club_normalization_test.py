@@ -7,6 +7,7 @@ class TestClubNormalization(unittest.TestCase):
     def setUp(self) -> None:
         self.NAMES = [
             "C.R. CABO DA CRUZ - C.R. PUEBLA",
+            "C.R. CABO DA CRUZ",
             "CCD CESANTES - RODAVIGO",
             "C.R. CABANA FERROL B",
             "C.R. PUEBLA B",
@@ -19,6 +20,7 @@ class TestClubNormalization(unittest.TestCase):
     def test_club_name_normalization(self):
         results = [
             "PUEBLA - CABO",
+            "CABO DA CRUZ",
             "CESANTES",
             "A CABANA B",
             "PUEBLA B",

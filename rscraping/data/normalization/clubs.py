@@ -191,6 +191,6 @@ def ensure_b_teams_have_the_main_team_racing(race: Race):
     """
     for i, p in enumerate(race.participants):
         if is_branch_club(p.participant) or is_branch_club(p.participant, letter="C"):
-            main_team = p.participant.replace(" B", "").replace(" C", "")
+            main_team = " ".join(w for w in p.participant.split() if w not in ["B", "C"])
             if not any(mt.participant == main_team for mt in race.participants):
                 race.participants[i].participant = main_team
