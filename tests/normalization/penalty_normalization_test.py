@@ -42,29 +42,40 @@ class TestPenaltyNormalization(unittest.TestCase):
             {
                 "HONDARRIBIA": ("20:29.100000", None),
             },
+            {
+                "CASTRO": ("21:48.120000", None),
+            },
         ]
         for idx, text in enumerate(notes):
             self.assertEqual(normalize_penalty(text), results[idx])
 
     def test_starboard_tack_normalization(self):
         notes = [
-            # "Vila de Cangas realizó la primera ciaboga por estribor.",
-            # "Ría de Marín realizó una ciaboga por estribor.",
-            # "Fortuna realizió una ciaboga por estribor",
+            "Vila de Cangas realizó la primera ciaboga por estribor.",
+            "Ría de Marín realizó una ciaboga por estribor.",
+            "Fortuna realizió una ciaboga por estribor",
             "Castro había dado la tercera ciaboga por estribor, siendo su tiempo de 21:48.3",
+            "Castro ocupó la séptima posición pero fue descalificado por realizar la segunda ciaboga por estribor. Su tiempo había sido de 21:48.12.",  # noqa: E501
+            "Castro fue descalificado por tomar la segunda ciaboga por estribor y no rectificar.",
         ]
         results = [
-            # {
-            #     "VILA DE CANGAS": (None, Penalty(disqualification=True, reason=STARBOARD_TACK)),
-            # },
-            # {
-            #     "RÍA DE MARÍN": (None, Penalty(disqualification=True, reason=STARBOARD_TACK)),
-            # },
-            # {
-            #     "FORTUNA": (None, Penalty(disqualification=True, reason=STARBOARD_TACK)),
-            # },
+            {
+                "VILA DE CANGAS": (None, Penalty(disqualification=True, reason=STARBOARD_TACK)),
+            },
+            {
+                "RÍA DE MARÍN": (None, Penalty(disqualification=True, reason=STARBOARD_TACK)),
+            },
+            {
+                "FORTUNA": (None, Penalty(disqualification=True, reason=STARBOARD_TACK)),
+            },
             {
                 "CASTRO": ("21:48.300000", Penalty(disqualification=True, reason=STARBOARD_TACK)),
+            },
+            {
+                "CASTRO": ("21:48.120000", Penalty(disqualification=True, reason=STARBOARD_TACK)),
+            },
+            {
+                "CASTRO": (None, Penalty(disqualification=True, reason=STARBOARD_TACK)),
             },
         ]
         for idx, text in enumerate(notes):

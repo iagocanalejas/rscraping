@@ -89,6 +89,8 @@ _TEMPLATES = {
         r"(.*) realiz(i)?ó (la primera|una) ciaboga por estribor",
         r"(.*) fue descalificado por dejar por estribor una baliza.*",
         r"(.*) había dado.*estribor",
+        r"(.*) ocupó .* fue descalificado por realizar la .* por estribor",
+        r"(.*) fue descalificado .* estribor.*",
     ],
     WRONG_LINEUP: [
         r"(.*) quedó fuera de regata (por alineación indebida|después de una reclamación por problemas con).*",
