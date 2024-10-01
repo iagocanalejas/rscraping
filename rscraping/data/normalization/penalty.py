@@ -34,6 +34,7 @@ _LEMMAS = {
         ["molesto"],
         ["invadir"],
         ["invasion"],
+        ["irrumpir"],
         ["chocar"],
         ["choco"],
     ],
@@ -44,7 +45,7 @@ _LEMMAS = {
     OFF_THE_FIELD: [["estribor", "meta"], ["meta", "entrar"]],
     SINKING: [["hundio"]],
     STARBOARD_TACK: [["estribor", "ciaboga"]],
-    WRONG_LINEUP: [["ficha", "remero"], ["alineacion", "indebido"]],
+    WRONG_LINEUP: [["ficha", "remero"], ["remero", "licencia"], ["alineacion", "indebido"], ["juvenil"]],
     WRONG_ROUTE: [],
 }
 
@@ -62,7 +63,7 @@ _TEMPLATES = {
         r".* jornada (.*) fue descalificado por invadir.*",
         r"(.*) se chocó.*",
         r".*, (.*) había.*pero abordó.*descalificado.*",
-        r"(.*) fue descalificado por aborda.*",
+        r"(.*) fue descalificado por (irrumpir|aborda).*",
     ],
     COXWAIN_WEIGHT_LIMIT: [],
     LACK_OF_COMPETITIVENESS: [
@@ -94,6 +95,9 @@ _TEMPLATES = {
     ],
     WRONG_LINEUP: [
         r"(.*) quedó fuera de regata (por alineación indebida|después de una reclamación por problemas con).*",
+        "(.*) fue descalificado por llevar un remero.*",
+        "(.*) fue descalificado por llevar juveniles",
+        "(.*) fue descalificado por .*indebida",
     ],
     WRONG_ROUTE: [],
 }
@@ -163,7 +167,6 @@ def normalize_penalty(text: str | None) -> PenaltyDict:
             if time:
                 club_name = normalize_club_name(club_name.upper())
                 penalties = Penalty.push(penalties, club_name, time.strftime("%M:%S.%f"))
-            continue
 
         note_lemmas = lemmatize(remove_parenthesis(note))
         for penalty_str, lemmas in _LEMMAS.items():

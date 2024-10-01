@@ -22,6 +22,7 @@ class TestPenaltyNormalization(unittest.TestCase):
             "El tiempo de Coruxo había sido de 22:32.16. El tiempo de Puebla había sido de 22:16.98.",
             "Donostia Arraun Lagunak fue descalificado, su tiempo había sido de 20:58.16.",
             "Hondarribia había realizado un tiempo de 20:29.1.",
+            "El tiempo de Portugalete había sido de 21:29.20, el de Santurtzi de 21:15.50, el de Trinxerpe de 20:35.00 y el de Zarautz de 20:57.70.",  # noqa: E501
         ]
         results = [
             {
@@ -43,7 +44,10 @@ class TestPenaltyNormalization(unittest.TestCase):
                 "HONDARRIBIA": ("20:29.100000", None),
             },
             {
-                "CASTRO": ("21:48.120000", None),
+                "PORTUGALETE": ("21:29.200000", None),
+                "SANTURTZI": ("21:15.500000", None),
+                "TRINXERPE": ("20:35.000000", None),
+                "ZARAUTZ": ("20:57.700000", None),
             },
         ]
         for idx, text in enumerate(notes):
@@ -160,6 +164,7 @@ class TestPenaltyNormalization(unittest.TestCase):
             "En la primera jornada, Santander había llegado junto a Astillero en el segundo puesto de tanda, pero abordó a Kaiku y fue descalificado y no participó en la segunda jornada del campeonato. Su tiempo había sido de 21:11.6.",  # noqa: E501
             "Ur-Kirolak fue descalificado por abordar a Astillero en una ciaboga. Su tiempo había sido de 20:54.44.",
             "Santander fue descalificado por abordaje. Su tiempo había sido de 21:41.00",
+            "Donibaneko fue descalificado por irrumpir en la calle de Orio. Su tiempo final había sido de 21:05.64.",
         ]
         results = [
             {
@@ -195,6 +200,9 @@ class TestPenaltyNormalization(unittest.TestCase):
             {
                 "SANTANDER": ("21:41.000000", Penalty(disqualification=True, reason=COLLISION)),
             },
+            {
+                "DONIBANEKO": ("21:05.640000", Penalty(disqualification=True, reason=COLLISION)),
+            },
         ]
         for idx, text in enumerate(notes):
             self.assertEqual(normalize_penalty(text), results[idx])
@@ -203,6 +211,8 @@ class TestPenaltyNormalization(unittest.TestCase):
         notes = [
             "Chapela quedó fuera de regata después de una reclamación por problemas con la ficha de uno de sus remeros (Guta Ionut). Perdió la cuarta plaza tras realizar un tiempo de 20:40.22.",  # noqa: E501
             "Bueu quedó fuera de regata por alineación indebida de remeros de Marín. Su tiempo había sido de 24:23.73.",
+            "Raspas fue descalificado por llevar un remero con licencia de Santurtzi. Deusto-Portugalete B fue descalificado por llevar juveniles.",  # noqa: E501
+            "Kaiku fue descalificado por alineación indebida, su tiempo había sido de 20:26.42.",
         ]
         results = [
             {
@@ -210,6 +220,13 @@ class TestPenaltyNormalization(unittest.TestCase):
             },
             {
                 "BUEU": ("24:23.730000", Penalty(disqualification=True, reason=WRONG_LINEUP)),
+            },
+            {
+                "RASPAS": (None, Penalty(disqualification=True, reason=WRONG_LINEUP)),
+                "DEUSTO-PORTUGALETE B": (None, Penalty(disqualification=True, reason=WRONG_LINEUP)),
+            },
+            {
+                "KAIKU": ("20:26.420000", Penalty(disqualification=True, reason=WRONG_LINEUP)),
             },
         ]
         for idx, text in enumerate(notes):

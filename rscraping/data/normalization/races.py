@@ -44,7 +44,6 @@ _KO_NAMES = {
     "GIPÚZKOA": ["GUIPÚZCOA"],
     "HERNANIKO": ["HERNANI"],
     "HIBAIKAKO": ["HIBAIKA"],
-    "HONDARRIBIKO": ["HONDARRIBI", "HONDARRIBIA"],
     "MUNDAKAKO": ["MUNDAKA"],
     "MUTRIKUKO": ["MUTRIKU"],
     "ONDARROAKO": ["ONDARROA"],
@@ -236,4 +235,5 @@ def normalize_known_race_names(name: str) -> str:
 
 
 def normalize_ko_race_names(name: str) -> str:
+    name = " ".join([w if "HONDARRIBI" not in w else "HONDARRIBIKO" for w in name.split()])
     return apply_replaces(name, _KO_NAMES)
