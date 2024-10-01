@@ -1,5 +1,6 @@
 import logging
 import os
+from collections import Counter
 from collections.abc import Generator
 from datetime import date, datetime
 from typing import override
@@ -269,7 +270,15 @@ class TrainerasHtmlParser(HtmlParser):
             return 1
         lanes = list(self.get_lane(p) for p in participants)
         lanes = {int(lane) for lane in lanes if lane is not None}
-        return len(lanes) if lanes else None
+        if lanes:
+            return len(lanes)
+
+        # try to count the number of participants in each serie
+        series = Counter([int(self.get_series(p)) for p in participants])
+        lanes = max(series.values())
+        if all(v == lanes or v == (lanes - 1) for v in series.values()):
+            return lanes
+        return None
 
     def get_race_laps(self, selector: Selector, table: int) -> int | None:
         cia = []

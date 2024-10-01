@@ -312,7 +312,7 @@ class TestTrainerasParser(unittest.TestCase):
             category=CATEGORY_ABSOLUT,
             participants=[],
             race_laps=4,
-            race_lanes=None,
+            race_lanes=2,
             cancelled=False,
         ),
     ]
