@@ -83,7 +83,8 @@ class TrainerasHtmlParser(HtmlParser):
         logger.info(f"{self.DATASOURCE}: race normalized to {name=}")
 
         participants = self.get_participants(selector, table)
-        ttype = self.get_type(participants)
+        race_lanes = self.get_race_lanes(participants)
+        ttype = RACE_TIME_TRIAL if race_lanes == 1 else self.get_type(participants)
         ttype = ttype if not should_be_time_trial(name, t_date) else RACE_TIME_TRIAL
         race_notes = self.get_race_notes(selector)
 
@@ -111,7 +112,7 @@ class TrainerasHtmlParser(HtmlParser):
             datasource=self.DATASOURCE.value,
             cancelled=self.is_cancelled(participants) or is_cancelled(race_notes),
             race_laps=self.get_race_laps(selector, table),
-            race_lanes=self.get_race_lanes(participants),
+            race_lanes=race_lanes,
             race_notes=race_notes,
             participants=[],
         )
