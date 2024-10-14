@@ -73,6 +73,22 @@ class TestTrainerasParser(unittest.TestCase):
             self.assertEqual(race, self._RACES_DOUBLE[idx])
             self.assertEqual(participants, self._PARTICIPANTS_DOUBLE[idx])
 
+    def test_parse_race_double_1(self):
+        # race_id=1625
+        with open(os.path.join(self.fixtures, "traineras_race_double_1.html")) as file:
+            selector = Selector(file.read())
+            races = [
+                self.parser.parse_race(selector, race_id="1234", table=1),
+                self.parser.parse_race(selector, race_id="1234", table=2),
+            ]
+
+        self.assertEqual(len(races), 2)
+        for idx, race in enumerate(races):
+            assert race is not None
+            race.participants = []
+
+            self.assertEqual(race, self._RACES_DOUBLE_1[idx])
+
     def test_parse_race_triple(self):
         # race_id=2503
         with open(os.path.join(self.fixtures, "traineras_race_triple.html")) as file:
@@ -378,6 +394,53 @@ class TestTrainerasParser(unittest.TestCase):
                 retired=False,
             ),
         ],
+    ]
+
+    _RACES_DOUBLE_1 = [
+        Race(
+            name="BANDERA DE SANTANDER",
+            date="25/08/1979",
+            day=1,
+            modality=RACE_TRAINERA,
+            type=RACE_TIME_TRIAL,
+            league=None,
+            town="SANTANDER",
+            organizer=None,
+            sponsor=None,
+            normalized_names=[("BANDERA DE SANTANDER", None)],
+            race_ids=["1234"],
+            url=None,
+            datasource=Datasource.TRAINERAS.value.lower(),
+            gender=GENDER_MALE,
+            category=CATEGORY_ABSOLUT,
+            participants=[],
+            race_notes=None,
+            race_laps=2,
+            race_lanes=1,
+            cancelled=True,
+        ),
+        Race(
+            name="BANDERA DE SANTANDER",
+            date="26/08/1979",
+            day=2,
+            modality=RACE_TRAINERA,
+            type=RACE_TIME_TRIAL,
+            league=None,
+            town="",
+            organizer=None,
+            sponsor=None,
+            normalized_names=[("BANDERA DE SANTANDER", None)],
+            race_ids=["1234"],
+            url=None,
+            datasource=Datasource.TRAINERAS.value.lower(),
+            gender=GENDER_MALE,
+            category=CATEGORY_ABSOLUT,
+            participants=[],
+            race_notes=None,
+            race_laps=4,
+            race_lanes=1,
+            cancelled=True,
+        ),
     ]
 
     _RACES_TRIPLE = [
