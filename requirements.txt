@@ -1,6 +1,6 @@
-numpy==2.1.1
+numpy==2.1.2
 opencv-python==4.10.0.84
-pandas==2.2.2
+pandas==2.2.3
 parsel==1.9.1
 pyutils @ git+https://github.com/iagocanalejas/pyutils.git@master
 requests==2.32.3
