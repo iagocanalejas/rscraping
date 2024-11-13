@@ -24,14 +24,18 @@ from rscraping.data.normalization import (
     ensure_b_teams_have_the_main_team_racing,
     find_league,
     find_race_sponsor,
+    is_absent,
     is_cancelled,
+    is_guest,
+    is_retired,
     normalize_club_name,
     normalize_lap_time,
+    normalize_name_parts,
     normalize_penalty,
     normalize_race_name,
     normalize_town,
+    retrieve_penalty_times,
 )
-from rscraping.data.normalization.races import normalize_name_parts
 
 from ._protocol import HtmlParser
 
@@ -121,19 +125,35 @@ class TrainerasHtmlParser(HtmlParser):
             participants=[],
         )
 
-        penalties = normalize_penalty(race_notes)
+        participant_names = [normalize_club_name(self.get_club_name(row)) for row in participants]
+        extra_times = retrieve_penalty_times(race_notes) if race_notes else {}
+        penalties = normalize_penalty(race_notes, participants=participant_names)
+
+        if any(k == "" for k in penalties.keys()) and len(extra_times) == 0:
+            penalties[list(extra_times.keys())[0]] = penalties[""]
+            penalties.pop("")
+        if any(k == "" for k in extra_times.keys()) and len(penalties) == 0:
+            extra_times[list(extra_times.keys())[0]] = extra_times[""]
+            extra_times.pop("")
+
+        if "" in extra_times:
+            logger.warning(f"{self.DATASOURCE}: no participant found for extra time:\n\t{extra_times['']}")
+        if "" in penalties:
+            logger.warning(f"{self.DATASOURCE}: no participant found for penalty:\n\t{penalties['']}")
         if race_notes and not penalties:
-            logging.warning(f"{self.DATASOURCE}: no penalties found for note:\n\t{race_notes}")
+            logger.warning(f"{self.DATASOURCE}: no penalties found for note:\n\t{race_notes}")
 
         for row in participants:
+            participant_name = normalize_club_name(self.get_club_name(row))
             laps = self.get_laps(row)
-            time, penalty = penalties.get(normalize_club_name(self.get_club_name(row)), (None, None))
+            time = extra_times.get(participant_name, None)
+            penalty = penalties.get(participant_name, None)
 
             if time:
-                laps.append(time)
+                laps.append(time.strftime("%M:%S.%f"))
 
             if penalty:
-                penalty.disqualification = penalty.disqualification or self.is_disqualified(row)
+                penalty.disqualification = self.is_disqualified(row) or penalty.disqualification
             elif self.is_disqualified(row):
                 penalty = Penalty(reason=None, disqualification=True)
 
@@ -147,11 +167,12 @@ class TrainerasHtmlParser(HtmlParser):
                     laps=laps,
                     distance=distance,
                     handicap=None,
-                    participant=normalize_club_name(self.get_club_name(row)),
+                    participant=participant_name,
                     race=race,
                     penalty=penalty,
-                    retired=self.has_retired(row),
-                    absent=False,
+                    retired=self.has_retired(row) or is_retired(participant_name, race_notes),
+                    absent=is_absent(participant_name, race_notes),
+                    guest=is_guest(participant_name, race_notes),
                 )
             )
 

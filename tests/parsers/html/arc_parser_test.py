@@ -86,6 +86,7 @@ class TestARCParser(unittest.TestCase):
             race=_RACE,
             absent=False,
             retired=False,
+            guest=False,
         ),
         Participant(
             gender=GENDER_MALE,
@@ -100,6 +101,7 @@ class TestARCParser(unittest.TestCase):
             race=_RACE,
             absent=False,
             retired=False,
+            guest=False,
         ),
     ]
     _RACE_NAMES = [

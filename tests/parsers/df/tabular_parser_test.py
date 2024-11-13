@@ -98,6 +98,7 @@ class TestTabularDataParser(unittest.TestCase):
         race=_RACE,
         absent=False,
         retired=False,
+        guest=False,
     )
 
     _RACES = [
@@ -201,6 +202,7 @@ class TestTabularDataParser(unittest.TestCase):
             race=_RACES[0],
             absent=False,
             retired=False,
+            guest=False,
         ),
         Participant(
             gender=GENDER_MALE,
@@ -215,6 +217,7 @@ class TestTabularDataParser(unittest.TestCase):
             race=_RACES[1],
             absent=False,
             retired=False,
+            guest=False,
         ),
         Participant(
             gender=GENDER_MALE,
@@ -229,6 +232,7 @@ class TestTabularDataParser(unittest.TestCase):
             race=_RACES[2],
             absent=False,
             retired=False,
+            guest=False,
         ),
         Participant(
             gender=GENDER_MALE,
@@ -243,5 +247,6 @@ class TestTabularDataParser(unittest.TestCase):
             race=_RACES[3],
             absent=False,
             retired=False,
+            guest=False,
         ),
     ]

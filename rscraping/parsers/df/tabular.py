@@ -105,6 +105,7 @@ class TabularDataFrameParser(DataFrameParserProtocol):
                 race=race,
                 absent=False,
                 retired=False,
+                guest=False,
             )
         ]
 

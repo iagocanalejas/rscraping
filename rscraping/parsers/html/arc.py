@@ -96,6 +96,7 @@ class ARCHtmlParser(HtmlParser):
                     penalty=penalty,
                     absent=False,
                     retired=False,
+                    guest=False,
                 )
             )
 
@@ -163,7 +164,10 @@ class ARCHtmlParser(HtmlParser):
         if is_play_off(name):  # exception case
             return 1 if "1" in name or "I" in name.split() else 2
         matches = re.findall(r"\d+ª día|\(\d+ª? JORNADA\)", name)
-        return int(re.findall(r"\d+", matches[0])[0].strip()) if matches else 1
+        if matches:
+            matches = re.findall(r"\d+", matches[0])[0].strip()
+            return int(matches) if matches <= 2 else 1
+        return 1
 
     def get_type(self, participants: list[Selector]) -> str:
         lanes = list(self.get_lane(p) for p in participants)

@@ -1,11 +1,12 @@
 import re
-from collections.abc import Generator
+from datetime import time
 
-from pyutils.strings import find_time, remove_parenthesis
+from pyutils.strings import find_time, lstrip_conjunctions, remove_parenthesis
 from rscraping.data.constants import (
     BOAT_WEIGHT_LIMIT,
     COLLISION,
     COXWAIN_WEIGHT_LIMIT,
+    DOPING,
     LACK_OF_COMPETITIVENESS,
     NO_LINE_START,
     NULL_START,
@@ -15,57 +16,189 @@ from rscraping.data.constants import (
     WRONG_LINEUP,
     WRONG_ROUTE,
 )
-from rscraping.data.models import Penalty, PenaltyDict
+from rscraping.data.models import Penalty
 
 from .clubs import normalize_club_name
 from .lemmatize import lemmatize
 
+_CANCELLED_LEMMAS = [
+    ["anular", "regata"],
+    ["anulo", "regata"],
+    ["cancelar", "regata"],
+    ["cancelo", "regata"],
+    ["suspender", "regata"],
+    ["suspendio", "regata"],
+    ["anular", "prueba"],
+    ["anulo", "prueba"],
+    ["cancelar", "prueba"],
+    ["cancelo", "prueba"],
+    ["suspender", "prueba"],
+    ["suspendio", "prueba"],
+    ["tanda", "no", "salio"],
+]
+
+
+def is_cancelled(note: str | None) -> bool:
+    if not note:
+        return False
+
+    lemmas = lemmatize(remove_parenthesis(note))
+    return any(set(w).issubset(lemmas) for w in _CANCELLED_LEMMAS)
+
+
+_RETIRED_RE = [
+    r"(.*) abandonó.*",
+    r"(.*) se retiró por.*",
+    r"(.*) no tomó la salida por.*",
+    r"(?:.*, )(.*) no quiso participar y se retiró.*",
+]
+
+
+def is_retired(participant: str, note: str | None) -> bool:
+    if not note:
+        return False
+    found = _find_participant(note, _RETIRED_RE)
+    if not found or participant not in found:
+        return any(_find_participant(part, _RETIRED_RE) == participant for part in _clean_note(note))
+    return True
+
+
+_GUEST_RE = [
+    r"(.*) (?:formaban?|participaban?).*promoción.*",
+    r"(?:.*que)?(.*) no puntuaban",
+]
+
+
+def is_guest(participant: str, note: str | None) -> bool:
+    if not note:
+        return False
+    found = _find_participant(note, _GUEST_RE)
+    if not found or participant not in found:
+        return any(_find_participant(part, _GUEST_RE) == participant for part in _clean_note(note))
+    return True
+
+
+_ABSENT_RE = [r"(?:.*de )(.*) pero no se presentó"]
+
+
+def is_absent(participant: str, note: str | None) -> bool:
+    if not note:
+        return False
+    found = _find_participant(note, _ABSENT_RE)
+    if not found or participant not in found:
+        return any(_find_participant(part, _ABSENT_RE) == participant for part in _clean_note(note))
+    return True
+
+
+_TIME_RE = [
+    r"(.*) (?:tuvo|hizo|había realizado|marcó|realizó) un tiempo de ([\d:.,]+)",
+    r"El tiempo(?: final)? de (.*) fue de ([\d:.,]+)",
+    r"El tiempo(?: final)? de (.*) había sido(?: de)? ([\d:.,]+)",
+    r"(?:y )?(?:mientras )?(?:el )?(?:de|del|que) (.*) fue (?:de|hizo) ([\d:.,]+)",
+    r"(?:y )?(?:mientras )?(?:el )?(?:de|del|que) (.*) (?:de|hizo) ([\d:.,]+)",
+    # -- no participant cases --
+    r"(.*)Su tiempo(?: final)? (?:había sido|fue)(?: .*)? ([\d:.,]+)",
+    r"(.*)Perdió.*realizar un tiempo de ([\d:.,]+)",
+    r"(.*)Terminó con un tiempo de ([\d:.,]+)",
+    r"(.*)siendo su tiempo(?: de)? ([\d:.,]+)",
+    r"(.*)El tiempo fue de ([\d:.,]+)",
+    # -- last case --
+    r"(.*) de ([\d:.,]+)",
+]
+
+
+def retrieve_penalty_times(note: str) -> dict[str, time]:
+    """
+    Retrieve the participants and their times from a penalty
+
+    1. Handle some weird cases that retrieves a list of participants and a list of times.
+    2. Split the note into parts.
+    3. For each part, try to find a participant and a time.
+    """
+    times: dict[str, time | None] = {}
+
+    # weird cases with a list of participants and then a list of times
+    r = r"(.*) formaban.*tiempos fueron(?: de) (.*)(?:,)(?: respectivamente)"
+    match = re.match(r, note, flags=re.IGNORECASE | re.UNICODE)
+    if match:
+        participants = [normalize_club_name(p) for p in match.group(1).replace(" y ", ", ").split(",")]
+        times = {p: find_time(t) for p, t in zip(participants, match.group(2).replace(" y ", ", ").split(","))}
+        return {k: v for k, v in times.items() if v}
+
+    parts = _clean_note(note)
+    for part in parts:
+        for r in _TIME_RE:
+            match = re.match(r, part, flags=re.IGNORECASE | re.UNICODE)
+            if match:
+                participant = normalize_club_name(match.group(1).upper())
+                assert participant not in times.keys(), f"participant {participant} already has a time"
+                ttime = find_time(match.group(2))
+                times[participant] = ttime
+                break
+
+    return {k: v for k, v in times.items() if v}
+
+
 _LEMMAS = {
     BOAT_WEIGHT_LIMIT: [["pesar", "embarcacion"]],
     COLLISION: [
+        ["abrir", "demasiado"],
+        ["abrir", "molesto"],
+        ["poner", "delante"],
+        ["ponerse", "delante"],
+        ["salio", "abrir"],
         ["abordaje"],
         ["abordar"],
         ["abordo"],
-        ["demasiado", "abrir"],
-        ["delante"],
-        ["estorbar"],
-        ["estorbo"],
-        ["molestar"],
-        ["molesto"],
-        ["invadir"],
-        ["invasion"],
-        ["irrumpir"],
         ["chocar"],
         ["choco"],
+        ["colisiono"],
+        ["colisionar"],
+        ["estorbo"],
+        ["estorbar"],
+        ["invasion"],
+        ["invadir"],
+        ["irrumpir"],
+        ["molestar"],
+        ["molesto"],
     ],
     COXWAIN_WEIGHT_LIMIT: [],
+    DOPING: [["antidoping"], ["doping"], ["positivo"]],
     LACK_OF_COMPETITIVENESS: [["falto", "voluntad", "competir"]],
     NO_LINE_START: [],
-    NULL_START: [["nulo", "salida"], ["tarde", "salida"]],
-    OFF_THE_FIELD: [["estribor", "meta"], ["meta", "entrar"]],
-    SINKING: [["hundio"]],
-    STARBOARD_TACK: [["estribor", "ciaboga"]],
+    NULL_START: [["nulo", "salida"], ["tarde", "salida"], ["deberia", "baliza", "salida"]],
+    SINKING: [["hundio"], ["entrar", "agua"]],
     WRONG_LINEUP: [["ficha", "remero"], ["remero", "licencia"], ["alineacion", "indebido"], ["juvenil"]],
-    WRONG_ROUTE: [],
 }
+
+_ROUTE_LEMMAS = [
+    ["estribor", "meta"],
+    ["estribor", "ciaboga"],
+    ["estribor", "baliza"],
+    ["ciaboga", "incorrecto"],
+    ["meta", "entrar"],
+    ["cruzarse", "calle"],
+]
+
 
 _TEMPLATES = {
     BOAT_WEIGHT_LIMIT: [
         r"(.*) fue descalificado por no pesar la embarcación",
     ],
     COLLISION: [
-        r"(.*) salió (demasiado|muy) abiert(o|a)",
-        r".*fue abordado por (.*) en.*",
-        r"(.*) se puso delante de.*",
-        r"(.*) fue descalificado por ponerse delante de.*",
-        r"(.*) estorbó a.*en la.*",
-        r"(.*) pero fue descalificada por invasión.*",
-        r".* jornada (.*) fue descalificado por invadir.*",
-        r"(.*) se chocó.*",
-        r".*, (.*) había.*pero abordó.*descalificado.*",
-        r"(.*) fue descalificado por (irrumpir|aborda).*",
+        r".*jornada (.*) fue.*invadir.*",
+        r".*fue abordado por (.*)",
+        r"(.*) salió( demasiado| muy)? abiert(o|a).*",
+        r"(.*) se puso delante.*",
+        r"(.*) fue.*ponerse delante.*",
+        r"(.*) fue.*(irrumpir|abordar|invadir|abordaje).*",
+        r"(.*) (estorbó|se chocó|colisionó).*",
+        r".*jornada,? (.*) había.*abordó.*",  # this is too specific
     ],
     COXWAIN_WEIGHT_LIMIT: [],
+    DOPING: [
+        r"(.*) pero.*no pasó el control antidoping.*",
+    ],
     LACK_OF_COMPETITIVENESS: [
         r"Se consideró que a (.*) le faltó voluntad de competir.*",
     ],
@@ -74,147 +207,192 @@ _TEMPLATES = {
         r"(.*) tuvo.*salida(s)? nula(s)?",
         r"(.*) compitió fuera de regata por salida(s)? nula(s)?",
         r"(.*) quedó fuera.*tarde a la salida",
-    ],
-    OFF_THE_FIELD: [
-        r"(.*) entró a meta fuera de linea.*",
-        r"(.*) (pas(ó|aron)|dej(ó|aron)) la baliza de meta por estribor",
-        r"(.*) fue descalificad(o|a) por entrar en meta dejando la boya por estribor",
-        r"(.*) fue descalificad(o|a) por dejar por estribor una baliza.*meta",
-        r"(.*) pero fue descalificado por dejar su baliza por estribor a la entrada a meta",
-        r"(.*) entró a meta fuera de línea",
+        r"(.*) debería.*baliza de salida.*",
     ],
     SINKING: [
         r"(.*) se hundió.*",
-    ],
-    STARBOARD_TACK: [
-        r"(.*) realiz(i)?ó (la primera|una) ciaboga por estribor",
-        r"(.*) fue descalificado por dejar por estribor una baliza.*",
-        r"(.*) había dado.*estribor",
-        r"(.*) ocupó .* fue descalificado por realizar la .* por estribor",
-        r"(.*) fue descalificado .* estribor.*",
+        r"(.*) se retiró por entrar agua .*",
     ],
     WRONG_LINEUP: [
         r"(.*) quedó fuera de regata (por alineación indebida|después de una reclamación por problemas con).*",
         "(.*) fue descalificado por llevar un remero.*",
         "(.*) fue descalificado por llevar juveniles",
         "(.*) fue descalificado por .*indebida",
+        "(.*) ganó.*remeros con ficha.*",
     ],
-    WRONG_ROUTE: [],
 }
 
-_CANCELLED = [
-    "se suspendió",
-    "tanda no salió",
-    "anular la regata",
-    "regata se anuló",
-    "fue anulada",
+_ROUTE_TEMPLATES = {
+    OFF_THE_FIELD: [
+        r"(.*) entró a meta fuera de linea.*",
+        r"(.*) (pas(ó|aron)|dej(ó|aron)) la baliza de meta por estribor",
+        r"(.*) ?pero.*descalificado.*baliza.*estribor.*meta",
+        r"(.*) fue descalificad(o|a) por entrar en meta.*estribor",
+        r"(.*) fue descalificad(o|a) por dejar por estribor.*meta",
+        r"(.*) entró.*meta.*fuera.*",
+    ],
+    STARBOARD_TACK: [
+        r"(.*) ocupó.*fue descalificado por realizar la.*por estribor",
+        r"(.*) (:?realiz(i)?ó|tomó|fue descalificad(o|a)|tuvo que).*(:? ciaboga|baliza).*(estribor|incorrecta)(?!.*meta).*",  # noqa: E501
+        r"(.*) había dado.*estribor",
+    ],
+    WRONG_ROUTE: [
+        r"(.*) fue descalificado por dejar por estribor una baliza.*recorrido.*",
+        r"(.*) fue descalificado por cruzar.*calle",
+    ],
+}
+
+_DISQUALIFICATION_LEMMAS = ["DESCALIFICADO", "DESCALIFICADA"]
+_UNKNOWN_PENALTY_TEMPLATES = [
+    "(.*) fue descalificado.*",
 ]
 
 
-def is_cancelled(text: str | None) -> bool:
+def normalize_penalty(text: str | None, participants: list[str]) -> dict[str, Penalty]:
     """
-    Check if a text contains any of the known patterns for a cancelled race
-    """
-    return text is not None and any(w in text for w in _CANCELLED)
+    Normalize a penalty note
 
-
-def normalize_penalty(text: str | None) -> PenaltyDict:
-    """
-    Retrieve a dict of penalties in the format {club_name: (time, penalty)} from a text.
-
-    1. Normalize the text by replacing known common patters.
-    2. Split the text by "." as penalties use to be separated by a colon.
-    3. For each note, check if it is a time note or a penalty note.
-    4. If it is a time note, add the time to the penalties dict.
-    5. If it is a penalty note, check if it matches any of the known penalty templates.
-    6. If it matches, retrieve the club name and add the penalty to the penalties dict.
+    1. Retrieve the times of the participants.
+    2. Recontextualize the note.
+    3. Try to find the penalties in note parts.
+    4. If no penalty is found, try to find the penalties in the whole note.
+    5. If no penalty is found, try to find a disqualification.
+    6. If no penalty is found, try to find an unknown penalty.
     """
 
-    penalties: PenaltyDict = {}
+    penalties: dict[str, Penalty] = {}
     if not text:
         return penalties
 
-    text = (
-        text.replace(", el de", ". El tiempo de").replace("y el de", ". El tiempo de").replace(", siendo", ". ")
-    )  # normalize time notes
-    notes = text.split(". ")
+    og_text = "" + text
+    times = retrieve_penalty_times(og_text)
+    time_participant = list(times.keys())[0] if len(times) == 1 else None
+    text = _recontextualize_note(text.upper(), participants)
+    parts = _clean_note(text)
 
-    for note in notes:
-        if note.endswith("."):
-            note = note[:-1]
+    def assign_penalty(
+        text: str, text_lemmas: list[str], penalty_str: str, regexes: list[str]
+    ) -> tuple[str, Penalty] | None:
+        club_name = _find_participant(text, regexes)
+        if (not club_name or club_name not in participants) and time_participant:
+            club_name = time_participant
+        if club_name and club_name in participants:
+            assert club_name not in penalties.keys(), f"club {club_name} already has a penalty"
+            # TODO: improve disqualification detection
+            if penalty_str in [OFF_THE_FIELD, STARBOARD_TACK, WRONG_ROUTE]:
+                disqualification = any(w in text for w in _DISQUALIFICATION_LEMMAS)
+            else:
+                disqualification = penalty_str not in [SINKING] and all(w not in text_lemmas for w in ["RETIRO"])
+            disqualification = disqualification or penalty_str == OFF_THE_FIELD
+            return club_name, Penalty(reason=penalty_str, disqualification=disqualification)
 
-        if any(pattern in note.lower() for pattern in ["el tiempo", "había realizado un tiempo de"]):
-            # note that just provides a club time without any other information
-            penalties, new_note = _process_time_note(note, penalties)
-            if new_note:
-                notes.append(new_note)
-            continue
+    for part in parts:  # parts_loop
+        note_lemmas = lemmatize(remove_parenthesis(part))
+        penalty_found = False
 
-        if any(w in note.lower() for w in ["su tiempo", "un tiempo de"]):
-            # note that provides a club time for an existing penalty
-            match = re.match(r"(.*) fue descalificado.* había sido de (.*)", note, flags=re.IGNORECASE | re.UNICODE)
-            if not match:
-                time = find_time(note)
-                if time:
-                    penalties = Penalty.push(penalties, time=time.strftime("%M:%S.%f"))
-                continue
+        # route penalties
+        for lemmas_lists in _ROUTE_LEMMAS:  # lemmas_loop
+            if not set(lemmas_lists).issubset(note_lemmas):
+                continue  # lemmas_loop
 
-            if len(match.groups()) != 2:
-                continue
+            for penalty_str, regexes in _ROUTE_TEMPLATES.items():  # penalties_loop
+                penalty = assign_penalty(part, note_lemmas, penalty_str, regexes)
+                if penalty:
+                    club_name, penalty = penalty
+                    penalties[club_name] = penalty
+                    penalty_found = True
+                    break  # penalties_loop
 
-            club_name, maybe_time = match.groups()
-            time = find_time(maybe_time)
-            if time:
-                club_name = normalize_club_name(club_name.upper())
-                penalties = Penalty.push(penalties, club_name, time.strftime("%M:%S.%f"))
+            if penalty_found:
+                break  # lemmas_loop
 
-        note_lemmas = lemmatize(remove_parenthesis(note))
-        for penalty_str, lemmas in _LEMMAS.items():
-            for word in lemmas:
-                if not all(lemma in note_lemmas for lemma in word):
-                    continue
-                for name in _retrieve_club_names(note, penalty_str):
-                    penalty = Penalty(reason=penalty_str, disqualification=True)
-                    penalties = Penalty.push(penalties, name, penalty=penalty)
-                break
+        if penalty_found:
+            continue  # parts_loop
+
+        # rest of the penalties
+        for penalty_str, lemmas_lists in _LEMMAS.items():  # penalties_loop
+            for lemmas in lemmas_lists:  # lemmas_loop
+                if not set(lemmas).issubset(note_lemmas):
+                    continue  # lemmas_loop
+
+                penalty = assign_penalty(part, note_lemmas, penalty_str, _TEMPLATES[penalty_str])
+                if penalty:
+                    club_name, penalty = penalty
+                    penalties[club_name] = penalty
+                    penalty_found = True
+                    break  # lemmas_loop
+
+            if penalty_found:
+                break  # penalties_loop
+
+    if len(penalties.keys()) > 0:
+        return penalties
+
+    note_lemmas = lemmatize(remove_parenthesis(og_text))
+    for penalty_str, lemmas_lists in _LEMMAS.items():  # penalties_loop
+        penalty_found = False
+        for lemmas in lemmas_lists:  # lemmas_loop
+            if not set(lemmas).issubset(note_lemmas):
+                continue  # lemmas_loop
+
+            penalty = assign_penalty(og_text, note_lemmas, penalty_str, _TEMPLATES[penalty_str])
+            if penalty:
+                club_name, penalty = penalty
+                penalties[club_name] = penalty
+                penalty_found = True
+                break  # lemmas_loop
+        if penalty_found:
+            break  # penalties_loop
+
+    if time_participant and "fue descalificado" in og_text:
+        club_name = time_participant
+        assert club_name not in penalties.keys(), f"club {club_name} already has a penalty"
+        penalties[club_name] = Penalty(reason=None, disqualification=True)
+
+    if len(penalties.keys()) > 0:
+        return penalties
+
+    for regex in _UNKNOWN_PENALTY_TEMPLATES:
+        match = re.match(regex, og_text, flags=re.IGNORECASE | re.UNICODE)
+        if match:
+            club_name = normalize_club_name(match.group(1).upper())
+            assert club_name not in penalties.keys(), f"club {club_name} already has a penalty"
+            penalties[club_name] = Penalty(reason=None, disqualification=True)
+            break
 
     return penalties
 
 
-def _process_time_note(note: str, penalties: PenaltyDict) -> tuple[PenaltyDict, str | None]:
-    new_note = None
-    clean_note = (
-        note.replace("El tiempo del ", "")
-        .replace("El tiempo de ", "")
-        .replace(" había sido de ", ", ")
-        .replace(" había sido ", ", ")
-        .replace(" había realizado un tiempo de ", ", ")
-    )
-    clean_note = re.sub(r" de ([\d:.]+)", r", \1", clean_note)
-    parts = clean_note.split(", ")
-
-    if len(parts) > 2:
-        club_name, time = parts[0], parts[1]
-        extra = parts[2:]
-        parts = [club_name, time]
-        new_note = f"{club_name} {' '.join(extra)}"
-
-    if len(parts) != 2:
-        return penalties, new_note
-
-    club_name, time = normalize_club_name(parts[0].upper()), find_time(parts[1])
-    if time:
-        penalties = Penalty.push(penalties, club_name, time.strftime("%M:%S.%f"))
-
-    return penalties, new_note
+def _clean_note(note: str | None) -> list[str]:
+    if not note:
+        return []
+    note = note.replace(" y ", ", ").replace(". ", ", ").replace(" ue ", " fue ").rstrip(".")
+    return [p.strip() for p in note.split(", ")]
 
 
-def _retrieve_club_names(note: str, penalty: str) -> Generator[str, None, None]:
-    club_name: str | None = None
-    for r in _TEMPLATES[penalty]:
+def _find_participant(note: str, regex: list[str]) -> str | None:
+    for r in regex:
         match = re.match(r, note, flags=re.IGNORECASE | re.UNICODE)
         if match:
-            club_name = match.group(1).upper().replace(" Y EL ", " Y ")
-            break
-    if club_name:
-        yield from (normalize_club_name(club) for club in club_name.split(" Y "))
+            return normalize_club_name(match.group(1).upper())
+    return None
+
+
+def _recontextualize_note(text: str, participants: list[str]) -> str:
+    if " Y " in text:
+        new_text = ""
+        for part in text.split(". "):
+            if part.count(" Y ") != 1:
+                new_text += part + ". "
+                continue
+
+            parts = part.split(" Y ")
+            clean_part = lstrip_conjunctions(parts[1])
+            for p in participants:
+                clean_part = clean_part.replace(p.upper(), "")
+            clean_part = clean_part.strip()
+
+            new_text += parts[0] + " " + clean_part + ". "
+            new_text += parts[1] + ". "
+        return new_text.strip()
+    return text

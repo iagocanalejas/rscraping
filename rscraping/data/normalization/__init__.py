@@ -27,5 +27,12 @@ from .towns import (
     extract_town as extract_town,
 )
 from .leagues import normalize_league_name as normalize_league_name, find_league as find_league
-from .penalty import normalize_penalty as normalize_penalty, is_cancelled as is_cancelled
+from .penalty import (
+    is_guest as is_guest,
+    is_absent as is_absent,
+    is_retired as is_retired,
+    is_cancelled as is_cancelled,
+    normalize_penalty as normalize_penalty,
+    retrieve_penalty_times as retrieve_penalty_times,
+)
 from .lemmatize import lemmatize as lemmatize

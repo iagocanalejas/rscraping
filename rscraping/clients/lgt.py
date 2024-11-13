@@ -195,7 +195,7 @@ class LGTClient(Client, source=Datasource.LGT):
                 left = mid + 1
         upper_race_id = right
 
-        return (str(r) for r in range(lower_race_id, (upper_race_id + 1)) if r not in self._excluded_ids)
+        yield from (str(r) for r in range(lower_race_id, (upper_race_id + 1)) if r not in self._excluded_ids)
 
     @override
     def get_last_weekend_race_ids(self, **kwargs) -> Generator[str]:

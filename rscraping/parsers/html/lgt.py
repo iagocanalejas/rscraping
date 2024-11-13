@@ -114,6 +114,7 @@ class LGTHtmlParser(HtmlParser):
                     penalty=penalty,
                     absent=False,
                     retired=False,
+                    guest=False,
                 )
             )
 

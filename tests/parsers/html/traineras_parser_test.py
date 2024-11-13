@@ -204,6 +204,7 @@ class TestTrainerasParser(unittest.TestCase):
             race=_RACE,
             absent=False,
             retired=False,
+            guest=False,
         ),
         Participant(
             gender=GENDER_MALE,
@@ -218,6 +219,7 @@ class TestTrainerasParser(unittest.TestCase):
             race=_RACE,
             absent=False,
             retired=False,
+            guest=False,
         ),
     ]
 
@@ -257,6 +259,7 @@ class TestTrainerasParser(unittest.TestCase):
             race=_RACE_LABEL,
             absent=False,
             retired=False,
+            guest=False,
         ),
         Participant(
             gender=GENDER_MALE,
@@ -271,6 +274,7 @@ class TestTrainerasParser(unittest.TestCase):
             race=_RACE_LABEL,
             absent=False,
             retired=False,
+            guest=False,
         ),
         Participant(
             gender=GENDER_MALE,
@@ -285,6 +289,7 @@ class TestTrainerasParser(unittest.TestCase):
             race=_RACE_LABEL,
             absent=False,
             retired=False,
+            guest=False,
         ),
     ]
 
@@ -348,6 +353,7 @@ class TestTrainerasParser(unittest.TestCase):
                 race=_RACES_DOUBLE[0],
                 absent=False,
                 retired=False,
+                guest=False,
             ),
             Participant(
                 gender=GENDER_MALE,
@@ -362,6 +368,7 @@ class TestTrainerasParser(unittest.TestCase):
                 race=_RACES_DOUBLE[0],
                 absent=False,
                 retired=False,
+                guest=False,
             ),
         ],
         [
@@ -378,6 +385,7 @@ class TestTrainerasParser(unittest.TestCase):
                 race=_RACES_DOUBLE[1],
                 absent=False,
                 retired=False,
+                guest=False,
             ),
             Participant(
                 gender=GENDER_MALE,
@@ -392,6 +400,7 @@ class TestTrainerasParser(unittest.TestCase):
                 race=_RACES_DOUBLE[1],
                 absent=False,
                 retired=False,
+                guest=False,
             ),
         ],
     ]
@@ -524,6 +533,7 @@ class TestTrainerasParser(unittest.TestCase):
                 race=_RACES_TRIPLE[0],
                 absent=False,
                 retired=False,
+                guest=False,
             ),
             Participant(
                 gender=GENDER_MALE,
@@ -538,6 +548,7 @@ class TestTrainerasParser(unittest.TestCase):
                 race=_RACES_TRIPLE[0],
                 absent=False,
                 retired=False,
+                guest=False,
             ),
         ],
         [
@@ -554,6 +565,7 @@ class TestTrainerasParser(unittest.TestCase):
                 race=_RACES_TRIPLE[1],
                 absent=False,
                 retired=False,
+                guest=False,
             ),
             Participant(
                 gender=GENDER_MALE,
@@ -568,6 +580,7 @@ class TestTrainerasParser(unittest.TestCase):
                 race=_RACES_TRIPLE[1],
                 absent=False,
                 retired=False,
+                guest=False,
             ),
         ],
         [
@@ -584,6 +597,7 @@ class TestTrainerasParser(unittest.TestCase):
                 race=_RACES_TRIPLE[2],
                 absent=False,
                 retired=False,
+                guest=False,
             ),
             Participant(
                 gender=GENDER_MALE,
@@ -598,6 +612,7 @@ class TestTrainerasParser(unittest.TestCase):
                 race=_RACES_TRIPLE[2],
                 absent=False,
                 retired=False,
+                guest=False,
             ),
         ],
     ]

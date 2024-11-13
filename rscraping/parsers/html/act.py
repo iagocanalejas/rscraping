@@ -104,6 +104,7 @@ class ACTHtmlParser(HtmlParser):
                     penalty=penalty,
                     absent=False,
                     retired=False,
+                    guest=False,
                 )
             )
 
