@@ -23,9 +23,11 @@ class TestTimeNormalization(unittest.TestCase):
             "21:02.48",
             "25:22.57",
             "28:24.00",
-            "00:00.00",
+            None,
             "21:13.66",
         ]
 
         for idx, lap_time in enumerate(self.TIMES):
-            self.assertEqual(normalize_lap_time(lap_time), datetime.strptime(results[idx], "%M:%S.%f").time())
+            result = results[idx]
+            result = datetime.strptime(result, "%M:%S.%f").time() if result else None
+            self.assertEqual(normalize_lap_time(lap_time), result)

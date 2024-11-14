@@ -28,14 +28,20 @@ def normalize_lap_time(value: str) -> time | None:
             parts[1] = parts[1][:-1]
         if len(parts[0]) == 4:
             # try to fix '2102:48'
-            return datetime.strptime(f"{parts[0][0:2]}:{parts[0][2:]},{parts[1]}", "%M:%S,%f").time()
+            return time_or_none(datetime.strptime(f"{parts[0][0:2]}:{parts[0][2:]},{parts[1]}", "%M:%S,%f").time())
         if len(parts[1]) == 4:
             # try to fix '25:2257'
-            return datetime.strptime(f"{parts[0]}:{parts[1][0:2]},{parts[1][2:]}", "%M:%S,%f").time()
-        return datetime.strptime(f"{parts[0]}:{parts[1]}", "%M:%S").time()
+            return time_or_none(datetime.strptime(f"{parts[0]}:{parts[1][0:2]},{parts[1][2:]}", "%M:%S,%f").time())
+        return time_or_none(datetime.strptime(f"{parts[0]}:{parts[1]}", "%M:%S").time())
     if len(parts) == 3:
-        return datetime.strptime(f"{parts[0]}:{parts[1]},{parts[2]}", "%M:%S,%f").time()
+        return time_or_none(datetime.strptime(f"{parts[0]}:{parts[1]},{parts[2]}", "%M:%S,%f").time())
     return None
+
+
+def time_or_none(value: time | None) -> time | None:
+    if value is None or value == time(0, 0, 0):
+        return None
+    return value
 
 
 MONTHS = {

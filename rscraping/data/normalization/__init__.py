@@ -19,7 +19,11 @@ from .races import (
     split_by_edition_parts as split_by_edition_parts,
     find_race_sponsor as find_race_sponsor,
 )
-from .times import normalize_lap_time as normalize_lap_time, normalize_spanish_months as normalize_spanish_months
+from .times import (
+    normalize_lap_time as normalize_lap_time,
+    normalize_spanish_months as normalize_spanish_months,
+    time_or_none as time_or_none,
+)
 from .towns import (
     normalize_town as normalize_town,
     amend_town as amend_town,
