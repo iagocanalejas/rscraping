@@ -15,6 +15,7 @@ from rscraping.data.constants import (
     CATEGORY_VETERAN,
     GENDER_FEMALE,
     GENDER_MALE,
+    GENDER_MIX,
     RACE_CONVENTIONAL,
     RACE_TIME_TRIAL,
     RACE_TRAINERA,
@@ -57,7 +58,8 @@ class TrainerasHtmlParser(HtmlParser):
 
     _FEMALE = ["SF", "VF", "JF", "F"]
     _VETERAN = ["VF", "VM"]
-    _SCHOOL = ["M", "JM", "JF", "CM", "CF"]
+    _MIX = ["M"]
+    _SCHOOL = ["JM", "JF", "CM", "CF"]
 
     @override
     def parse_race(self, selector: Selector, *, race_id: str, table: int | None = None, **_) -> Race | None:
@@ -272,7 +274,11 @@ class TrainerasHtmlParser(HtmlParser):
     def get_gender(self, selector: Selector) -> str:
         parts = selector.xpath("/html/body/div[1]/main/div/div/div/div[1]/h2/text()").get("")
         part = whitespaces_clean(parts.split(" - ")[-1])
-        return GENDER_FEMALE if part in self._FEMALE else GENDER_MALE
+        if part in self._MIX:
+            return GENDER_MIX
+        if part in self._FEMALE:
+            return GENDER_FEMALE
+        return GENDER_MALE
 
     def get_type(self, participants: list[Selector]) -> str:
         series = [s for s in [p.xpath("//*/td[4]/text()").get("") for p in participants] if s]
@@ -324,7 +330,7 @@ class TrainerasHtmlParser(HtmlParser):
 
     def get_lane(self, participant: Selector) -> int | None:
         lane = participant.xpath("//*/td[3]/text()").get()
-        return int(lane) if lane else None
+        return int(lane) if lane and int(lane) <= 6 else None
 
     def get_club_name(self, participant: Selector) -> str:
         name = participant.xpath("//*/td[2]/text()").get()
