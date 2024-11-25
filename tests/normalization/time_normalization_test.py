@@ -14,6 +14,7 @@ class TestTimeNormalization(unittest.TestCase):
             "028:24",
             "00:009",
             "21.13.66",
+            "11,10",
         ]
 
     def test_lap_time_normalization(self):
@@ -25,6 +26,7 @@ class TestTimeNormalization(unittest.TestCase):
             "28:24.00",
             None,
             "21:13.66",
+            "11:10.00",
         ]
 
         for idx, lap_time in enumerate(self.TIMES):

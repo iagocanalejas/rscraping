@@ -5,7 +5,11 @@ from rscraping.data.constants import SYNONYM_FEMALE, SYNONYM_MEMORIAL, SYNONYMS
 
 
 def should_be_time_trial(name: str, date: date) -> bool:
-    return is_play_off(name) or (all(w in name.split() for w in ["TERESA", "HERRERA"]) and date.isoweekday() == 6)
+    return (
+        is_play_off(name)
+        or (all(w in name.split() for w in ["TERESA", "HERRERA"]) and date.isoweekday() == 6)
+        or (all(w in name.split() for w in ["VILLA", "BILBAO"]))
+    )
 
 
 def is_play_off(name: str) -> bool:

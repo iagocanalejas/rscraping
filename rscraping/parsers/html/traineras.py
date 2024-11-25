@@ -57,8 +57,8 @@ class TrainerasHtmlParser(HtmlParser):
     DATASOURCE = Datasource.TRAINERAS
 
     _FEMALE = ["SF", "VF", "JF", "F"]
-    _VETERAN = ["VF", "VM"]
     _MIX = ["M"]
+    _VETERAN = ["VF", "VM"]
     _SCHOOL = ["JM", "JF", "CM", "CF"]
 
     @override
@@ -343,7 +343,7 @@ class TrainerasHtmlParser(HtmlParser):
         return int(part.replace(" metros", "")) if part is not None else None
 
     def get_laps(self, participant: Selector) -> list[str]:
-        laps = [e for e in participant.xpath("//*/td/text()").getall() if any(c in e for c in [":", "."])]
+        laps = [e for e in participant.xpath("//*/td/text()").getall() if any(c in e for c in [":", ".", ","])]
         return [t.strftime("%M:%S.%f") for t in [normalize_lap_time(e) for e in laps if e] if t is not None]
 
     def is_disqualified(self, participant: Selector) -> bool:
@@ -415,8 +415,8 @@ class TrainerasHtmlParser(HtmlParser):
             words = ["MIXTO"]
 
         titles = selector.xpath("/html/body/main/div/div/div/div[*]/h2/text()").getall()
-        idx = next((i for i, t in enumerate(titles) if all(w in t for w in words)), 0)
-        return selector.xpath(f"/html/body/main/div/div/div/div[{idx + 1}]/div/table").get(None)
+        idx = next((i for i, t in enumerate(titles) if all(w in t for w in words)), -1)
+        return selector.xpath(f"/html/body/main/div/div/div/div[{idx + 1}]/div/table").get(None) if idx >= 0 else None
 
     @staticmethod
     def _participants_path(selector: Selector) -> str:

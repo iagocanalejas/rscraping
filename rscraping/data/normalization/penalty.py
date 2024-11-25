@@ -23,18 +23,12 @@ from .lemmatize import lemmatize
 
 _CANCELLED_LEMMAS = [
     ["anular", "regata"],
-    ["anulo", "regata"],
     ["cancelar", "regata"],
-    ["cancelo", "regata"],
     ["suspender", "regata"],
-    ["suspendio", "regata"],
     ["anular", "prueba"],
-    ["anulo", "prueba"],
     ["cancelar", "prueba"],
-    ["cancelo", "prueba"],
     ["suspender", "prueba"],
-    ["suspendio", "prueba"],
-    ["tanda", "no", "salio"],
+    ["tanda", "no", "salir"],
 ]
 
 
@@ -146,13 +140,11 @@ _LEMMAS = {
         ["abrir", "molesto"],
         ["poner", "delante"],
         ["ponerse", "delante"],
-        ["salio", "abrir"],
+        ["salir", "abrir"],
         ["abordaje"],
         ["abordar"],
         ["abordo"],
         ["chocar"],
-        ["choco"],
-        ["colisiono"],
         ["colisionar"],
         ["estorbo"],
         ["estorbar"],
@@ -164,10 +156,10 @@ _LEMMAS = {
     ],
     COXWAIN_WEIGHT_LIMIT: [],
     DOPING: [["antidoping"], ["doping"], ["positivo"]],
-    LACK_OF_COMPETITIVENESS: [["falto", "voluntad", "competir"]],
+    LACK_OF_COMPETITIVENESS: [["faltar", "voluntad", "competir"]],
     NO_LINE_START: [],
-    NULL_START: [["nulo", "salida"], ["tarde", "salida"], ["deberia", "baliza", "salida"]],
-    SINKING: [["hundio"], ["entrar", "agua"]],
+    NULL_START: [["nulo", "salida"], ["tarde", "salida"], ["deber", "baliza", "salir"]],
+    SINKING: [["hundir"], ["entrar", "agua"]],
     WRONG_LINEUP: [["ficha", "remero"], ["remero", "licencia"], ["alineacion", "indebido"], ["juvenil"]],
 }
 
