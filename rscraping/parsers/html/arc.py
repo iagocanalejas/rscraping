@@ -45,6 +45,7 @@ class ARCHtmlParser(HtmlParser):
             return None
         logger.info(f"{self.DATASOURCE}: found race {name}")
 
+        t_date = self.get_date(selector)
         gender = GENDER_FEMALE if is_female else GENDER_MALE
 
         normalized_names = normalize_name_parts(normalize_race_name(name))
@@ -59,7 +60,7 @@ class ARCHtmlParser(HtmlParser):
         race = Race(
             name=self.get_name(selector),
             normalized_names=normalized_names,
-            date=self.get_date(selector).strftime("%d/%m/%Y"),
+            date=t_date.strftime("%d/%m/%Y"),
             type=self.get_type(participants),
             day=self.get_day(selector),
             modality=RACE_TRAINERA,
@@ -81,6 +82,16 @@ class ARCHtmlParser(HtmlParser):
         for row in participants:
             disqualified = self.is_disqualified(selector, row)
             penalty = Penalty(reason=None, disqualification=disqualified) if disqualified else None
+            participant_name = normalize_club_name(self.get_club_name(row))
+            if "CASTRO" in participant_name:
+                # HACK: CASTRO URDIALES, CASTRO and CASTREÑA differentiation
+                if t_date.year < 2013:
+                    participant_name = "CASTRO URDIALES"
+                else:
+                    if any(w in self.get_club_name(row) for w in ["A.N. ", "AN ", "AN. "]):
+                        participant_name = "CASTRO"
+                    else:
+                        participant_name = "CASTREÑA"
             race.participants.append(
                 Participant(
                     gender=gender,
@@ -91,7 +102,7 @@ class ARCHtmlParser(HtmlParser):
                     laps=self.get_laps(row),
                     distance=self.get_distance(is_female),
                     handicap=None,
-                    participant=normalize_club_name(self.get_club_name(row)),
+                    participant=participant_name,
                     race=race,
                     penalty=penalty,
                     absent=False,

@@ -172,7 +172,7 @@ class TestPenaltyNormalization(unittest.TestCase):
             {"BUEU": Penalty(disqualification=True, reason=WRONG_LINEUP)},
             {
                 "RASPAS": Penalty(disqualification=True, reason=WRONG_LINEUP),
-                "DEUSTO-PORTUGALETE B": Penalty(disqualification=True, reason=WRONG_LINEUP),
+                "DEUSTO - PORTUGALETE B": Penalty(disqualification=True, reason=WRONG_LINEUP),
             },
             {"KAIKU": Penalty(disqualification=True, reason=WRONG_LINEUP)},
             {"KAIKU": Penalty(disqualification=True, reason=WRONG_LINEUP)},

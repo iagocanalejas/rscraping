@@ -89,6 +89,11 @@ class ACTHtmlParser(HtmlParser):
         for row in participants:
             disqualified = self.is_disqualified(row)
             penalty = Penalty(reason=None, disqualification=disqualified) if disqualified else None
+            participant_name = normalize_club_name(self.get_club_name(row)).replace("ACT | ", "")
+            if any(w in participant_name for w in ["CASTRO", "CASTREÑA"]):
+                # HACK: CASTRO URDIALES was renamed to CASTREÑA when the club went down
+                participant_name = "CASTRO URDIALES"
+
             race.participants.append(
                 Participant(
                     gender=gender,
@@ -99,7 +104,7 @@ class ACTHtmlParser(HtmlParser):
                     laps=self.get_laps(row),
                     distance=self.get_distance(is_female),
                     handicap=None,
-                    participant=normalize_club_name(self.get_club_name(row)).replace("ACT | ", ""),
+                    participant=participant_name,
                     race=race,
                     penalty=penalty,
                     absent=False,

@@ -93,24 +93,30 @@ _NORMALIZED_ENTITIES = {
     "PORTUGALETE": [["POTUGALETE"]],
     "GETXO": [["GETRXO"]],
     "DONOSTIARRA": [["DNOSTIARRA"]],
-    "UR KIROLAK": [["UR-KIROLAK"]],
+    "UR KIROLAK": [["UR", "KIROLAK"]],
     "URDAIBAI": [["BERMEO", "URDAIBAI"]],
-    "CASTREÑA": [["CASTRO", "CANTERAS", "SANTULLAN"]],  # this one is a mess since SDR Castro close
 }
 
 _KNOWN_SPONSORS = [
     "AMENABAR",
     "ANTTON BILBAO",
+    "AVIA",
+    "BABYAUTO",
     "BAHIAS DE BIZKAIA",
     "BEREZ GALANTA",
     "BERTAKO IGOGAILUAK",
     "BIZKAIA",
+    "CANTERAS DE SANTULLAN",
     "CIKAUTXO",
     "CMO VALVES",
     "DELTECO",
     "ELECNOR",
     "FANDICOSTA",
     "GESALAGA OKELAN",
+    "GLASS",
+    "GO FIT",
+    "IBERIA",
+    "IBERDROLA",
     "JAMONES ANCIN",
     "MATRIX",
     "MICHELIN",
@@ -181,8 +187,9 @@ def remove_club_sponsor(name: str) -> str:
     for sponsor in _KNOWN_SPONSORS:
         if name.replace(sponsor, "") != "":  # avoid removing the whole name
             name = name.replace(sponsor, "")
-    if name.endswith(" - ") or name.startswith(" - "):
-        name = name.replace(" - ", "")
+    name = whitespaces_clean(name.replace("-", " - "))
+    if name.endswith(" -") or name.startswith("- "):
+        name = name.replace("-", "")
     return whitespaces_clean(name)
 
 

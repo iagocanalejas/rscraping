@@ -147,6 +147,16 @@ class TrainerasHtmlParser(HtmlParser):
 
         for row in participants:
             participant_name = normalize_club_name(self.get_club_name(row))
+            if "CASTRO" in participant_name or "CASTREÑA" in participant_name:
+                # HACK: CASTRO URDIALES, CASTRO and CASTREÑA differentiation
+                if t_date.year < 2013:
+                    participant_name = "CASTRO URDIALES"
+                else:
+                    if any(w in self.get_club_name(row) for w in ["A.N. ", "AN ", "AN. "]):
+                        participant_name = "CASTRO"
+                    else:
+                        participant_name = "CASTREÑA"
+
             laps = self.get_laps(row)
             time = extra_times.get(participant_name, None)
             penalty = penalties.get(participant_name, None)
