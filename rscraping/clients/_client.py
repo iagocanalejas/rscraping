@@ -62,15 +62,19 @@ class Client(ClientProtocol):
     @override
     def get_race_by_url(self, url: str, race_id: str, **kwargs) -> Race | None:
         self.validate_url(url)
-        race = self._html_parser.parse_race(
-            selector=Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8")),
-            race_id=race_id,
-            is_female=self.is_female,
-            **kwargs,
-        )
-        if race:
-            race.url = url
-        return race
+        try:
+            race = self._html_parser.parse_race(
+                selector=Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8")),
+                race_id=race_id,
+                is_female=self.is_female,
+                **kwargs,
+            )
+        except AssertionError:
+            return None
+        else:
+            if race:
+                race.url = url
+            return race
 
     @override
     def get_race_ids_by_year(self, year: int, **kwargs) -> Generator[str]:

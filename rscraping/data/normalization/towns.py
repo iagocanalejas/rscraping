@@ -5,7 +5,7 @@ from pyutils.strings import (
     remove_parenthesis,
     whitespaces_clean,
 )
-from rscraping.data.constants import SYNONYM_PORT, SYNONYMS
+from rscraping.data.constants import SYNONYM_BAY, SYNONYM_BEACH, SYNONYM_PORT, SYNONYMS
 
 _NORMALIZED_TOWNS = {
     "A POBRA DO CARAMIÑAL": [["POBRA"], ["PUEBLA"]],
@@ -15,11 +15,11 @@ _NORMALIZED_TOWNS = {
 _PROVINCES = [
     "A CORUÑA",
     "PONTEVEDRA",
+    "LUGO",
     "GIPUZKOA",
     "BIZKAIA",
     "CANTABRIA",
 ]
-
 
 def normalize_town(town: str) -> str:
     """
@@ -30,8 +30,7 @@ def normalize_town(town: str) -> str:
     2. Remove province
     3. Specific known town normalizations
     """
-    town = whitespaces_clean(town.upper().replace("PORTO DE ", ""))
-
+    town = whitespaces_clean(town.upper())
     town = remove_province(town)
     town = amend_town(town)
 
@@ -50,7 +49,7 @@ def remove_province(town: str) -> str:
 def amend_town(town: str) -> str:
     town = town.replace("/", "-").replace("-", " - ")
 
-    for w in SYNONYMS[SYNONYM_PORT]:
+    for w in SYNONYMS[SYNONYM_PORT] + SYNONYMS[SYNONYM_BAY] + SYNONYMS[SYNONYM_BEACH]:
         town = town.replace(f"{w} DE", "").replace(f"{w} DA", "").replace(w, "")
 
     town = match_normalization(town, _NORMALIZED_TOWNS)

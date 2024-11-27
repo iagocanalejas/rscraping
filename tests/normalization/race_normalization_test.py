@@ -1,6 +1,6 @@
 import unittest
 
-from rscraping.data.normalization.races import normalize_name_parts, normalize_race_name, remove_day_indicator
+from rscraping.data.normalization import normalize_name_parts, normalize_race_name, remove_day_indicator
 
 
 class TestRaceNormalization(unittest.TestCase):

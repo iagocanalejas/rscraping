@@ -16,8 +16,7 @@ def expand_path(path: str, valid_files: list[str]) -> list[str]:
 
 
 def save_csv(items: list[Race], file_name: str):
-    if not len(items):
-        return
+    assert len(items), "no items to save"
 
     file_name = file_name if ".csv" in file_name else f"{file_name}.csv"
     with open(file_name, "w") as csvfile:

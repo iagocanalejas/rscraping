@@ -62,47 +62,31 @@ class TrainerasHtmlParser(HtmlParser):
     _SCHOOL = ["JM", "JF", "CM", "CF"]
 
     @override
-    def parse_race(self, selector: Selector, *, race_id: str, table: int | None = None, **_) -> Race | None:
+    def parse_race(self, selector: Selector, *, race_id: str, table: int | None = None, **_) -> Race:
         if self._races_count(selector) > 1 and not table:
-            raise MultiRaceException()
+            logger.error(f"{self.DATASOURCE}: multiple races found for {race_id=} without specifying a table")
+            raise MultiRaceException("no table specified")
         table = table or 1
 
         name = self.get_name(selector)
-        if not name:
-            logger.error(f"{self.DATASOURCE}: no race found for {race_id=}")
-            return None
-        logger.info(f"{self.DATASOURCE}: found race {name}")
+        assert name, f"{self.DATASOURCE}: no name found for {race_id=}"
 
-        path = "div[1]/h2" if table == 1 else f"div[2]/h2[{table - 1}]"
-        t_date = find_date(selector.xpath(f"/html/body/div[1]/main/div/div/div/{path}/text()").get(""))
-        if not t_date:
-            # race_id=1625
-            path = f"div[3]/h2[{table - 1}]"
-            t_date = find_date(selector.xpath(f"/html/body/div[1]/main/div/div/div/{path}/text()").get(""))
+        t_date = self.get_date(selector, table)
+        assert t_date is not None, f"{self.DATASOURCE}: no date found for {race_id=}"
+
+        normalized_names = normalize_name_parts(normalize_race_name(name))
+        normalized_names = [(self._normalizations(n, name, t_date), e) for (n, e) in normalized_names]
+        assert len(normalized_names) > 0, f"{self.DATASOURCE}: unable to normalize {name=}"
+        logger.info(f"{self.DATASOURCE}: found race {t_date}::{name}")
+
         gender = self.get_gender(selector)
         category = self.get_category(selector)
         distance = self.get_distance(selector)
 
-        if not t_date:
-            logger.error(f"{self.DATASOURCE}: no date found for {name=}")
-            return None
-
-        if not name:
-            logger.error(f"{self.DATASOURCE}: no race found for {race_id=}")
-            return None
-        logger.info(f"{self.DATASOURCE}: race normalized to {name=}")
-
         participants = self.get_participants(selector, table)
         race_lanes = self.get_race_lanes(participants)
-        ttype = RACE_TIME_TRIAL if race_lanes == 1 else self.get_type(participants)
-        ttype = ttype if not should_be_time_trial(name, t_date) else RACE_TIME_TRIAL
         race_notes = self.get_race_notes(selector)
-
-        normalized_names = normalize_name_parts(normalize_race_name(name))
-        if len(normalized_names) == 0:
-            logger.error(f"{self.DATASOURCE}: unable to normalize {name=}")
-            return None
-        normalized_names = [(self._normalize_race_name(n, name, t_date), e) for (n, e) in normalized_names]
+        ttype = self.get_type(participants) if not should_be_time_trial(name, t_date) else RACE_TIME_TRIAL
 
         race = Race(
             name=name,
@@ -281,6 +265,15 @@ class TrainerasHtmlParser(HtmlParser):
         name = " ".join(name.split()[:-1])
         return name
 
+    def get_date(self, selector: Selector, table: int) -> date | None:
+        date_path = "div[1]/h2" if table == 1 else f"div[2]/h2[{table - 1}]"
+        t_date = find_date(selector.xpath(f"/html/body/div[1]/main/div/div/div/{date_path}/text()").get(""))
+        if not t_date:
+            # race_id=1625
+            date_path = f"div[3]/h2[{table - 1}]"
+            t_date = find_date(selector.xpath(f"/html/body/div[1]/main/div/div/div/{date_path}/text()").get(""))
+        return t_date
+
     def get_gender(self, selector: Selector) -> str:
         parts = selector.xpath("/html/body/div[1]/main/div/div/div/div[1]/h2/text()").get("")
         part = whitespaces_clean(parts.split(" - ")[-1])
@@ -291,8 +284,19 @@ class TrainerasHtmlParser(HtmlParser):
         return GENDER_MALE
 
     def get_type(self, participants: list[Selector]) -> str:
-        series = [s for s in [p.xpath("//*/td[4]/text()").get("") for p in participants] if s]
-        return RACE_TIME_TRIAL if len(set(series)) == len(series) else RACE_CONVENTIONAL
+        series = [self.get_series(p) for p in participants]
+        series = [s for s in series if s]
+        if len(set(series)) == len(series):
+            # series column is indicating start order
+            return RACE_TIME_TRIAL
+
+        lanes = [self.get_lane(p) for p in participants]
+        lanes = [lane for lane in lanes if lane]
+        if len(set(lanes)) == 1 and len(participants) > 1:
+            # all participants are racing in the same lane
+            return RACE_TIME_TRIAL
+
+        return RACE_CONVENTIONAL
 
     def get_category(self, selector: Selector) -> str:
         subtitle = selector.xpath("/html/body/div[1]/main/div/div/div/div[1]/h2/text()").get("").upper()
@@ -437,7 +441,7 @@ class TrainerasHtmlParser(HtmlParser):
         return path
 
     @staticmethod
-    def _normalize_race_name(name: str, original_name: str, t_date: date) -> str:
+    def _normalizations(name: str, original_name: str, t_date: date) -> str:
         if all(n in name for n in ["ILLA", "SAMERTOLAMEU"]) and "FANDICOSTA" in original_name:
             # HACK: this is a weird flag case in witch Meira restarted the edition for his 'B' team.
             return "BANDERA ILLA DO SAMERTOLAMEU - FANDICOSTA"

@@ -38,23 +38,19 @@ class ARCHtmlParser(HtmlParser):
     DATASOURCE = Datasource.ARC
 
     @override
-    def parse_race(self, selector: Selector, *, race_id: str, is_female: bool, **_) -> Race | None:
+    def parse_race(self, selector: Selector, *, race_id: str, is_female: bool, **_) -> Race:
         name = self.get_name(selector)
-        if not name:
-            logger.error(f"{self.DATASOURCE}: no race found for {race_id=}")
-            return None
-        logger.info(f"{self.DATASOURCE}: found race {name}")
+        assert name, f"{self.DATASOURCE}: no name found for {race_id=}"
 
         t_date = self.get_date(selector)
-        gender = GENDER_FEMALE if is_female else GENDER_MALE
+        assert t_date is not None, f"{self.DATASOURCE}: no date found for {race_id=}"
 
         normalized_names = normalize_name_parts(normalize_race_name(name))
-        if len(normalized_names) == 0:
-            logger.error(f"{self.DATASOURCE}: unable to normalize {name=}")
-            return None
         normalized_names = [(remove_day_indicator(n), e) for (n, e) in normalized_names]
-        logger.info(f"{self.DATASOURCE}: race normalized to {normalized_names=}")
+        assert len(normalized_names) > 0, f"{self.DATASOURCE}: unable to normalize {name=}"
+        logger.info(f"{self.DATASOURCE}: found race {t_date}::{name}")
 
+        gender = GENDER_FEMALE if is_female else GENDER_MALE
         participants = self.get_participants(selector)
 
         race = Race(

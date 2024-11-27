@@ -9,9 +9,10 @@ def normalize_lap_time(value: str) -> time | None:
     Normalize the lap time to a standard time
 
     1. Try to fix ':18,62' | ':45'
-    2. Try to fix '2102:48' | '25:2257'
-    3. Try to fix '028:24'
-    4. Try to fix '00:009'
+    2. Try to fix '028:24'
+    3. Try to fix '00:009'
+    4. Try to fix '2102:48' | '25:2257'
+    5. Try to fix '25:2257'
     """
     if value.startswith(":"):
         # try to fix ':18,62' | ':45'

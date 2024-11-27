@@ -7,6 +7,12 @@ strictListInference = true
 strictDictionaryInference = true
 strictSetInference = true
 deprecateTypingAliases = true
+exclude = [
+	"**/build",
+	"**/dist",
+	"**/out",
+	"**/venv",
+]
 
 [tool.coverage.run]
 source = ["rscraping"]
@@ -14,6 +20,7 @@ omit = [
 	"rscraping/_functions.py",
 	"rscraping/data/*.py",
 	"rscraping/**/_protocol.py",
+	"**/__init__.py",
 ]
 
 [tool.coverage.report]

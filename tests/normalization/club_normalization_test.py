@@ -1,6 +1,6 @@
 import unittest
 
-from rscraping.data.normalization.clubs import normalize_club_name
+from rscraping.data.normalization import normalize_club_name
 
 
 class TestClubNormalization(unittest.TestCase):

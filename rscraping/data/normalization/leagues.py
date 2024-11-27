@@ -5,7 +5,7 @@ __LEAGUES_MAP = {
     "LIGA GALEGA DE TRAIÑAS": [["LGT"]],
     "LIGA GALEGA DE TRAIÑAS A": [["LIGA", "A"]],
     "LIGA GALEGA DE TRAIÑAS B": [["LIGA", "B"]],
-    "LIGA GALEGA DE TRAIÑAS FEMENINA": [["LIGA", "FEM"], ["LIGA", "F"]],
+    "LIGA GALEGA DE TRAIÑAS FEMENINA": [["LIGA", "FEM"], ["LIGA", "F"]],  # sometimes we don't have the gender
     "EUSKO LABEL LIGA": [["ACT"]],
 }
 
@@ -43,11 +43,11 @@ def find_league(name: str) -> str | None:
         return None
 
     if is_lgt(name, "A"):
-        return "LIGA A"
+        return "LIGA GALEGA DE TRAIÑAS A"
     if is_lgt(name, "B"):
-        return "LIGA B"
+        return "LIGA GALEGA DE TRAIÑAS B"
     if is_lgt(name, "F"):
-        return "LIGA FEM"
+        return "LIGA GALEGA DE TRAIÑAS FEMENINA"
     if is_act(name):
         return "EUSKO LABEL LIGA"
     if is_act(name, is_female=True):

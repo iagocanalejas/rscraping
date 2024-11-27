@@ -23,6 +23,7 @@ _MISSPELLINGS = {
     "TRAIÑEIRAS": ["TRAIEIRAS"],
 }
 
+# tuples of sponsor name and if it should be replaced when found
 _KNOWN_RACE_SPONSORS = [
     ("CEFYCAL", True),
     ("FANDICOSTA", False),
@@ -70,6 +71,7 @@ _NORMALIZED_RACES = {
         ["BANDERA", "RIBEIRA"],
         ["BANDERA", "RIVEIRA"],
     ],
+    "BILBOKO BANDERA - BANDERA DE BILBAO": [["BILBOKO", "BANDERA"], ["BILBAO", "BANDERA"]],
     "BANDEIRA VIRXE DO CARME": [["VIRXE", "CARME"], ["VIRGEN", "CARMEN"]],
     "BANDEIRA ILLA DO SAMERTOLAMEU - FANDICOSTA": [["ILLA", "SAMERTOLAMEU", "FANDICOSTA"]],
 }
@@ -217,7 +219,6 @@ def deacronym_race_name(name: str) -> str:
 
 def amend_race_name(name: str) -> str:
     re.sub(r"(CONCELLO)( DE)?", "CONCELLO DE", name)
-    name = name.replace("BILBOKO BANDERA - BANDERA DE BILBAO", "BANDERA DE BILBAO")
     name = name.replace("JESÚS TENORIO", "XESÚS TENORIO")
     name = name.replace("CCD CESANTES", "CESANTES")
 

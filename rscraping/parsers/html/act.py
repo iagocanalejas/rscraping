@@ -38,30 +38,22 @@ class ACTHtmlParser(HtmlParser):
     DATASOURCE = Datasource.ACT
 
     @override
-    def parse_race(self, selector: Selector, *, race_id: str, is_female: bool, **_) -> Race | None:
+    def parse_race(self, selector: Selector, *, race_id: str, is_female: bool, **_) -> Race:
         name = self.get_name(selector)
-        if not name:
-            logger.error(f"{self.DATASOURCE}: no race found for {race_id=}")
-            return None
-        logger.info(f"{self.DATASOURCE}: found race {name}")
+        assert name, f"{self.DATASOURCE}: no name found for {race_id=}"
 
         t_date = find_date(name)
-        if not t_date:
-            logger.error(f"{self.DATASOURCE}: no date found for {name=}")
-            return None
-
-        gender = GENDER_FEMALE if is_female else GENDER_MALE
+        assert t_date is not None, f"{self.DATASOURCE}: no date found for {race_id=}"
 
         normalized_names = normalize_name_parts(normalize_race_name(name))
-        if len(normalized_names) == 0:
-            logger.error(f"{self.DATASOURCE}: unable to normalize {name=}")
-            return None
         normalized_names = [
-            self._hardcoded_name_edition(remove_day_indicator(n), is_female=is_female, year=t_date.year, edition=e)
+            self._normalizations(remove_day_indicator(n), is_female=is_female, year=t_date.year, edition=e)
             for (n, e) in normalized_names
         ]
-        logger.info(f"{self.DATASOURCE}: race normalized to {normalized_names=}")
+        assert len(normalized_names) > 0, f"{self.DATASOURCE}: unable to normalize {name=}"
+        logger.info(f"{self.DATASOURCE}: found race {t_date}::{name}")
 
+        gender = GENDER_FEMALE if is_female else GENDER_MALE
         participants = self.get_participants(selector)
 
         race = Race(
@@ -237,7 +229,7 @@ class ACTHtmlParser(HtmlParser):
     #                  NORMALIZATION                   #
     ####################################################
     @staticmethod
-    def _hardcoded_name_edition(name: str, is_female: bool, year: int, edition: int | None) -> tuple[str, int | None]:
+    def _normalizations(name: str, is_female: bool, year: int, edition: int | None) -> tuple[str, int | None]:
         if "ASTILLERO" in name:
             name, edition = "BANDERA AYUNTAMIENTO DE ASTILLERO", (year - 1970)
 
