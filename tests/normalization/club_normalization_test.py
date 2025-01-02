@@ -17,6 +17,8 @@ class TestClubNormalization(unittest.TestCase):
             "E.D. MOAÑA",
             "DEUSTO A.T. - C.R. SAN NICOLÁS A.T. B",
             "UROLA KOSTA A.E.",
+            "C.R. IBERIA B",
+            "C.M. CASTROPOL",
         ]
 
     def test_club_name_normalization(self):
@@ -32,6 +34,8 @@ class TestClubNormalization(unittest.TestCase):
             "MOAÑA",
             "DEUSTO - SAN NICOLÁS B",
             "UROLA KOSTA",
+            "IBERIA B",
+            "CASTROPOL",
         ]
 
         for idx, club_name in enumerate(self.NAMES):

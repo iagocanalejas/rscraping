@@ -79,7 +79,7 @@ class ARCHtmlParser(HtmlParser):
             disqualified = self.is_disqualified(selector, row)
             penalty = Penalty(reason=None, disqualification=disqualified) if disqualified else None
             participant_name = normalize_club_name(self.get_club_name(row))
-            if "CASTRO" in participant_name:
+            if "CASTRO " in participant_name:
                 # HACK: CASTRO URDIALES, CASTRO and CASTREÑA differentiation
                 if t_date.year < 2013:
                     participant_name = "CASTRO URDIALES"

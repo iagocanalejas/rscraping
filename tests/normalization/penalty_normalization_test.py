@@ -63,6 +63,8 @@ class TestPenaltyNormalization(unittest.TestCase):
             "Tirán fue descalificada por entrar en meta dejando la boya por estribor. Su tiempo había sido de 21:58.00.",  # noqa: E501
             "San Simón fue descalificado por dejar por estribor una baliza del recorrido y la meta.",
             "El tiempo de Tirán había sido 19:15.32, pero fue descalificado por dejar su baliza por estribor a la entrada a meta.",  # noqa: E501
+            "Hondarribia fue descalificado por entrar en la baliza de Pedreña. Había realizado un tiempo de 21:57.",
+            "Rianxo fue descalificado por dejar el puente por el arco equivocado. Su tiempo había sido de 18:58.91. El ganador de la bandera era quien tuviese menos tiempo en la jornada final",  # noqa: E501
         ]
         penalties = [
             {
@@ -77,6 +79,8 @@ class TestPenaltyNormalization(unittest.TestCase):
             {"TIRÁN": Penalty(disqualification=True, reason=OFF_THE_FIELD)},
             {"SAN SIMÓN": Penalty(disqualification=True, reason=OFF_THE_FIELD)},
             {"TIRÁN": Penalty(disqualification=True, reason=OFF_THE_FIELD)},
+            {"HONDARRIBIA": Penalty(disqualification=True, reason=OFF_THE_FIELD)},
+            {"RIANXO": Penalty(disqualification=True, reason=OFF_THE_FIELD)},
         ]
         for idx, text in enumerate(notes):
             self.assertEqual(normalize_penalty(text, list(penalties[idx].keys())), penalties[idx])
@@ -136,6 +140,7 @@ class TestPenaltyNormalization(unittest.TestCase):
             "En la tercera ciaboga Castro fue abordado por Pedreña, cuando iban primeros.",
             "Se clasificaban cuatro para la final, y los cuatro siguientes para el trofeo Federación. Donibaneko y San Pedro volvieron a impugnar al volver a presentarse Orio con la trainera de fibra. San Pedro colisionó con Donibaneko tras efectuar el viraje de la última ciaboga.",  # noqa: E501
             "En la primera jornada, Santander había llegado junto a Astillero en el segundo puesto de tanda, pero abordó a Kaiku y fue descalificado y no participó en la segunda jornada del campeonato. Su tiempo había sido de 21:11.6.",  # noqa: E501
+            "Hondarribia se retiró tras colisionar con Santoña.",
         ]
         penalties = [
             {"RIANXO": Penalty(disqualification=True, reason=COLLISION)},
@@ -155,6 +160,7 @@ class TestPenaltyNormalization(unittest.TestCase):
             {"PEDREÑA": Penalty(disqualification=True, reason=COLLISION)},
             {"SAN PEDRO": Penalty(disqualification=True, reason=COLLISION)},
             {"SANTANDER": Penalty(disqualification=True, reason=COLLISION)},
+            {"HONDARRIBIA": Penalty(disqualification=True, reason=COLLISION)},
         ]
         for idx, text in enumerate(notes):
             self.assertEqual(normalize_penalty(text, list(penalties[idx].keys())), penalties[idx])
@@ -240,6 +246,7 @@ class TestPenaltyNormalization(unittest.TestCase):
             "El tiempo de Amegrove había sido de 20:09.33, pero fue descalificada por invasión de la calle del Náutico de Vigo a la salida de la segunda ciaboga.",  # noqa: E501
             "El tiempo de Camargo había sido de 21:02.84 y el de Pedreña de 21:09.46. Fueron descalificados por no dar el peso mínimo de la trainera.",  # noqa: E501
             "El tiempo final de Camargo había sido de 21:48,00, pero tenía en su tripulación un juvenil que ya había remado tres regatas en el mismo año.",  # noqa: E501
+            "Hondarribia fue descalificado por entrar en la baliza de Pedreña. Había realizado un tiempo de 21:57.",
             "Arraun Lagunak tuvo un tiempo de 21:21.02.",
             "Hondarribia había realizado un tiempo de 20:29.1.",
             # -- MULTIPLE TIMES --
@@ -258,6 +265,7 @@ class TestPenaltyNormalization(unittest.TestCase):
             "Samertolameu estorbó a Bueu en la tercera virada. Su tiempo había sido el mejor con 19:07.89.",
             "En la segunda jornada Donibaneko fue descalificado por invadir la calle de Santurtzi en la segunda ciaboga. Terminó con un tiempo de 20:59,35.",  # noqa: E501
             "Chapela quedó fuera de regata después de una reclamación por problemas con la ficha de uno de sus remeros (Guta Ionut). Perdió la cuarta plaza tras realizar un tiempo de 20:40.22.",  # noqa: E501
+            "Rianxo fue descalificado por dejar el puente por el arco equivocado. Su tiempo había sido de 18:58.91. El ganador de la bandera era quien tuviese menos tiempo en la jornada final",  # noqa: E501
         ]
         results = [
             {"VILAXOAN": time(0, 26, 16)},
@@ -280,6 +288,7 @@ class TestPenaltyNormalization(unittest.TestCase):
             {"AMEGROVE": time(0, 20, 9, 330000)},
             {"CAMARGO": time(0, 21, 2, 840000), "PEDREÑA": time(0, 21, 9, 460000)},
             {"CAMARGO": time(0, 21, 48)},
+            {"": time(0, 21, 57)},
             {"ARRAUN LAGUNAK": time(0, 21, 21, 20000)},
             {"HONDARRIBIA": time(0, 20, 29, 100000)},
             {"PERILLO B": time(0, 19, 52), "MECOS B": time(0, 19, 58)},
@@ -306,6 +315,7 @@ class TestPenaltyNormalization(unittest.TestCase):
             {"": time(0, 19, 7, 890000)},
             {"": time(0, 20, 59, 350000)},
             {"": time(0, 20, 40, 220000)},
+            {"": time(0, 18, 58, 910000)},
         ]
         self.assertEqual(len(notes), len(results))
         for i, text in enumerate(notes):

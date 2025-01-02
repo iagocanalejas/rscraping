@@ -94,6 +94,7 @@ _TIME_RE = [
     r"(.*)Su tiempo(?: final)? (?:había sido|fue)(?: .*)? ([\d:.,]+)",
     r"(.*)Perdió.*realizar un tiempo de ([\d:.,]+)",
     r"(.*)Terminó con un tiempo de ([\d:.,]+)",
+    r"(.*)Había realizado un tiempo de ([\d:.,]+)",
     r"(.*)siendo su tiempo(?: de)? ([\d:.,]+)",
     r"(.*)El tiempo fue de ([\d:.,]+)",
     # -- last case --
@@ -167,9 +168,11 @@ _ROUTE_LEMMAS = [
     ["estribor", "meta"],
     ["estribor", "ciaboga"],
     ["estribor", "baliza"],
+    ["entrar", "baliza"],
     ["ciaboga", "incorrecto"],
     ["meta", "entrar"],
     ["cruzarse", "calle"],
+    ["dejar", "equivocar"],
 ]
 
 
@@ -185,6 +188,7 @@ _TEMPLATES = {
         r"(.*) fue.*ponerse delante.*",
         r"(.*) fue.*(irrumpir|abordar|invadir|abordaje).*",
         r"(.*) (estorbó|se chocó|colisionó).*",
+        r"(.*) se retiró.*colisionar.*",
         r".*jornada,? (.*) había.*abordó.*",  # this is too specific
     ],
     COXWAIN_WEIGHT_LIMIT: [],
@@ -220,7 +224,9 @@ _ROUTE_TEMPLATES = {
         r"(.*) (pas(ó|aron)|dej(ó|aron)) la baliza de meta por estribor",
         r"(.*) ?pero.*descalificado.*baliza.*estribor.*meta",
         r"(.*) fue descalificad(o|a) por entrar en meta.*estribor",
+        r"(.*) fue descalificad(o|a) por entrar en la baliza.*",
         r"(.*) fue descalificad(o|a) por dejar por estribor.*meta",
+        r"(.*) fue descalificad(o|a) por dejar.*equivocado",
         r"(.*) entró.*meta.*fuera.*",
     ],
     STARBOARD_TACK: [

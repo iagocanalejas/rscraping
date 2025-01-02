@@ -185,7 +185,7 @@ def remove_club_title(name: str) -> str:
 
 def remove_club_sponsor(name: str) -> str:
     for sponsor in _KNOWN_SPONSORS:
-        if name.replace(sponsor, "") != "":  # avoid removing the whole name
+        if name.replace(sponsor, "") not in ["", " B", " C"]:  # avoid removing the whole name
             name = name.replace(sponsor, "")
     name = whitespaces_clean(name.replace("-", " - "))
     if name.endswith(" -") or name.startswith("- "):
