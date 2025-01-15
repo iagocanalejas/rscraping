@@ -160,7 +160,9 @@ def normalize_club_name(name: str) -> str:
     name = " ".join(name.split()[1:]) if name.split() and name.split()[0] in CONJUNCTIONS else name
 
     is_B_team, is_C_team = is_branch_club(name), is_branch_club(name, letter="C")  # never saw more than a C
-    name = match_normalization(name, _NORMALIZED_ENTITIES)
+    if not ("KOXTAPE" in name and " - " in name):
+        # HACK: edge case for KOXTAPE - XXX merge
+        name = match_normalization(name, _NORMALIZED_ENTITIES)
     name = f"{name} C" if is_C_team and not is_branch_club(name, letter="C") else name
     name = f"{name} B" if is_B_team and not is_branch_club(name) else name
 
@@ -185,6 +187,9 @@ def remove_club_title(name: str) -> str:
 
 def remove_club_sponsor(name: str) -> str:
     for sponsor in _KNOWN_SPONSORS:
+        if sponsor == "IBERIA" and "KAIKU" in name:
+            # HACK: edge case for KAIKU - IBERIA merge
+            continue
         if name.replace(sponsor, "") not in ["", " B", " C"]:  # avoid removing the whole name
             name = name.replace(sponsor, "")
     name = whitespaces_clean(name.replace("-", " - "))
