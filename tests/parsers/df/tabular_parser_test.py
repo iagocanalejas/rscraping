@@ -21,8 +21,7 @@ class TestTabularDataParser(unittest.TestCase):
         race = self.parser.parse_race(race_row, is_female=False, url="test_url")
 
         if not race:
-            self.assertIsNotNone(race)
-            return
+            raise ValueError("unable to parse race")
 
         participants = race.participants
         race.participants = []

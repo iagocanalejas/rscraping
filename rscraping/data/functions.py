@@ -6,7 +6,9 @@ from typing import Any
 from rscraping.data.models import Race
 
 
-def expand_path(path: str, valid_files: list[str]) -> list[str]:
+def expand_path(
+    path: str, valid_files: list[str]
+) -> list[str]:  # pragma: no cover - util functions not needing testing
     def is_valid(file: str) -> bool:
         _, extension = os.path.splitext(file)
         return extension.upper() in valid_files
@@ -15,7 +17,7 @@ def expand_path(path: str, valid_files: list[str]) -> list[str]:
     return [f for f in files if is_valid(f)]
 
 
-def save_csv(items: list[Race], file_name: str):
+def save_csv(items: list[Race], file_name: str):  # pragma: no cover - util functions not needing testing
     assert len(items), "no items to save"
 
     file_name = file_name if ".csv" in file_name else f"{file_name}.csv"
@@ -26,7 +28,7 @@ def save_csv(items: list[Race], file_name: str):
             writer.writerow(item.__dict__.values())
 
 
-def sys_print_items(items: list[Any]):
+def sys_print_items(items: list[Any]):  # pragma: no cover - util functions not needing testing
     items_len = len(items)
     sys.stdout.write("[")
     for i, race in enumerate(items):

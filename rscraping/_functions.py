@@ -8,7 +8,7 @@ def find_race(
     is_female: bool,
     category: str | None = None,
     table: int | None = None,
-) -> Race | None:
+) -> Race | None:  # pragma: no cover - wrapper function for the Client class
     """
     Find a race based on the provided parameters.
 

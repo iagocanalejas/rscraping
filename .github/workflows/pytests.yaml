@@ -5,15 +5,10 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                python-version: ["3.12"]
+                python-version: ["3.12", "3.13"]
 
         steps:
             - uses: actions/checkout@v4
-
-            - name: Set locale (required for inforemo parsing)
-              run: |
-                  sudo locale-gen es_ES.utf8 # Replace with your desired locale
-                  sudo update-locale
 
             - name: Set up Python ${{ matrix.python-version }}
               uses: actions/setup-python@v5
@@ -29,10 +24,12 @@ jobs:
                   pip install pytest coverage
                   if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-            - name: Test with pytest
+            - name: Pytest + code coverage
               run: |
-                  coverage run -m pytest
-
-            - name: Coverage report
-              run: |
+                  coverage run -m pytest &&
                   coverage report -m
+
+            - name: Test coverage
+              run: |
+                  coverage run --source=tests -m pytest &&
+                  coverage report -m --fail-under=100
