@@ -15,7 +15,6 @@ class Datasource(StrEnum):
     LGT = auto()
     ARC = auto()
     TRAINERAS = auto()
-    TABULAR = auto()
 
     @classmethod
     def has_value(cls, value: str) -> bool:

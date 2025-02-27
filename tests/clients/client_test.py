@@ -5,8 +5,6 @@ from rscraping.clients import (
     ARCClient,
     Client,
     LGTClient,
-    TabularClientConfig,
-    TabularDataClient,
     TrainerasClient,
 )
 from rscraping.data.constants import CATEGORY_VETERAN, GENDER_FEMALE
@@ -27,19 +25,3 @@ class TestClient(unittest.TestCase):
 
         client = Client(source=Datasource.TRAINERAS, gender=GENDER_FEMALE, category=CATEGORY_VETERAN)
         self.assertTrue(isinstance(client, TrainerasClient))
-
-        with self.assertRaises(ValueError):
-            config = TabularClientConfig(file_path="1", sheet_id="1")
-            TabularDataClient(source=Datasource.TABULAR, config=config)
-
-        TabularDataClient._load_dataframe = self._load_dataframe  # type: ignore
-        client = Client(source=Datasource.TABULAR, config=TabularClientConfig(sheet_id=""))
-        self.assertTrue(isinstance(client, TabularDataClient))
-
-        client = Client(source=Datasource.TABULAR, config=TabularClientConfig(sheet_id="", sheet_name="femenina"))
-        self.assertTrue(isinstance(client, TabularDataClient))
-        self.assertTrue(client.is_female)
-
-    # testing replacement for _load_dataframe
-    def _load_dataframe(*_, **__):
-        return None
