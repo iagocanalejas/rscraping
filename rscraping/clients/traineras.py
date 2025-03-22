@@ -79,7 +79,7 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
             r"^(https?:\/\/)?"  # Scheme (http, https, or empty)
             r"(traineras\.es\/clasificaciones\/)"  # Domain name
             r"([\d]*\/?)$",  # race ID
-            re.IGNORECASE,
+            flags=re.IGNORECASE,
         )
 
         if not pattern.match(url):

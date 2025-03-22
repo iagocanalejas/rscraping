@@ -100,7 +100,7 @@ class LGTClient(Client, source=Datasource.LGT):
             r"^(https?:\/\/)?"  # Scheme (http, https, or empty)
             r"(www\.ligalgt\.com\/principal\/regata\/)"  # Domain name
             r"([\d]*\/?)$",  # race ID
-            re.IGNORECASE,
+            flags=re.IGNORECASE,
         )
 
         if not pattern.match(url):

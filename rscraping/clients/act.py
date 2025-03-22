@@ -34,7 +34,7 @@ class ACTClient(Client, source=Datasource.ACT):
             r"(\/femenina)?"  # Optional female
             r"(\/resultados\/ver\.php\?r=)"  # Path
             r"([\d]*\/?)$",  # race ID
-            re.IGNORECASE,
+            flags=re.IGNORECASE,
         )
 
         if not pattern.match(url):

@@ -33,7 +33,7 @@ class ARCClient(Client, source=Datasource.ARC):
             r"(www\.(ligaete|liga-arc)\.com\/es\/regata\/)"  # Domain name
             r"([\d]*\/)"  # race ID
             r"(.*)$",  # rest of the shit the ARC uses
-            re.IGNORECASE,
+            flags=re.IGNORECASE,
         )
 
         if not pattern.match(url):
