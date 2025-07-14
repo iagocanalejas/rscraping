@@ -15,6 +15,26 @@ __FEMALE_LEAGUES_MAP = {
     "LIGA EUSKOTREN": [["ACT"]],
 }
 
+LEAGUE_KEYWORDS = {
+    "LGT": [
+        "LIGA GALEGA DE TRAIÑAS A",
+        "LIGA GALEGA DE TRAIÑAS B",
+        "LIGA GALEGA DE TRAIÑAS FEMENINA",
+        "LIGA GALEGA DE TRAIÑAS F",
+        "LIGA GALEGA DE TRAIÑAS",
+    ],
+    "ACT": ["EUSKO LABEL LIGA", "LIGA EUSKOTREN", "LIGA ACT", "ACT"],
+    "ARC": [
+        "ASOCIACIÓN DE REMO DEL CANTÁBRICO 1",
+        "ASOCIACIÓN DE REMO DEL CANTÁBRICO 2",
+        "ASOCIACIÓN DE REMO DEL CANTÁBRICO",
+        "ARC 1",
+        "ARC 2",
+        "ARC",
+    ],
+    "ETE": ["EMAKUMEZKO TRAINERUEN ELKARTEA", "ETE"],
+}
+
 
 def normalize_league_name(name: str, is_female: bool = False) -> str:
     """

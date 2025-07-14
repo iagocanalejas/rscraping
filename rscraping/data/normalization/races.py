@@ -12,6 +12,7 @@ from pyutils.strings import (
     whitespaces_clean,
 )
 from rscraping.data.checks import is_play_off
+from rscraping.data.normalization.leagues import LEAGUE_KEYWORDS
 
 _MISSPELLINGS = {
     "": ["RECICLAMOS LA LUZ", " AE ", "EXCMO", "ILTMO"],
@@ -198,13 +199,13 @@ def remove_day_indicator(name: str) -> str:
 
 
 def remove_league_indicator(name: str) -> str:
-    words = name.split()
-    filtered_words = [w for w in words if w not in {"B", "F"}]
+    # ensure something remais after removing the league indicator
+    for keyword_list in LEAGUE_KEYWORDS.values():
+        for keyword in keyword_list:
+            if keyword in name and len(name.replace(keyword, "").strip()) > 0:
+                name = name.replace(keyword, "")
 
-    if name.endswith(" A"):
-        filtered_words = filtered_words[:-1]
-
-    return whitespaces_clean(" ".join(filtered_words))
+    return whitespaces_clean(remove_parenthesis(name))
 
 
 def deacronym_race_name(name: str) -> str:

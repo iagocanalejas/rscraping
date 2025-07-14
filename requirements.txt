@@ -1,4 +1,4 @@
 parsel==1.10.0
 pyutils @ git+https://github.com/iagocanalejas/pyutils.git@master
-requests==2.32.3
+requests==2.32.4
 simplemma==1.1.2

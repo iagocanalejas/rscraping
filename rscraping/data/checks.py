@@ -50,9 +50,9 @@ def is_lgt(name: str, letter: str | None = None) -> bool:
 def is_arc(name: str, category: int = 1) -> bool:
     match category:
         case 1:
-            return "ARC" in name.split()
+            return "2" not in name and any(n in name.split() for n in {"ARC", "ASOCIACIÓN DE REMO DEL CANTÁBRICO"})
         case 2:
-            return "ARC2" in name.split()
+            return any(n in name.split() for n in {"ARC2", "ASOCIACIÓN DE REMO DEL CANTÁBRICO 2"})
     raise ValueError(f"Invalid category: {category}")
 
 
