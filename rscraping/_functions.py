@@ -1,4 +1,5 @@
 from rscraping.clients import Client
+from rscraping.data.constants import GENDER_FEMALE, GENDER_MALE
 from rscraping.data.models import Datasource, Race
 
 
@@ -23,5 +24,6 @@ def find_race(
     - Optional[Race]: The found Race object if the race is found, otherwise None.
     """
 
-    client = Client(source=datasource, is_female=is_female, category=category)
+    gender = GENDER_FEMALE if is_female or datasource in {Datasource.ETE} else GENDER_MALE
+    client = Client(source=datasource, gender=gender, category=category)
     return client.get_race_by_id(race_id, table=table)

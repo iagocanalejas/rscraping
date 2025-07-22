@@ -14,6 +14,7 @@ class Datasource(StrEnum):
     ACT = auto()
     LGT = auto()
     ARC = auto()
+    ETE = auto()
     TRAINERAS = auto()
 
     @classmethod
