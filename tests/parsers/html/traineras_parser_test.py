@@ -73,9 +73,9 @@ class TestTrainerasParser(unittest.TestCase):
             self.assertEqual(race, self._RACES_DOUBLE[idx])
             self.assertEqual(participants, self._PARTICIPANTS_DOUBLE[idx])
 
-    def test_parse_race_double_1(self):
+    def test_parse_race_double_with_label(self):
         # race_id=1625
-        with open(os.path.join(self.fixtures, "traineras_race_double_1.html")) as file:
+        with open(os.path.join(self.fixtures, "traineras_race_double_with_label.html")) as file:
             selector = Selector(file.read())
             races = [
                 self.parser.parse_race(selector, race_id="1234", table=1),
@@ -332,7 +332,7 @@ class TestTrainerasParser(unittest.TestCase):
             gender=GENDER_MALE,
             category=CATEGORY_ABSOLUT,
             participants=[],
-            race_laps=4,
+            race_laps=1,
             race_lanes=2,
             cancelled=False,
         ),
@@ -393,7 +393,7 @@ class TestTrainerasParser(unittest.TestCase):
                 club_name="C.R. PUEBLA",
                 lane=None,
                 series=1,
-                laps=["03:21.000000", "10:30.000000", "17:47.000000", "21:02.240000"],
+                laps=["21:02.240000"],
                 distance=5556,
                 handicap=None,
                 participant="PUEBLA",
@@ -435,7 +435,7 @@ class TestTrainerasParser(unittest.TestCase):
             modality=RACE_TRAINERA,
             type=RACE_TIME_TRIAL,
             league=None,
-            town="",
+            town="SANTANDER",
             organizer=None,
             sponsor=None,
             normalized_names=[("BANDERA DE SANTANDER", None)],
@@ -472,6 +472,11 @@ class TestTrainerasParser(unittest.TestCase):
             participants=[],
             race_laps=2,
             race_lanes=1,
+            race_notes=(
+                "Las dos regatas que se muestran el día 11 correspondían a ligas diferentes, por ese motivo "
+                "aparecen separados los resultados, pero los mejores 10 tiempos disputaban la final, "
+                "independientemente de la liga de la que formaban parte."
+            ),
             cancelled=False,
         ),
         Race(
@@ -493,6 +498,11 @@ class TestTrainerasParser(unittest.TestCase):
             participants=[],
             race_laps=2,
             race_lanes=1,
+            race_notes=(
+                "Las dos regatas que se muestran el día 11 correspondían a ligas diferentes, por ese motivo "
+                "aparecen separados los resultados, pero los mejores 10 tiempos disputaban la final, "
+                "independientemente de la liga de la que formaban parte."
+            ),
             cancelled=False,
         ),
         Race(
@@ -502,7 +512,7 @@ class TestTrainerasParser(unittest.TestCase):
             modality=RACE_TRAINERA,
             type=RACE_CONVENTIONAL,
             league=None,
-            town="",
+            town="A CORUÑA",
             organizer=None,
             sponsor=None,
             normalized_names=[("TROFEO TERESA HERRERA", None)],
@@ -514,6 +524,11 @@ class TestTrainerasParser(unittest.TestCase):
             participants=[],
             race_laps=2,
             race_lanes=2,
+            race_notes=(
+                "Las dos regatas que se muestran el día 11 correspondían a ligas diferentes, por ese motivo "
+                "aparecen separados los resultados, pero los mejores 10 tiempos disputaban la final, "
+                "independientemente de la liga de la que formaban parte."
+            ),
             cancelled=False,
         ),
     ]

@@ -96,7 +96,7 @@ class TrainerasHtmlParser(HtmlParser):
             day=self._clean_day(table, name),
             modality=RACE_TRAINERA,
             league=find_league(name),
-            town=self.get_town(selector, race_table=table),
+            town=self.get_town(selector, table=table),
             organizer=None,
             sponsor=find_race_sponsor(self.get_name(selector)),
             race_ids=[race_id],
@@ -258,13 +258,8 @@ class TrainerasHtmlParser(HtmlParser):
         return name
 
     def get_date(self, selector: Selector, table: int) -> date | None:
-        date_path = "div[1]/h2" if table == 1 else f"div[2]/h2[{table - 1}]"
-        t_date = find_date(selector.xpath(f"/html/body/div[1]/main/div/div/div/{date_path}/text()").get(""))
-        if not t_date:
-            # race_id=1625
-            date_path = f"div[3]/h2[{table - 1}]"
-            t_date = find_date(selector.xpath(f"/html/body/div[1]/main/div/div/div/{date_path}/text()").get(""))
-        return t_date
+        title = self._get_race_title(selector, table)
+        return find_date(title)
 
     def get_gender(self, selector: Selector) -> str:
         parts = selector.xpath("/html/body/div[1]/main/div/div/div/div[1]/h2/text()").get("")
@@ -299,8 +294,8 @@ class TrainerasHtmlParser(HtmlParser):
             return CATEGORY_SCHOOL
         return CATEGORY_ABSOLUT
 
-    def get_town(self, selector: Selector, race_table: int) -> str:
-        parts = selector.xpath(f"/html/body/div[1]/main/div/div/div/div[{race_table}]/h2/text()").get("")
+    def get_town(self, selector: Selector, table: int) -> str:
+        parts = self._get_race_title(selector, table)
         return normalize_town(whitespaces_clean(parts.split(" - ")[0]))
 
     def get_race_lanes(self, participants: list[Selector]) -> int | None:
@@ -331,7 +326,8 @@ class TrainerasHtmlParser(HtmlParser):
         return len([lap for lap in laps if len(lap) == 0]) >= len(participants) // 2
 
     def get_participants(self, selector: Selector, table: int) -> list[Selector]:
-        rows = selector.xpath(f"{self._participants_path(selector)}[{table}]/tr").getall()
+        modifier = 1 if self._has_label(selector) else 0
+        rows = selector.xpath(f"/html/body/div[1]/main/div/div/div/div[{(table * 2) + modifier}]/table/tr").getall()
         return [Selector(t) for t in rows[1:]]
 
     def get_lane(self, participant: Selector) -> int | None:
@@ -376,8 +372,18 @@ class TrainerasHtmlParser(HtmlParser):
     #                     PRIVATE                      #
     ####################################################
 
+    def _has_label(self, selector: Selector) -> bool:
+        target_div = selector.xpath("/html/body/div[1]/main/div/div/div/div[2]")
+        return bool(target_div[0].xpath(".//p"))
+
+    def _get_race_title(self, selector: Selector, table: int) -> str:
+        modifier = 0 if self._has_label(selector) and table > 1 else 1
+        date_path = f"div[{(table * 2) - modifier}]/h2"
+        return selector.xpath(f"/html/body/div[1]/main/div/div/div/{date_path}/text()").get("")
+
     def _races_count(self, selector: Selector) -> int:
-        return len(selector.xpath(f"{self._participants_path(selector)}[*]").getall())
+        tables = selector.xpath("/html/body/div[1]/main/div/div/div/div[*]/table").getall()
+        return len(tables)
 
     def _has_gender(self, is_female: bool | None, value: str) -> bool:
         return is_female is None or (value in self._FEMALE if is_female else value not in self._FEMALE)
@@ -423,14 +429,6 @@ class TrainerasHtmlParser(HtmlParser):
         titles = selector.xpath("/html/body/main/div/div/div/div[*]/h2/text()").getall()
         idx = next((i for i, t in enumerate(titles) if all(w in t for w in words)), -1)
         return selector.xpath(f"/html/body/main/div/div/div/div[{idx + 1}]/div/table").get(None) if idx >= 0 else None
-
-    @staticmethod
-    def _participants_path(selector: Selector) -> str:
-        path = "/html/body/div[1]/main/div[1]/div/div/div[2]/table"
-        if not selector.xpath(path):
-            # race_id=5706
-            path = "/html/body/div[1]/main/div[1]/div/div/div[3]/table"
-        return path
 
     @staticmethod
     def _normalizations(name: str, original_name: str, t_date: date) -> str:
