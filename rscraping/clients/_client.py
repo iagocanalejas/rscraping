@@ -1,6 +1,6 @@
 from collections.abc import Generator
 from datetime import date, datetime, timedelta
-from typing import override
+from typing import Self, override
 
 import requests
 from parsel.selector import Selector
@@ -26,7 +26,7 @@ class Client(ClientProtocol):
         if source:
             cls._registry[source] = cls
 
-    def __new__(cls, source: Datasource, gender: str = GENDER_MALE, **_) -> "Client":
+    def __new__(cls, source: Datasource, gender: str = GENDER_MALE, **_) -> Self:
         subclass = cls._registry[source]
         final_obj = object.__new__(subclass)
         if not final_obj._is_valid_gender(gender):
