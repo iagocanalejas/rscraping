@@ -126,7 +126,7 @@ class ARCHtmlParser(HtmlParser):
         assert all(d.year == days[0].year for d in days), "all days must be from the same year"
 
         def _find_date(s: Selector) -> datetime | None:
-            maybe_date = f"{whitespaces_clean(s.xpath("//*/td[1]/span/text()").get("")).upper()} {days[0].year}"
+            maybe_date = f"{whitespaces_clean(s.xpath('//*/td[1]/span/text()').get('')).upper()} {days[0].year}"
             found_date = find_date(maybe_date, day_first=True)
             return datetime.combine(found_date, datetime.min.time()) if found_date else None
 
@@ -169,7 +169,9 @@ class ARCHtmlParser(HtmlParser):
     def get_day(self, selector: Selector) -> int:
         name = self.get_name(selector)
         if is_play_off(name):  # exception case
-            return 1 if "1" in name or "I" in name.split() else 2
+            if "1" in name or "I" in name.split():
+                return 1
+            return 2 if self.get_date(selector).isoweekday() == 7 else 1  # 2 for sunday
         matches = re.findall(r"\d+ª día|\(\d+ª? JORNADA\)", name)
         if matches:
             matches = re.findall(r"\d+", matches[0])[0].strip()
