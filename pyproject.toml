@@ -2,46 +2,68 @@
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "rscraping"
+version = "1.0.0"
+description = "A set of tools to scrape and process data from various rowing sources."
+readme = "README.md"
+license = { file = "LICENSE.md" }
+authors = [{ name = "Iago Santos" }]
+requires-python = ">=3.13"
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only"
+]
+dependencies = [
+  "parsel",
+  "requests",
+  "simplemma",
+  "pyutils @ git+https://github.com/iagocanalejas/pyutils.git@master",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["rscraping*"]
+
 [tool.pyright]
 strictListInference = true
 strictDictionaryInference = true
 strictSetInference = true
 deprecateTypingAliases = true
 exclude = [
-	"**/build",
-	"**/dist",
-	"**/out",
-	"**/venv",
+  "**/build",
+  "**/dist",
+  "**/out",
+  "**/venv",
 ]
 
 [tool.coverage.run]
 branch = true
 source = ["rscraping"]
 omit = [
-	"**/__init__.py",
-	"rscraping/**/_protocol.py",
+  "**/__init__.py",
+  "rscraping/**/_protocol.py",
 ]
 
 [tool.coverage.report]
-# skip_covered = true
 show_missing = true
 exclude_also = [
-	"pragma: no cover*",
-	"import .*",
-	"def __repr__",
-    "if self.debug:",
-    "if settings.DEBUG",
-    "raise AssertionError",
-    "raise NotImplementedError",
-	"raise",
-    "if 0:",
-    "if False:",
-    "if __name__ == .__main__.:",
-    "if TYPE_CHECKING:",
-    "class .*\\bProtocol\\):",
-    "@(abc\\.)?abstractmethod",
-	"logger.*",
-	"-> ['\"]?NoReturn['\"]?:",
-	"self.fail*",
-	"def __str__",
-    ]
+  "pragma: no cover*",
+  "import .*",
+  "def __repr__",
+  "if self.debug:",
+  "if settings.DEBUG",
+  "raise AssertionError",
+  "raise NotImplementedError",
+  "raise",
+  "if 0:",
+  "if False:",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+  "class .*\\bProtocol\\):",
+  "@(abc\\.)?abstractmethod",
+  "logger.*",
+  "-> ['\"]?NoReturn['\"]?:",
+  "self.fail*",
+  "def __str__",
+]
