@@ -269,7 +269,10 @@ def normalize_penalty(text: str | None, participants: list[str]) -> dict[str, Pe
     parts = _clean_note(text)
 
     def assign_penalty(
-        text: str, text_lemmas: list[str], penalty_str: str, regexes: list[str]
+        text: str,
+        text_lemmas: list[str],
+        penalty_str: str,
+        regexes: list[str],
     ) -> tuple[str, Penalty] | None:
         club_name = _find_participant(text, regexes)
         if (not club_name or club_name not in participants) and time_participant:
@@ -289,8 +292,8 @@ def normalize_penalty(text: str | None, participants: list[str]) -> dict[str, Pe
         penalty_found = False
 
         # route penalties
-        for lemmas_lists in _ROUTE_LEMMAS:  # lemmas_loop
-            if not set(lemmas_lists).issubset(note_lemmas):
+        for lemmas in _ROUTE_LEMMAS:  # lemmas_loop
+            if not set(lemmas).issubset(note_lemmas):
                 continue  # lemmas_loop
 
             for penalty_str, regexes in _ROUTE_TEMPLATES.items():  # penalties_loop

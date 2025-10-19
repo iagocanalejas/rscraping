@@ -25,7 +25,7 @@ from rscraping.data.normalization import (
 
 
 class TestPenaltyNormalization(unittest.TestCase):
-    def test_starboard_tack_normalization(self):
+    def test_starboard_tack_normalization(self) -> None:
         notes = [
             "Vila de Cangas realizó la primera ciaboga por estribor.",
             "Vila de Cangas realizó la segunda ciaboga por estribor.",
@@ -55,7 +55,7 @@ class TestPenaltyNormalization(unittest.TestCase):
         for idx, text in enumerate(notes):
             self.assertEqual(normalize_penalty(text, list(penalties[idx].keys())), penalties[idx])
 
-    def test_off_the_field_normalization(self):
+    def test_off_the_field_normalization(self) -> None:
         notes = [
             "San Simón y A Cabana pasaron la baliza de meta por estribor. El tiempo de San Simón había sido de 24:34.29 y el de A Cabana de 24:30.41.",  # noqa: E501
             "Cesantes y el Náutico de Vigo dejaron la baliza de meta por estribor. El tiempo de Cesantes había sido de 21:52.58 y el del Náutico de Vigo de 21:39.47.",  # noqa: E501
@@ -85,7 +85,7 @@ class TestPenaltyNormalization(unittest.TestCase):
         for idx, text in enumerate(notes):
             self.assertEqual(normalize_penalty(text, list(penalties[idx].keys())), penalties[idx])
 
-    def test_wrong_route_normalization(self):
+    def test_wrong_route_normalization(self) -> None:
         notes = [
             "Orio fue descalificado por cruzarse de calle.",
         ]
@@ -95,7 +95,7 @@ class TestPenaltyNormalization(unittest.TestCase):
         for idx, text in enumerate(notes):
             self.assertEqual(normalize_penalty(text, list(penalties[idx].keys())), penalties[idx])
 
-    def test_lack_of_competitiveness_normalization(self):
+    def test_lack_of_competitiveness_normalization(self) -> None:
         notes = [
             "Se consideró que a Ondarroa le faltó voluntad de competir, infringiendo el artículo 39 del vigente Código de Regatas, que obliga a toda tripulación que tome la salida a remar a ritmo de regata hasta terminar.",  # noqa: E501
         ]
@@ -105,7 +105,7 @@ class TestPenaltyNormalization(unittest.TestCase):
         for idx, text in enumerate(notes):
             self.assertEqual(normalize_penalty(text, list(results[idx].keys())), results[idx])
 
-    def test_null_start_normalization(self):
+    def test_null_start_normalization(self) -> None:
         notes = [
             "Virxe da Guía tuvo dos salidas nulas.",
             "Tirán compitió fuera de regata por salidas nulas. Su tiempo había sido de 20:55.",
@@ -121,7 +121,7 @@ class TestPenaltyNormalization(unittest.TestCase):
         for idx, text in enumerate(notes):
             self.assertEqual(normalize_penalty(text, list(penalties[idx].keys())), penalties[idx])
 
-    def test_collision_normalization(self):
+    def test_collision_normalization(self) -> None:
         notes = [
             "Rianxo salió demasiado abierto.",
             "Cabo da Cruz se puso delante de Chapela en la meta. Su tiempo había sido de 21:25.13.",
@@ -165,7 +165,7 @@ class TestPenaltyNormalization(unittest.TestCase):
         for idx, text in enumerate(notes):
             self.assertEqual(normalize_penalty(text, list(penalties[idx].keys())), penalties[idx])
 
-    def test_wrong_lineup_normalization(self):
+    def test_wrong_lineup_normalization(self) -> None:
         notes = [
             "Chapela quedó fuera de regata después de una reclamación por problemas con la ficha de uno de sus remeros (Guta Ionut). Perdió la cuarta plaza tras realizar un tiempo de 20:40.22.",  # noqa: E501
             "Bueu quedó fuera de regata por alineación indebida de remeros de Marín. Su tiempo había sido de 24:23.73.",
@@ -186,7 +186,7 @@ class TestPenaltyNormalization(unittest.TestCase):
         for idx, text in enumerate(notes):
             self.assertEqual(normalize_penalty(text, list(penalties[idx].keys())), penalties[idx])
 
-    def test_doping_normalization(self):
+    def test_doping_normalization(self) -> None:
         notes = [
             "El tiempo de Yola había sido de 23:16.95, pero su remero Patxi Aldasoro no pasó el control antidoping y fueron descalificados.",  # noqa: E501
         ]
@@ -196,7 +196,7 @@ class TestPenaltyNormalization(unittest.TestCase):
         for idx, text in enumerate(notes):
             self.assertEqual(normalize_penalty(text, list(penalties[idx].keys())), penalties[idx])
 
-    def test_sinking_normalization(self):
+    def test_sinking_normalization(self) -> None:
         notes = [
             "Ares se hundió antes de la 3.ª ciaboga. A Cabana fue abordado por Perillo en la 1.ª ciaboga. El tiempo de Perillo había sido de 22:31.58",  # noqa: E501
             "Raspas se retiró por entrar agua en su embarcación.",
@@ -211,7 +211,7 @@ class TestPenaltyNormalization(unittest.TestCase):
         for idx, text in enumerate(notes):
             self.assertEqual(normalize_penalty(text, list(penalties[idx].keys())), penalties[idx])
 
-    def test_boat_weight_normalization(self):
+    def test_boat_weight_normalization(self) -> None:
         notes = [
             "Samertolameu fue descalificado por no pesar la embarcación. Su tiempo había sido de 21:07.34.",
         ]
@@ -221,7 +221,7 @@ class TestPenaltyNormalization(unittest.TestCase):
         for idx, text in enumerate(notes):
             self.assertEqual(normalize_penalty(text, list(penalties[idx].keys())), penalties[idx])
 
-    def test_unknown_penalty_normalization(self):
+    def test_unknown_penalty_normalization(self) -> None:
         notes = [
             "Donostia Arraun Lagunak fue descalificado, su tiempo había sido de 20:58.16.",
             "La primera jornada se tuvo que anular por el mal estado de la mar. El ganador se adjudicó también el III trofeo Manolo Santamaría y la VIII Copa del Rey. La primera tanda sirvió como Campeonato Regional. Santoñés realizó un tiempo de 20:33.0, pero fue descalificado.",  # noqa: E501
@@ -233,7 +233,7 @@ class TestPenaltyNormalization(unittest.TestCase):
         for idx, text in enumerate(notes):
             self.assertEqual(normalize_penalty(text, list(penalties[idx].keys())), penalties[idx])
 
-    def test_retrieve_participant_times(self):
+    def test_retrieve_participant_times(self) -> None:
         notes = [
             "El tiempo de Vilaxoan fue de 26:16.00.",
             "El tiempo de Raspas había sido 23:41.86.",
@@ -321,7 +321,7 @@ class TestPenaltyNormalization(unittest.TestCase):
         for i, text in enumerate(notes):
             self.assertEqual(retrieve_penalty_times(text), results[i])
 
-    def test_cancelled(self):
+    def test_cancelled(self) -> None:
         notes = [
             "La regata se suspendió en los primeros compases de la segunda tanda, después de varios retrasos en la salida de la prueba.",  # noqa: E501
             "La regata se anuló después de que Elantxobe impugnara porque una embarcación que cruzó el campo de regateo les molestó",  # noqa: E501
@@ -336,7 +336,7 @@ class TestPenaltyNormalization(unittest.TestCase):
             if not is_cancelled(text):
                 self.fail(text)
 
-    def test_retired(self):
+    def test_retired(self) -> None:
         notes = [
             (
                 "SANTURTZI",
@@ -359,7 +359,7 @@ class TestPenaltyNormalization(unittest.TestCase):
             if not is_retired(participant, text):
                 self.fail(text)
 
-    def test_guest(self):
+    def test_guest(self) -> None:
         notes = [
             (
                 "PERILLO B",
@@ -390,7 +390,7 @@ class TestPenaltyNormalization(unittest.TestCase):
             if not is_guest(participant, text):
                 self.fail(text)
 
-    def test_absent(self):
+    def test_absent(self) -> None:
         notes = [
             ("LAREDO", "Estaba prevista la participación de Laredo pero no se presentó."),
         ]
@@ -398,7 +398,7 @@ class TestPenaltyNormalization(unittest.TestCase):
             if not is_absent(participant, text):
                 self.fail(text)
 
-    def test_no_penalty(self):
+    def test_no_penalty(self) -> None:
         notes = [
             "Donibaneko utilizó la trainera de madera en lugar de la de fibra. Orio compitió con una trainera de fibra construida por la firma Compoplás.",  # noqa: E501
             "El mal estado de la mar hizo que las traineras colocaran sus palcas de proa a popa.",

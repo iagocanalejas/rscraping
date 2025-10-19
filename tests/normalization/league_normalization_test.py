@@ -9,7 +9,7 @@ class TestLeagueNormalization(unittest.TestCase):
             "LIGA FEM",
         ]
 
-    def test_league_name_normalization(self):
+    def test_league_name_normalization(self) -> None:
         results = [
             "LIGA GALEGA DE TRAIÑAS FEMENINA",
         ]
@@ -17,7 +17,7 @@ class TestLeagueNormalization(unittest.TestCase):
         for idx, league_name in enumerate(self.NAMES):
             self.assertEqual(normalize_league_name(league_name), results[idx])
 
-    def test_find_league(self):
+    def test_find_league(self) -> None:
         self.assertEqual(find_league("LGT PLAY OFF"), "LGT")
         self.assertEqual(find_league("ARC PLAY OFF"), "ARC")
         self.assertEqual(find_league("ACT PLAY OFF"), "ACT")

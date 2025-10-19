@@ -2,6 +2,7 @@ import json
 from dataclasses import dataclass
 from datetime import datetime
 from enum import StrEnum, auto
+from typing import Any
 
 
 @dataclass
@@ -22,7 +23,7 @@ class Datasource(StrEnum):
         return value is not None and value.lower() in [d for d in cls]
 
     @classmethod
-    def _missing_(cls, value) -> "Datasource | None":
+    def _missing_(cls, value: Any) -> "Datasource | None":
         if not isinstance(value, str):
             return None
         value = value.lower()
@@ -52,7 +53,7 @@ class Penalty:
         values = json.loads(json_str)
         return Penalty(**values)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {k: v for k, v in self.__dict__.items()}
 
     def to_json(self) -> str:
@@ -107,7 +108,7 @@ class Race:
             race.participants = [Participant(**p, race=race) for p in participants]
         return race
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         d = {k: v for k, v in self.__dict__.items()}
         d["participants"] = [p.to_dict() for p in d["participants"]]
         return d
@@ -148,7 +149,7 @@ class Participant:
             values["race"] = None
         return Participant(**values)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         d = {k: v for k, v in self.__dict__.items() if k not in ["race"]}
         d["penalty"] = self.penalty.to_dict() if self.penalty else None
         return d
