@@ -204,7 +204,7 @@ def remove_club_sponsor(name: str) -> str:
     return whitespaces_clean(name)
 
 
-def ensure_b_teams_have_the_main_team_racing(race: Race):
+def ensure_b_teams_have_the_main_team_racing(race: Race) -> None:
     """
     Ensure that if a B team is racing, the main team is also racing
     """
