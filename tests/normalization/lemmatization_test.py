@@ -4,7 +4,7 @@ from rscraping.data.normalization import lemmatize
 
 
 class TestLemmatization(unittest.TestCase):
-    def test_lemmatization(self):
+    def test_lemmatization(self) -> None:
         results = [
             ("BANDEIRA CONCELLO DE BUEU", ["bandera", "ayuntamiento", "bueu"]),
             ("EL CORREO IKURRIÑA", ["correo", "bandera"]),
