@@ -17,7 +17,7 @@ class TestTimeNormalization(unittest.TestCase):
             "11,10",
         ]
 
-    def test_lap_time_normalization(self):
+    def test_lap_time_normalization(self) -> None:
         results = [
             "00:18.62",
             "00:45.00",

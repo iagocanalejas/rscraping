@@ -23,7 +23,7 @@ class TestClubNormalization(unittest.TestCase):
             "KOXTAPE - DENIA",
         ]
 
-    def test_club_name_normalization(self):
+    def test_club_name_normalization(self) -> None:
         results = [
             "PUEBLA - CABO",
             "CABO DA CRUZ",

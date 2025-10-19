@@ -4,7 +4,7 @@ from rscraping.data.normalization import normalize_town
 
 
 class TestTownNormalization(unittest.TestCase):
-    def test_town_normalization(self):
+    def test_town_normalization(self) -> None:
         results = [
             ("PORTO DA POBRA", "A POBRA DO CARAMIÑAL"),
             ("PUERTO DE TIRÁN", "TIRÁN"),
