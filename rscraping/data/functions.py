@@ -17,7 +17,7 @@ def expand_path(
     return [f for f in files if is_valid(f)]
 
 
-def save_csv(items: list[Race], file_name: str):  # pragma: no cover - util functions not needing testing
+def save_csv(items: list[Race], file_name: str) -> None:  # pragma: no cover - util functions not needing testing
     assert len(items), "no items to save"
 
     file_name = file_name if ".csv" in file_name else f"{file_name}.csv"
@@ -28,7 +28,7 @@ def save_csv(items: list[Race], file_name: str):  # pragma: no cover - util func
             writer.writerow(item.__dict__.values())
 
 
-def sys_print_items(items: list[Any]):  # pragma: no cover - util functions not needing testing
+def sys_print_items(items: list[Any]) -> None:  # pragma: no cover - util functions not needing testing
     items_len = len(items)
     sys.stdout.write("[")
     for i, race in enumerate(items):
