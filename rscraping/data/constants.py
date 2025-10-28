@@ -79,7 +79,7 @@ _USER_AGENTS = [
 ]
 
 
-def HTTP_HEADERS():  # pragma: no cover
+def HTTP_HEADERS() -> dict[str, str]:  # pragma: no cover
     return {
         "Accept": "*/*",
         "User-Agent": _USER_AGENTS[random.randint(0, len(_USER_AGENTS) - 1)],
