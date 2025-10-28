@@ -10,11 +10,11 @@ from rscraping.parsers.html.act import ACTHtmlParser
 
 
 class TestACTParser(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.parser = ACTHtmlParser()
         self.fixtures = os.path.join(os.getcwd(), "tests", "fixtures", "html")
 
-    def test_parse_race(self):
+    def test_parse_race(self) -> None:
         with open(os.path.join(self.fixtures, "act_details.html")) as file:
             race = self.parser.parse_race(
                 Selector(file.read()),
@@ -30,13 +30,13 @@ class TestACTParser(unittest.TestCase):
         self.assertEqual(race, self._RACE)
         self.assertEqual(participants, self._PARTICIPANTS)
 
-    def test_parse_race_ids(self):
+    def test_parse_race_ids(self) -> None:
         with open(os.path.join(self.fixtures, "act_races.html")) as file:
             ids = self.parser.parse_race_ids(Selector(file.read()))
 
         self.assertEqual(list(ids), ["1616789082", "1616789390", "1616789420"])
 
-    def test_parse_race_ids_by_days(self):
+    def test_parse_race_ids_by_days(self) -> None:
         with open(os.path.join(self.fixtures, "act_races.html")) as file:
             ids = self.parser.parse_race_ids_by_days(
                 Selector(file.read()),
@@ -45,7 +45,7 @@ class TestACTParser(unittest.TestCase):
 
         self.assertEqual(list(ids), ["1616789082"])
 
-    def test_parse_race_names(self):
+    def test_parse_race_names(self) -> None:
         with open(os.path.join(self.fixtures, "act_races.html")) as file:
             race_names = self.parser.parse_race_names(Selector(file.read()), is_female=False)
 

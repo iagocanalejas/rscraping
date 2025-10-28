@@ -13,7 +13,7 @@ from rscraping.data.models import Datasource
 
 
 class TestClient(unittest.TestCase):
-    def test_client_initialization(self):
+    def test_client_initialization(self) -> None:
         self.assertTrue(isinstance(Client(source=Datasource.TRAINERAS), TrainerasClient))
         self.assertTrue(isinstance(Client(source=Datasource.ACT), ACTClient))
         self.assertTrue(isinstance(Client(source=Datasource.ARC), ARCClient))
@@ -23,7 +23,7 @@ class TestClient(unittest.TestCase):
             # cannot create an ETE client with 'MALE' gender
             Client(source=Datasource.ETE)
 
-    def test_client_initialization_with_config(self):
+    def test_client_initialization_with_config(self) -> None:
         self.assertTrue(isinstance(Client(source=Datasource.ACT, gender=GENDER_FEMALE), ACTClient))
         self.assertTrue(isinstance(Client(source=Datasource.ARC, gender=GENDER_FEMALE), ARCClient))
         self.assertTrue(isinstance(Client(source=Datasource.LGT, gender=GENDER_FEMALE), LGTClient))
