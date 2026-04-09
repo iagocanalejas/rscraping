@@ -7,8 +7,10 @@ from parsel.selector import Selector
 
 from rscraping.data.constants import (
     CATEGORY_ABSOLUT,
+    CATEGORY_ALL,
     CATEGORY_SCHOOL,
     CATEGORY_VETERAN,
+    GENDER_ALL,
     GENDER_FEMALE,
     GENDER_MALE,
     GENDER_MIX,
@@ -32,6 +34,8 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
 
     @property
     def tag(self) -> str:
+        if self._category == CATEGORY_ALL and self._gender == GENDER_ALL:
+            return ""
         if self._gender == GENDER_MIX:
             return "M"
         if self._category == CATEGORY_VETERAN:
@@ -48,7 +52,7 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
 
     @override
     def _is_valid_gender(self, gender: str) -> bool:
-        return gender in [GENDER_MALE, GENDER_FEMALE, GENDER_MIX]
+        return gender in [GENDER_MALE, GENDER_FEMALE, GENDER_MIX, GENDER_ALL]
 
     @override
     def get_race_details_url(self, race_id: str, **_) -> str:
@@ -95,6 +99,9 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
 
         Yields: str: Race IDs.
         """
+        if self._gender == GENDER_ALL:
+            raise ValueError("GENDER_ALL not supported in get_race_by_id method")
+
         url = self.get_flag_url(flag_id)
         content = Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8"))
         yield from self._html_parser.parse_flag_race_ids(content, gender=self._gender, category=self._category)
@@ -111,6 +118,9 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
 
         Returns: Race | None: The parsed race details or None if the race is not found.
         """
+        if self._gender == GENDER_ALL:
+            raise ValueError("GENDER_ALL not supported in get_race_by_id method")
+
         race = super().get_race_by_id(race_id, **kwargs)
         if not race:
             return None
@@ -184,5 +194,7 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
 
         first_page = get_page_selector(1)
         total_pages = self._html_parser.get_number_of_pages(first_page)
+
+        yield first_page
         for page_number in range(2, total_pages + 1):
             yield get_page_selector(page_number)

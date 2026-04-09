@@ -246,7 +246,8 @@ class TrainerasHtmlParser(HtmlParser):
                 )
 
     def get_number_of_pages(self, selector: Selector) -> int:
-        return len(selector.xpath("/html/body/div[1]/div[3]/nav/ul/li[*]").getall()) - 2
+        pages = len(selector.xpath("/html/body/div[1]/div[3]/nav/ul/li").getall())
+        return pages - 2 if pages > 0 else 1
 
     ####################################################
     #                     GETTERS                      #
