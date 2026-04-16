@@ -118,9 +118,6 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
 
         Returns: Race | None: The parsed race details or None if the race is not found.
         """
-        if self._gender == GENDER_ALL:
-            raise ValueError("GENDER_ALL not supported in get_race_by_id method")
-
         race = super().get_race_by_id(race_id, **kwargs)
         if not race:
             return None
@@ -133,9 +130,13 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
         if len(flag_urls) < 1:
             return race
 
+        gender = race.gender if race.gender else self._gender
+        if gender == GENDER_ALL:
+            raise ValueError("GENDER_ALL not supported in get_race_by_id method")
+
         # the first flag should be an exact match of the given one, so we can use it to get the editions
         content = Selector(requests.get(url=flag_urls[0], headers=HTTP_HEADERS()).content.decode("utf-8"))
-        editions = self._html_parser.parse_flag_editions(content, gender=self._gender, category=self._category)
+        editions = self._html_parser.parse_flag_editions(content, gender=gender, category=self._category)
         edition = next((e for (y, e) in editions if y == race.year), None)
         if edition:
             race.normalized_names = [(n[0], edition) for n in race.normalized_names]
