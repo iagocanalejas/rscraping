@@ -93,6 +93,8 @@ def normalize_name_parts(name: str) -> list[tuple[str, int | None]]:
 
     normalized = remove_parenthesis(whitespaces_clean(name))
     normalized = f"{normalized} ({'CLASIFICATORIA'})" if "CLASIFICATORIA" in name else normalized
+    if "DESCENSO" in name and "DE TRAINERAS" not in name:
+        normalized = normalized.replace("DESCENSO", "DESCENSO DE TRAINERAS")
 
     should_split = none(" - " in r in normalized for r in _NORMALIZED_RACES.keys())
     name_parts = normalized.split(" - ") if should_split and not is_play_off(normalized) else [normalized]
