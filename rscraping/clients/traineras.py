@@ -157,9 +157,8 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
 
     @override
     def get_race_ids_by_club(self, club_id: str, year: int, **kwargs) -> Generator[str]:
-        content = requests.get(url=self.get_club_races_url(club_id, year), headers=HTTP_HEADERS())
-        content = content.content.decode("utf-8")
-        return self._html_parser.parse_club_race_ids(Selector(content))
+        response = requests.get(url=self.get_club_races_url(club_id, year), headers=HTTP_HEADERS())
+        return self._html_parser.parse_club_race_ids(Selector(response.content.decode("utf-8")))
 
     def get_race_ids_by_rower(self, rower_id: str, year: str | None = None, **_) -> Generator[str]:
         """

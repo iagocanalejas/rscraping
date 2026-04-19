@@ -1,6 +1,7 @@
 import re
 from typing import override
 
+from rscraping.data.constants import GENDER_MALE
 from rscraping.data.models import Datasource
 from rscraping.parsers.html import ARCHtmlParser
 
@@ -8,8 +9,9 @@ from ._client import Client
 
 
 class ARCClient(Client, source=Datasource.ARC):
+    _gender = GENDER_MALE
+
     DATASOURCE = Datasource.ARC
-    MALE_START = 2009
     FEMALE_START = 2018
 
     @property
@@ -17,14 +19,16 @@ class ARCClient(Client, source=Datasource.ARC):
         return ARCHtmlParser()
 
     @override
-    def get_race_details_url(self, race_id: str, *, is_female: bool, **_) -> str:
-        host = "ligaete" if is_female else "liga-arc"
-        return f"https://www.{host}.com/es/regata/{race_id}/unknown"
+    def _is_valid_gender(self, gender: str) -> bool:
+        return gender in [GENDER_MALE]
 
     @override
-    def get_races_url(self, year: int, *, is_female: bool, **_) -> str:
-        host = "ligaete" if is_female else "liga-arc"
-        return f"https://www.{host}.com/es/calendario/{year}"
+    def get_race_details_url(self, race_id: str, **_) -> str:
+        return f"https://www.liga-arc.com/es/regata/{race_id}/unknown"
+
+    @override
+    def get_races_url(self, year: int, **_) -> str:
+        return f"https://www.liga-arc.com/es/calendario/{year}"
 
     @override
     def validate_url(self, url: str):

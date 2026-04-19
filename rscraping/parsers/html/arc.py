@@ -38,7 +38,7 @@ class ARCHtmlParser(HtmlParser):
     DATASOURCE = Datasource.ARC
 
     @override
-    def parse_race(self, selector: Selector, *, race_id: str, is_female: bool, **_) -> Race:
+    def parse_race(self, selector: Selector, *, race_id: str, is_female: bool = False, **_) -> Race:
         name = self.get_name(selector)
         assert name, f"{self.DATASOURCE}: no name found for {race_id=}"
 

@@ -38,7 +38,7 @@ class ACTHtmlParser(HtmlParser):
     DATASOURCE = Datasource.ACT
 
     @override
-    def parse_race(self, selector: Selector, *, race_id: str, is_female: bool, **_) -> Race:
+    def parse_race(self, selector: Selector, *, race_id: str, is_female: bool = False, **_) -> Race:
         name = self.get_name(selector)
         assert name, f"{self.DATASOURCE}: no name found for {race_id=}"
 
@@ -180,10 +180,10 @@ class ACTHtmlParser(HtmlParser):
         return max(int(lane) for lane in lanes)
 
     def get_race_laps(self, selector: Selector) -> int | None:
-        columns = selector.xpath('//*[@id="col-a"]/div/section/div[3]/div[2]/div/table/tbody/tr').getall()
-        columns = [Selector(c).xpath("//*/td/text()").getall() for c in columns]
-        columns = max(len(c) - 3 for c in columns)
-        return columns if columns > 1 else None
+        column_rows = selector.xpath('//*[@id="col-a"]/div/section/div[3]/div[2]/div/table/tbody/tr').getall()
+        columns = [Selector(c).xpath("//*/td/text()").getall() for c in column_rows]
+        column_counts = max(len(c) - 3 for c in columns)
+        return column_counts if column_counts > 1 else None
 
     def is_cancelled(self, selector: Selector) -> bool:
         # race_id=1301303104|1301302999

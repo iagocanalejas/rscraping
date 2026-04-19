@@ -62,7 +62,9 @@ class TrainerasHtmlParser(HtmlParser):
     _SCHOOL = ["JM", "JF", "CM", "CF"]
 
     @override
-    def parse_race(self, selector: Selector, *, race_id: str, table: int | None = None, **_) -> Race:
+    def parse_race(self, selector: Selector, *, race_id: str | None = None, table: int | None = None, **_) -> Race:
+        assert race_id is not None, f"{self.DATASOURCE}: 'race_id' is required to parse a race"
+
         if self._races_count(selector) > 1 and not table:
             logger.error(f"{self.DATASOURCE}: multiple races found for {race_id=} without specifying a table")
             raise MultiRaceException("no table specified")
@@ -222,14 +224,12 @@ class TrainerasHtmlParser(HtmlParser):
 
         year = selector.xpath("/html/body/main/section[1]/div/div[2]/div[1]/div[1]/span/text()").get("")
         year = whitespaces_clean(year)
-        if not year.isdigit():
-            year = None
 
         return Club(
             name=name,
             normalized_name=normalize_club_name(name),
             datasource=self.DATASOURCE.value,
-            founding_year=year,
+            founding_year=year if year.isdigit() else None,
         )
 
     def parse_searched_flag_urls(self, selector: Selector) -> list[str]:
@@ -303,15 +303,15 @@ class TrainerasHtmlParser(HtmlParser):
         if self.get_type(participants) == RACE_TIME_TRIAL:
             return 1
         lanes = list(self.get_lane(p) for p in participants)
-        lanes = {int(lane) for lane in lanes if lane is not None}
-        if lanes:
-            return len(lanes)
+        lanes_set = {int(lane) for lane in lanes if lane is not None}
+        if lanes_set:
+            return len(lanes_set)
 
         # try to count the number of participants in each serie
         series = Counter([int(self.get_series(p)) for p in participants])
-        lanes = max(series.values())
-        if all(v == lanes or v == (lanes - 1) for v in series.values()):
-            return lanes
+        lanes_max = max(series.values())
+        if all(v == lanes_max or v == (lanes_max - 1) for v in series.values()):
+            return lanes_max
         return None
 
     def get_race_laps(self, selector: Selector, table: int) -> int | None:
@@ -340,8 +340,8 @@ class TrainerasHtmlParser(HtmlParser):
         return whitespaces_clean(name).upper() if name else ""
 
     def get_distance(self, selector: Selector) -> int | None:
-        parts = whitespaces_clean(selector.xpath("/html/body/div[1]/main/div/div/div/div[1]/h2/text()").get(""))
-        parts = parts.split(" - ")
+        parts_str = whitespaces_clean(selector.xpath("/html/body/div[1]/main/div/div/div/div[1]/h2/text()").get(""))
+        parts = parts_str.split(" - ")
         part = next((p for p in parts if "metros" in p), None)
         return int(part.replace(" metros", "")) if part is not None else None
 

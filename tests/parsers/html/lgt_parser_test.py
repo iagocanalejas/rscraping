@@ -21,8 +21,8 @@ class TestLGTParser(unittest.TestCase):
         ):
             race = self.parser.parse_race(
                 Selector(file.read()),
-                results_selector=Selector(results.read()),
                 race_id="1234",
+                results_selector=Selector(results.read()),
             )
         if not race:
             raise ValueError("unable to parse race")

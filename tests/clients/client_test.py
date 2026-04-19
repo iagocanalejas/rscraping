@@ -1,13 +1,6 @@
 import unittest
 
-from rscraping.clients import (
-    ACTClient,
-    ARCClient,
-    Client,
-    LGTClient,
-    TrainerasClient,
-)
-from rscraping.clients.ete import ETEClient
+from rscraping.clients import ACTClient, ARCClient, Client, ETEClient, LGTClient, TrainerasClient
 from rscraping.data.constants import CATEGORY_VETERAN, GENDER_FEMALE
 from rscraping.data.models import Datasource
 
@@ -25,9 +18,12 @@ class TestClient(unittest.TestCase):
 
     def test_client_initialization_with_config(self) -> None:
         self.assertTrue(isinstance(Client(source=Datasource.ACT, gender=GENDER_FEMALE), ACTClient))
-        self.assertTrue(isinstance(Client(source=Datasource.ARC, gender=GENDER_FEMALE), ARCClient))
         self.assertTrue(isinstance(Client(source=Datasource.LGT, gender=GENDER_FEMALE), LGTClient))
         self.assertTrue(isinstance(Client(source=Datasource.ETE, gender=GENDER_FEMALE), ETEClient))
+
+        with self.assertRaises(ValueError):
+            # cannot create an ARC client with 'FEMALE' gender
+            Client(source=Datasource.ARC, gender=GENDER_FEMALE)
 
         client = Client(source=Datasource.TRAINERAS, gender=GENDER_FEMALE, category=CATEGORY_VETERAN)
         self.assertTrue(isinstance(client, TrainerasClient))
