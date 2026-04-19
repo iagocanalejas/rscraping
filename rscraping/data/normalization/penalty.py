@@ -286,6 +286,7 @@ def normalize_penalty(text: str | None, participants: list[str]) -> dict[str, Pe
                 disqualification = penalty_str not in [SINKING] and all(w not in text_lemmas for w in ["RETIRO"])
             disqualification = disqualification or penalty_str == OFF_THE_FIELD
             return club_name, Penalty(reason=penalty_str, disqualification=disqualification)
+        return None
 
     for part in parts:  # parts_loop
         note_lemmas = lemmatize(remove_parenthesis(part))
@@ -299,8 +300,7 @@ def normalize_penalty(text: str | None, participants: list[str]) -> dict[str, Pe
             for penalty_str, regexes in _ROUTE_TEMPLATES.items():  # penalties_loop
                 penalty = assign_penalty(part, note_lemmas, penalty_str, regexes)
                 if penalty:
-                    club_name, penalty = penalty
-                    penalties[club_name] = penalty
+                    club_name, penalties[club_name] = penalty
                     penalty_found = True
                     break  # penalties_loop
 
@@ -318,8 +318,7 @@ def normalize_penalty(text: str | None, participants: list[str]) -> dict[str, Pe
 
                 penalty = assign_penalty(part, note_lemmas, penalty_str, _TEMPLATES[penalty_str])
                 if penalty:
-                    club_name, penalty = penalty
-                    penalties[club_name] = penalty
+                    club_name, penalties[club_name] = penalty
                     penalty_found = True
                     break  # lemmas_loop
 
@@ -338,8 +337,7 @@ def normalize_penalty(text: str | None, participants: list[str]) -> dict[str, Pe
 
             penalty = assign_penalty(og_text, note_lemmas, penalty_str, _TEMPLATES[penalty_str])
             if penalty:
-                club_name, penalty = penalty
-                penalties[club_name] = penalty
+                club_name, penalties[club_name] = penalty
                 penalty_found = True
                 break  # lemmas_loop
         if penalty_found:

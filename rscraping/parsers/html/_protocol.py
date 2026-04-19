@@ -10,12 +10,13 @@ from rscraping.data.models import Datasource, Race, RaceName
 class HtmlParser(Protocol):
     DATASOURCE: Datasource
 
-    def parse_race(self, selector: Selector, **kwargs) -> Race:
+    def parse_race(self, selector: Selector, *, race_id: str, **kwargs) -> Race:
         """
         Parse the given Selector to retrieve the race object.
 
         Args:
             selector (Selector): The Selector to parse.
+            race_id (str): The ID of the race to parse.
             **kwargs: Additional keyword arguments.
 
         Returns: Race: The race object.

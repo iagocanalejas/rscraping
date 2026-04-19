@@ -42,7 +42,9 @@ class LGTHtmlParser(HtmlParser):
     DATASOURCE = Datasource.LGT
 
     @override
-    def parse_race(self, selector: Selector, *, results_selector: Selector, race_id: str, **_) -> Race:
+    def parse_race(self, selector: Selector, *, race_id: str, results_selector: Selector | None = None, **_) -> Race:
+        assert results_selector is not None, f"{self.DATASOURCE}: 'results_selector' is required to parse a race"
+
         name = self.get_name(selector)
         assert name, f"{self.DATASOURCE}: no name found for {race_id=}"
         if name.upper() == "EREWEWEWERW" or name.upper() == "REGATA" or "?" in name:  # wtf
@@ -202,7 +204,7 @@ class LGTHtmlParser(HtmlParser):
         return normalize_town(value)
 
     def get_organizer(self, selector: Selector) -> str | None:
-        organizer = selector.xpath('//*[@id="regata"]/div/div/div[3]/div[1]/text()').get("")
+        organizer = selector.xpath('//*[@id="regata"]/div/div/div[3]/div[1]/text()').get(None)
         organizer = whitespaces_clean(organizer).upper().replace("ORGANIZA:", "").strip() if organizer else None
         return normalize_club_name(organizer) if organizer else None
 

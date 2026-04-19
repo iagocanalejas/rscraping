@@ -13,7 +13,7 @@ from ._protocol import ClientProtocol
 
 
 class Client(ClientProtocol):
-    _registry = {}
+    _registry: dict[Datasource, type[Self]] = {}
     _gender: str = GENDER_MALE
 
     DATASOURCE: Datasource
