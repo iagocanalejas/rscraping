@@ -16,6 +16,14 @@ class TestRaceNormalization(unittest.TestCase):
             "BANDERA CONCELLO DE BUEU (ACT)",
             "ASOCIACIÓN DE REMO DEL CANTÁBRICO 2:BANDERA VILLA DE LAREDO",
             "REGATA LIGA GALEGA DE TRAINERAS A",
+            "BANDERA EUSKADI BASQUE-COUNTRY",
+            "XV. BILBOKO BANDERA - BANDERA DE BILBAO (13-07-2024)",
+            "CLASIFICATORIA ARC",
+            "BANDERA CONCELLO DE VILAGARCÍA",
+            "BANDERA BILBAO 716 ANIVERSARIO",
+            "BANDERA WOFCO",
+            "BANDERA CIUDAD DE RIVEIRA",
+            "REGATA LIGA ARC",
         ]
 
     def test_race_name_normalization(self) -> None:
@@ -30,6 +38,14 @@ class TestRaceNormalization(unittest.TestCase):
             "BANDERA CONCELLO DE BUEU",
             "BANDERA VILLA DE LAREDO",
             "REGATA LIGA GALEGA DE TRAINERAS A",
+            "BANDERA EUSKADI BASQUE COUNTRY",
+            "XV BANDERA DE BILBAO",
+            "CLASIFICATORIA ARC",
+            "BANDERA CONCELLO DE VILAGARCÍA",
+            "BANDERA BILBAO 716 ANIVERSARIO",
+            "BANDERA WOFCO",
+            "BANDERA CIUDAD DE RIVEIRA",
+            "REGATA LIGA ARC",
         ]
 
         for idx, race_name in enumerate(self.NAMES):
@@ -47,6 +63,14 @@ class TestRaceNormalization(unittest.TestCase):
             [("BANDERA CONCELLO DE BUEU", None)],
             [("BANDERA VILLA DE LAREDO", None)],
             [("REGATA LIGA GALEGA DE TRAINERAS A", None)],
+            [("BANDERA EUSKADI BASQUE COUNTRY", None)],
+            [("BANDERA DE BILBAO", 15)],
+            [("CLASIFICATORIA ARC", None)],
+            [("BANDERA CONCELLO DE VILAGARCÍA", None)],
+            [("BANDERA BILBAO 716 ANIVERSARIO", None)],
+            [("BANDERA WOFCO", None)],
+            [("BANDERA CIUDAD DE RIVEIRA", None)],
+            [("REGATA LIGA ARC", None)],
         ]
 
         races = [normalize_race_name(n) for n in self.NAMES]

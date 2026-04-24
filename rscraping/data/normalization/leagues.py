@@ -22,6 +22,7 @@ LEAGUE_KEYWORDS = {
         "LIGA GALEGA DE TRAIÑAS FEMENINA",
         "LIGA GALEGA DE TRAIÑAS F",
         "LIGA GALEGA DE TRAIÑAS",
+        "LGT",
     ],
     "ACT": ["EUSKO LABEL LIGA", "LIGA EUSKOTREN", "LIGA ACT", "ACT"],
     "ARC": [

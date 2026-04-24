@@ -22,6 +22,7 @@ _MISSPELLINGS = {
     "CASTILLA LA": ["CASTILLA - LA"],
     "AYUNTAMIENTO": ["AYTO"],
     "TRAIÑEIRAS": ["TRAIEIRAS"],
+    "RIVEIRA": ["RIBEIRA"],
 }
 
 # tuples of sponsor name and if it should be replaced when found
@@ -30,7 +31,7 @@ _KNOWN_RACE_SPONSORS = [
     ("FANDICOSTA", False),
     ("ONURA HOMES", True),
     ("SALGADO CONGELADOS", False),
-    ("WOFCO", True),
+    ("WOFCO", False),
     ("YURRITA GROUP", True),
     ("YURRITA", True),
 ]
@@ -66,15 +67,11 @@ _NORMALIZED_RACES = {
     "MEMORIAL LAGAR": [["MEMORIAL", "MIGUEL", "LORES"]],
     "MEMORIAL RULY": [["MEMORIAL", "RAUL", "REY"]],
     "BANDEIRA SALGADO CONGELADOS": [["SALGADO"]],
-    "BANDEIRA CONCELLO DE RIBEIRA": [
-        ["BANDEIRA", "RIBEIRA"],
-        ["BANDEIRA", "RIVEIRA"],
-        ["BANDERA", "RIBEIRA"],
-        ["BANDERA", "RIVEIRA"],
-    ],
-    "BILBOKO BANDERA - BANDERA DE BILBAO": [["BILBOKO", "BANDERA"], ["BILBAO", "BANDERA"]],
+    "BANDERA DE BILBAO": [["BILBOKO", "BANDERA", "BILBAO", "BANDERA"]],  # TODO: check this with ACT
     "BANDEIRA VIRXE DO CARME": [["VIRXE", "CARME"], ["VIRGEN", "CARMEN"]],
     "BANDEIRA ILLA DO SAMERTOLAMEU - FANDICOSTA": [["ILLA", "SAMERTOLAMEU", "FANDICOSTA"]],
+    "BANDERA EUSKADI BASQUE COUNTRY": [["EUSKADI", "BASQUE", "COUNTRY"]],
+    "BANDERA DE UR-KIROLAK": [["UR-KIROLAK"], ["UR", "KIROLAK"]],
 }
 
 
@@ -92,7 +89,7 @@ def normalize_name_parts(name: str) -> list[tuple[str, int | None]]:
     parts: list[tuple[str, int | None]] = []
 
     normalized = remove_parenthesis(whitespaces_clean(name))
-    normalized = f"{normalized} ({'CLASIFICATORIA'})" if "CLASIFICATORIA" in name else normalized
+    normalized = f"{normalized} ({'CLASIFICATORIA'})" if _is_clasifier_but_not_weird(normalized) else normalized
     if "DESCENSO" in name and "DE TRAINERAS" not in name:
         normalized = normalized.replace("DESCENSO", "DESCENSO DE TRAINERAS")
 
@@ -109,6 +106,10 @@ def normalize_name_parts(name: str) -> list[tuple[str, int | None]]:
         parts.append((clean_name, edition))
 
     return parts
+
+
+def _is_clasifier_but_not_weird(name: str) -> bool:
+    return "CLASIFICATORIA" in name and "CLASIFICATORIA ARC" not in name
 
 
 def normalize_race_name(name: str) -> str:
@@ -128,6 +129,10 @@ def normalize_race_name(name: str) -> str:
     name = deacronym_race_name(name)  # need to be executed before "." removal
 
     name = re.sub(r"[\'\".:ª]", " ", name)
+
+    if name == "CLASIFICATORIA ARC":
+        # this is a special case that we want to keep as is
+        return "CLASIFICATORIA ARC"
 
     name = amend_race_name(name)
     name = remove_league_indicator(name)
@@ -205,6 +210,8 @@ def remove_league_indicator(name: str) -> str:
     for keyword_list in LEAGUE_KEYWORDS.values():
         for keyword in keyword_list:
             if keyword in name and len(name.replace(keyword, "").strip()) > 0:
+                if len(keyword.split()) == 1:
+                    continue
                 name = name.replace(keyword, "")
 
     return whitespaces_clean(remove_parenthesis(name))
