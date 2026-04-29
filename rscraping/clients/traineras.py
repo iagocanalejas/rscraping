@@ -1,3 +1,4 @@
+import itertools
 import re
 from collections.abc import Generator
 from typing import override
@@ -6,6 +7,7 @@ import requests
 from parsel.selector import Selector
 
 from rscraping.data.constants import (
+    CATEGORIES,
     CATEGORY_ABSOLUT,
     CATEGORY_ALL,
     CATEGORY_SCHOOL,
@@ -14,6 +16,7 @@ from rscraping.data.constants import (
     GENDER_FEMALE,
     GENDER_MALE,
     GENDER_MIX,
+    GENDERS,
     HTTP_HEADERS,
 )
 from rscraping.data.models import Club, Datasource, Race, RaceName
@@ -99,12 +102,14 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
 
         Yields: str: Race IDs.
         """
-        if self._gender == GENDER_ALL:
-            raise ValueError("GENDER_ALL not supported in get_race_by_id method")
+        genders = GENDERS if self._gender == GENDER_ALL else [self._gender]
+        categories = CATEGORIES if self._category == CATEGORY_ALL else [self._category]
 
         url = self.get_flag_url(flag_id)
         content = Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8"))
-        yield from self._html_parser.parse_flag_race_ids(content, gender=self._gender, category=self._category)
+
+        for gender, category in itertools.product(genders, categories):
+            yield from self._html_parser.parse_flag_race_ids(content, gender=gender, category=category)
 
     @override
     def get_race_by_id(self, race_id: str, **kwargs) -> Race | None:
