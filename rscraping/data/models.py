@@ -4,6 +4,8 @@ from datetime import datetime
 from enum import StrEnum, auto
 from typing import Any
 
+from rscraping.data.constants import DATE_FORMAT
+
 
 @dataclass
 class RaceName:
@@ -92,7 +94,7 @@ class Race:
 
     @property
     def year(self) -> int:
-        return datetime.strptime(self.date, "%d/%m/%Y").date().year
+        return datetime.strptime(self.date, DATE_FORMAT).date().year
 
     def __str__(self) -> str:
         return self.to_json()

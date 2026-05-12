@@ -13,9 +13,11 @@ from rscraping.data.constants import (
     CATEGORY_ABSOLUT,
     CATEGORY_SCHOOL,
     CATEGORY_VETERAN,
+    DATE_FORMAT,
     GENDER_FEMALE,
     GENDER_MALE,
     GENDER_MIX,
+    LAP_FORMAT,
     RACE_CONVENTIONAL,
     RACE_TIME_TRIAL,
     RACE_TRAINERA,
@@ -93,7 +95,7 @@ class TrainerasHtmlParser(HtmlParser):
         race = Race(
             name=name,
             normalized_names=normalized_names,
-            date=t_date.strftime("%d/%m/%Y"),
+            date=t_date.strftime(DATE_FORMAT),
             type=ttype,
             day=self._clean_day(table, name),
             modality=RACE_TRAINERA,
@@ -140,7 +142,7 @@ class TrainerasHtmlParser(HtmlParser):
             penalty = penalties.get(participant_name, None)
 
             if time:
-                laps.append(time.strftime("%M:%S.%f"))
+                laps.append(time.strftime(LAP_FORMAT))
 
             if penalty:
                 penalty.disqualification = self.is_disqualified(row) or penalty.disqualification
@@ -347,7 +349,7 @@ class TrainerasHtmlParser(HtmlParser):
 
     def get_laps(self, participant: Selector) -> list[str]:
         laps = [e for e in participant.xpath("//*/td/text()").getall() if any(c in e for c in [":", ".", ","])]
-        return [t.strftime("%M:%S.%f") for t in [normalize_lap_time(e) for e in laps if e] if t is not None]
+        return [t.strftime(LAP_FORMAT) for t in [normalize_lap_time(e) for e in laps if e] if t is not None]
 
     def is_disqualified(self, participant: Selector) -> bool:
         # race_id=5360|5535

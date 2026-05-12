@@ -1,6 +1,7 @@
 import unittest
 from datetime import datetime
 
+from rscraping.data.constants import LAP_FORMAT
 from rscraping.data.normalization import normalize_lap_time
 
 
@@ -31,5 +32,5 @@ class TestTimeNormalization(unittest.TestCase):
 
         for idx, lap_time in enumerate(self.TIMES):
             result = results[idx]
-            result = datetime.strptime(result, "%M:%S.%f").time() if result else None
+            result = datetime.strptime(result, LAP_FORMAT).time() if result else None
             self.assertEqual(normalize_lap_time(lap_time), result)

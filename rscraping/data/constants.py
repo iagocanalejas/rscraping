@@ -1,5 +1,8 @@
 import random
 
+DATE_FORMAT = "%d/%m/%Y"
+LAP_FORMAT = "%M:%S.%f"
+
 ################
 #   RACE TYPE  #
 ################

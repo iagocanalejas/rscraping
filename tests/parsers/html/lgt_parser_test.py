@@ -4,7 +4,7 @@ from datetime import datetime
 
 from parsel.selector import Selector
 
-from rscraping.data.constants import CATEGORY_ABSOLUT, GENDER_MALE, RACE_CONVENTIONAL, RACE_TRAINERA
+from rscraping.data.constants import CATEGORY_ABSOLUT, DATE_FORMAT, GENDER_MALE, RACE_CONVENTIONAL, RACE_TRAINERA
 from rscraping.data.models import Datasource, Participant, Race, RaceName
 from rscraping.parsers.html.lgt import LGTHtmlParser
 
@@ -43,7 +43,7 @@ class TestLGTParser(unittest.TestCase):
         with open(os.path.join(self.fixtures, "lgt_calendar.html")) as file:
             ids = self.parser.parse_race_ids_by_days(
                 Selector(file.read()),
-                days=[datetime.strptime("03/08/2024", "%d/%m/%Y")],
+                days=[datetime.strptime("03/08/2024", DATE_FORMAT)],
             )
 
         self.assertEqual(list(ids), ["209", "210"])

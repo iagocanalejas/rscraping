@@ -11,8 +11,10 @@ from pyutils.strings import find_date, remove_parenthesis, whitespaces_clean
 from rscraping.data.checks import is_play_off
 from rscraping.data.constants import (
     CATEGORY_ABSOLUT,
+    DATE_FORMAT,
     GENDER_FEMALE,
     GENDER_MALE,
+    LAP_FORMAT,
     RACE_CONVENTIONAL,
     RACE_TIME_TRIAL,
     RACE_TRAINERA,
@@ -59,7 +61,7 @@ class ACTHtmlParser(HtmlParser):
         race = Race(
             name=self.get_name(selector),
             normalized_names=normalized_names,
-            date=t_date.strftime("%d/%m/%Y"),
+            date=t_date.strftime(DATE_FORMAT),
             type=self.get_type(selector, participants),
             day=self.get_day(selector),
             modality=RACE_TRAINERA,
@@ -207,7 +209,7 @@ class ACTHtmlParser(HtmlParser):
 
     def get_laps(self, participant: Selector) -> list[str]:
         laps = participant.xpath("//*/td/text()").getall()[2:-1]
-        return [t.strftime("%M:%S.%f") for t in [normalize_lap_time(e) for e in laps if e] if t is not None]
+        return [t.strftime(LAP_FORMAT) for t in [normalize_lap_time(e) for e in laps if e] if t is not None]
 
     def is_disqualified(self, participant: Selector) -> bool:
         # race_id=1647864823
