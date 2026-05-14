@@ -1,4 +1,4 @@
-import random
+import secrets
 
 DATE_FORMAT = "%d/%m/%Y"
 LAP_FORMAT = "%M:%S.%f"
@@ -87,7 +87,7 @@ _USER_AGENTS = [
 def HTTP_HEADERS() -> dict[str, str]:  # pragma: no cover
     return {
         "Accept": "*/*",
-        "User-Agent": _USER_AGENTS[random.randint(0, len(_USER_AGENTS) - 1)],
+        "User-Agent": secrets.choice(_USER_AGENTS),
     }
 
 

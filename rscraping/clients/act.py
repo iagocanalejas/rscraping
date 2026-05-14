@@ -28,6 +28,7 @@ class ACTClient(Client, source=Datasource.ACT):
 
     @override
     def validate_url(self, url: str):
+        super().validate_url(url)
         pattern = re.compile(
             r"^(https?:\/\/)?"  # Scheme (http, https, or empty)
             r"(www\.euskolabelliga\.com)"  # Domain name

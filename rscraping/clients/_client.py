@@ -1,6 +1,9 @@
+import socket
 from collections.abc import Generator
 from datetime import date, datetime, timedelta
+from ipaddress import ip_address
 from typing import Self, override
+from urllib.parse import urlparse
 
 import requests
 from parsel.selector import Selector
@@ -46,6 +49,26 @@ class Client(ClientProtocol):
     @property
     def is_female(self) -> bool:
         return self._gender == GENDER_FEMALE
+
+    @override
+    def validate_url(self, url: str):
+        parsed = urlparse(url)
+
+        # Check for allowed schemes
+        if parsed.scheme not in ["http", "https"]:
+            raise ValueError(f"Invalid URL scheme: {parsed.scheme}")
+
+        # Check hostname doesn't resolve to internal IP
+        hostname = parsed.hostname
+        if not hostname:
+            raise ValueError("Invalid URL hostname")
+
+        try:
+            ip = ip_address(socket.gethostbyname(hostname))
+            if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved:
+                raise ValueError("URL resolves to internal IP address")
+        except socket.gaierror:
+            return
 
     @override
     def validate_year(self, year: int):
@@ -118,10 +141,6 @@ class Client(ClientProtocol):
     ####################################################
     #                     ABSTRACT                     #
     ####################################################
-
-    @override
-    def validate_url(self, url: str):
-        raise NotImplementedError
 
     @override
     def get_races_url(self, year: int, **kwargs) -> str:

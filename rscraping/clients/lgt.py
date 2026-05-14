@@ -15,61 +15,13 @@ from ._client import Client
 
 
 class LGTClient(Client, source=Datasource.LGT):
-    _excluded_ids = [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        13,
-        14,
-        15,
-        23,
-        25,
-        26,
-        27,
-        28,
-        31,
-        32,
-        33,
-        34,
-        36,
-        37,
-        40,
-        41,
-        44,
-        50,
-        51,
-        54,
-        55,
-        56,
-        57,
-        58,
-        59,
-        75,
-        88,
-        94,
-        95,
-        96,
-        97,
-        98,
-        99,
-        103,
-        104,
-        105,
-        106,
-        108,
-        125,
-        131,
-        137,
-        138,
-        146,
-        147,
-        151,
-    ]  # weird races
+    # fmt: off
+    _excluded_ids = [ "1", "2", "3", "4", "5", "6", "7", "8", "13", "14", "15", "23", "25", "26", "27", "28", "31",
+        "32", "33", "34", "36", "37", "40", "41", "44", "50", "51", "54", "55", "56", "57", "58", "59", "75", "88",
+        "94", "95", "96", "97", "98", "99", "103", "104", "105", "106", "108", "125", "131", "137", "138", "146",
+        "147", "151",
+    ]  # noqa
+    # fmt: on
 
     DATASOURCE = Datasource.LGT
     MALE_START = FEMALE_START = 2020
@@ -82,8 +34,9 @@ class LGTClient(Client, source=Datasource.LGT):
     def get_race_details_url(self, race_id: str, **_) -> str:
         return f"https://www.ligalgt.com/principal/regata/{race_id}"
 
-    @staticmethod
-    def get_results_selector(race_id: str) -> Selector:
+    def get_results_selector(self, race_id: str) -> Selector:
+        if race_id in self._excluded_ids:
+            raise ValueError(f"Invalid {race_id=}")
         url = "https://www.ligalgt.com/ajax/principal/ver_resultados.php"
         data = {"liga_id": 1, "regata_id": race_id}
         return Selector(requests.post(url=url, headers=HTTP_HEADERS(), data=data).content.decode("utf-8"))
@@ -96,6 +49,7 @@ class LGTClient(Client, source=Datasource.LGT):
 
     @override
     def validate_url(self, url: str):
+        super().validate_url(url)
         pattern = re.compile(
             r"^(https?:\/\/)?"  # Scheme (http, https, or empty)
             r"(www\.ligalgt\.com\/principal\/regata\/)"  # Domain name
@@ -143,7 +97,7 @@ class LGTClient(Client, source=Datasource.LGT):
         """
         Find the IDs of the races that took place in a given year.
 
-        As the LGT datasource doesn't give us an easy way of retrieving the races for a given year we need to bruteforce
+        As the LGT datasource doesn't give us a easy way of retrieving the races for a given year we need to brute-force
         it, this method will do a binary search for the 'upper' and 'lower' bounds of a season.
 
         We also need to ignore a hole ton of useless IDs (_excluded_ids) that are not used or have invalid information.
