@@ -36,6 +36,7 @@ class ETEClient(Client, source=Datasource.ETE):
 
     @override
     def validate_url(self, url: str):
+        super().validate_url(url)
         pattern = re.compile(
             r"^(https?:\/\/)?"  # Scheme (http, https, or empty)
             r"(www\.(ligaete|liga-arc)\.com\/es\/regata\/)"  # Domain name

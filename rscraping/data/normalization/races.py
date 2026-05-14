@@ -228,7 +228,7 @@ def deacronym_race_name(name: str) -> str:
 
 
 def amend_race_name(name: str) -> str:
-    re.sub(r"(CONCELLO)( DE)?", "CONCELLO DE", name)
+    name = re.sub(r"(CONCELLO)( DE)?", "CONCELLO DE", name)
     name = name.replace("JESÚS TENORIO", "XESÚS TENORIO")
     name = name.replace("CCD CESANTES", "CESANTES")
 
