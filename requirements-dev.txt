@@ -1,5 +1,5 @@
 -r requirements.txt
-coverage==7.14.0
+coverage==7.14.1
 mypy==2.1.0
 pytest==9.0.3
 types-requests>=2.33.0
