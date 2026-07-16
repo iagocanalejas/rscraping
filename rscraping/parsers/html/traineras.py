@@ -3,7 +3,7 @@ import os
 from collections import Counter
 from collections.abc import Generator
 from datetime import date, datetime
-from typing import override
+from typing import Any, override
 
 from parsel.selector import Selector
 
@@ -64,7 +64,7 @@ class TrainerasHtmlParser(HtmlParser):
     _SCHOOL = ["JM", "JF", "CM", "CF"]
 
     @override
-    def parse_race(self, selector: Selector, *, race_id: str | None = None, table: int | None = None, **_) -> Race:
+    def parse_race(self, selector: Selector, *, race_id: str | None = None, table: int | None = None, **_: Any) -> Race:
         assert race_id is not None, f"{self.DATASOURCE}: 'race_id' is required to parse a race"
 
         if self._races_count(selector) > 1 and not table:
@@ -173,11 +173,11 @@ class TrainerasHtmlParser(HtmlParser):
         return race
 
     @override
-    def parse_race_ids(self, selector: Selector, **_) -> Generator[str]:
+    def parse_race_ids(self, selector: Selector, **_: Any) -> Generator[str]:
         return (race.race_id for race in self.parse_race_names(selector))
 
     @override
-    def parse_race_ids_by_days(self, selector: Selector, days: list[datetime], **kwargs) -> Generator[str]:
+    def parse_race_ids_by_days(self, selector: Selector, days: list[datetime], **_: Any) -> Generator[str]:
         assert len(days) > 0, "days must have at least one element"
         assert all(d.year == days[0].year for d in days), "all days must be from the same year"
 
@@ -190,7 +190,7 @@ class TrainerasHtmlParser(HtmlParser):
                 yield row.xpath("//*/td[1]/a/@href").get("").split("/")[-1]
 
     @override
-    def parse_race_names(self, selector: Selector, **_) -> Generator[RaceName]:
+    def parse_race_names(self, selector: Selector, **_: Any) -> Generator[RaceName]:
         rows = [Selector(r) for r in selector.xpath("/html/body/div[1]/div[2]/table/tbody/tr").getall()]
         for row in rows:
             ttype = row.xpath("//*/td[2]/text()").get("")
@@ -198,7 +198,7 @@ class TrainerasHtmlParser(HtmlParser):
             name = " ".join(n for n in name.split() if n != ttype)
             yield RaceName(race_id=row.xpath("//*/td[1]/a/@href").get("").split("/")[-1], name=name)
 
-    def parse_flag_race_ids(self, selector: Selector, gender: str, category: str, **_) -> Generator[str]:
+    def parse_flag_race_ids(self, selector: Selector, gender: str, category: str, **_: Any) -> Generator[str]:
         table = self._get_matching_flag_table(gender, category, selector)
         if table:
             rows = Selector(table).xpath("//*/tr").getall()
@@ -219,7 +219,7 @@ class TrainerasHtmlParser(HtmlParser):
             if year in selector.xpath("//*/td[2]/text()").get("")
         )
 
-    def parse_club_details(self, selector: Selector, **_) -> Club | None:
+    def parse_club_details(self, selector: Selector, **_: Any) -> Club | None:
         name = whitespaces_clean(selector.xpath("/html/body/main/section[1]/div/div[2]/h1/text()").get("").upper())
         if not name:
             return None

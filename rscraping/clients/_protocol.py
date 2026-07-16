@@ -1,5 +1,5 @@
 from collections.abc import Generator
-from typing import Protocol
+from typing import Any, Protocol
 
 from rscraping.data.constants import GENDER_MALE
 from rscraping.data.models import Datasource, Race, RaceName
@@ -17,7 +17,7 @@ class ClientProtocol(Protocol):
     def _html_parser(self) -> HtmlParser: ...
     def _is_valid_gender(self, gender: str) -> bool: ...
 
-    def validate_year(self, year: int):
+    def validate_year(self, year: int) -> None:
         """
         Checks the given year for the current datasource raising a ValueError if it's outside the range.
 
@@ -28,7 +28,7 @@ class ClientProtocol(Protocol):
         """
         ...
 
-    def validate_url(self, url: str):
+    def validate_url(self, url: str) -> None:
         """
         Checks the given url for the current datasource, raising a ValueError if it's invalid.
 
@@ -39,7 +39,7 @@ class ClientProtocol(Protocol):
         """
         ...
 
-    def get_race_by_id(self, race_id: str, **kwargs) -> Race | None:
+    def get_race_by_id(self, race_id: str, **kwargs: Any) -> Race | None:
         """
         Retrieve race details by ID parsing data from the corresponding datasource.
 
@@ -51,7 +51,7 @@ class ClientProtocol(Protocol):
         """
         ...
 
-    def get_race_by_url(self, url: str, race_id: str, **kwargs) -> Race | None:
+    def get_race_by_url(self, url: str, race_id: str, **kwargs: Any) -> Race | None:
         """
         Retrieve race details by parsing data from the corresponding datasource.
 
@@ -64,7 +64,7 @@ class ClientProtocol(Protocol):
         """
         ...
 
-    def get_race_names_by_year(self, year: int, **kwargs) -> Generator[RaceName]:
+    def get_race_names_by_year(self, year: int, **kwargs: Any) -> Generator[RaceName]:
         """
         Find the names of the races that took place in a given year.
 
@@ -76,7 +76,7 @@ class ClientProtocol(Protocol):
         """
         ...
 
-    def get_race_ids_by_year(self, year: int, **kwargs) -> Generator[str]:
+    def get_race_ids_by_year(self, year: int, **kwargs: Any) -> Generator[str]:
         """
         Find the IDs of the races that took place in a given year.
 
@@ -88,7 +88,7 @@ class ClientProtocol(Protocol):
         """
         ...
 
-    def get_race_ids_by_club(self, club_id: str, year: int, **kwargs) -> Generator[str]:
+    def get_race_ids_by_club(self, club_id: str, year: int, **kwargs: Any) -> Generator[str]:
         """
         Find the IDs for the races in witch a given club participated in a given year.
 
@@ -101,7 +101,7 @@ class ClientProtocol(Protocol):
         """
         ...
 
-    def get_last_weekend_race_ids(self, **kwargs) -> Generator[str]:
+    def get_last_weekend_race_ids(self, **kwargs: Any) -> Generator[str]:
         """
         Find the IDs for the races that took place the last weekend.
 
@@ -109,13 +109,13 @@ class ClientProtocol(Protocol):
         """
         ...
 
-    def get_races_url(self, year: int, **kwargs) -> str:
+    def get_races_url(self, year: int, **kwargs: Any) -> str:
         """
         Return the URL for retrieving races in a specific year.
         """
         ...
 
-    def get_race_details_url(self, race_id: str, **kwargs) -> str:
+    def get_race_details_url(self, race_id: str, **kwargs: Any) -> str:
         """
         Return the URL for retrieving details of a specific race.
         """

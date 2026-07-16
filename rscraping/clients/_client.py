@@ -2,7 +2,7 @@ import socket
 from collections.abc import Generator
 from datetime import date, datetime, timedelta
 from ipaddress import ip_address
-from typing import Self, override
+from typing import Any, override
 from urllib.parse import urlparse
 
 import requests
@@ -16,20 +16,20 @@ from ._protocol import ClientProtocol
 
 
 class Client(ClientProtocol):
-    _registry: dict[Datasource, type[Self]] = {}
+    _registry: dict[Datasource, type["Client"]] = {}
     _gender: str = GENDER_MALE
 
     DATASOURCE: Datasource
     FEMALE_START: int
     MALE_START: int
 
-    def __init_subclass__(cls, **kwargs):
+    def __init_subclass__(cls, **kwargs: Any):
         source = kwargs.pop("source", None)
         super().__init_subclass__(**kwargs)
         if source:
             cls._registry[source] = cls
 
-    def __new__(cls, source: Datasource, gender: str = GENDER_MALE, **_) -> Self:
+    def __new__(cls, source: Datasource, gender: str = GENDER_MALE, **_: Any) -> "Client":
         subclass = cls._registry[source]
         final_obj = object.__new__(subclass)
         if not final_obj._is_valid_gender(gender):
@@ -51,7 +51,7 @@ class Client(ClientProtocol):
         return self._gender == GENDER_FEMALE
 
     @override
-    def validate_url(self, url: str):
+    def validate_url(self, url: str) -> None:
         parsed = urlparse(url)
 
         # Check for allowed schemes
@@ -71,19 +71,19 @@ class Client(ClientProtocol):
             return
 
     @override
-    def validate_year(self, year: int):
+    def validate_year(self, year: int) -> None:
         since = self.FEMALE_START if self.is_female else self.MALE_START
         today = date.today().year
         if year < since or year > today:
             raise ValueError(f"invalid 'year', available values are [{since}, {today}]")
 
     @override
-    def get_race_by_id(self, race_id: str, **kwargs) -> Race | None:
+    def get_race_by_id(self, race_id: str, **kwargs: Any) -> Race | None:
         url = self.get_race_details_url(race_id, is_female=self.is_female)
         return self.get_race_by_url(url, race_id=race_id, **kwargs)
 
     @override
-    def get_race_by_url(self, url: str, race_id: str, **kwargs) -> Race | None:
+    def get_race_by_url(self, url: str, race_id: str, **kwargs: Any) -> Race | None:
         self.validate_url(url)
         try:
             race = self._html_parser.parse_race(
@@ -100,7 +100,7 @@ class Client(ClientProtocol):
             return race
 
     @override
-    def get_race_ids_by_year(self, year: int, **kwargs) -> Generator[str]:
+    def get_race_ids_by_year(self, year: int, **kwargs: Any) -> Generator[str]:
         self.validate_year(year)
 
         url = self.get_races_url(year, is_female=self.is_female)
@@ -111,7 +111,7 @@ class Client(ClientProtocol):
         )
 
     @override
-    def get_last_weekend_race_ids(self, **kwargs) -> Generator[str]:
+    def get_last_weekend_race_ids(self, **kwargs: Any) -> Generator[str]:
         today = datetime.today()
         last_saturday = today - timedelta(days=(today.weekday() + 1) % 7 + 1)
         last_sunday = today - timedelta(days=(today.weekday()) % 7 + 1)
@@ -128,7 +128,7 @@ class Client(ClientProtocol):
         )
 
     @override
-    def get_race_names_by_year(self, year: int, **kwargs) -> Generator[RaceName]:
+    def get_race_names_by_year(self, year: int, **kwargs: Any) -> Generator[RaceName]:
         self.validate_year(year)
 
         url = self.get_races_url(year, is_female=self.is_female)
@@ -143,13 +143,13 @@ class Client(ClientProtocol):
     ####################################################
 
     @override
-    def get_races_url(self, year: int, **kwargs) -> str:
+    def get_races_url(self, year: int, **kwargs: Any) -> str:
         raise NotImplementedError
 
     @override
-    def get_race_details_url(self, race_id: str, **kwargs) -> str:
+    def get_race_details_url(self, race_id: str, **kwargs: Any) -> str:
         raise NotImplementedError
 
     @override
-    def get_race_ids_by_club(self, club_id: str, year: int, **kwargs) -> Generator[str]:
+    def get_race_ids_by_club(self, club_id: str, year: int, **kwargs: Any) -> Generator[str]:
         raise NotImplementedError

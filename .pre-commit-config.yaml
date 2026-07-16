@@ -31,3 +31,10 @@ repos:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
         types_or: [python, pyi]
+
+  # - repo: https://github.com/pre-commit/mirrors-mypy
+  #   rev: v2.3.0
+  #   hooks:
+  #     - id: mypy
+  #       args:
+  #         - --config-file=pyproject.toml

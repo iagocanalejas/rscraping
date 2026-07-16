@@ -1,5 +1,5 @@
 import re
-from typing import override
+from typing import Any, override
 
 from rscraping.data.constants import GENDER_MALE
 from rscraping.data.models import Datasource
@@ -23,15 +23,15 @@ class ARCClient(Client, source=Datasource.ARC):
         return gender in [GENDER_MALE]
 
     @override
-    def get_race_details_url(self, race_id: str, **_) -> str:
+    def get_race_details_url(self, race_id: str, **_: Any) -> str:
         return f"https://www.liga-arc.com/es/regata/{race_id}/unknown"
 
     @override
-    def get_races_url(self, year: int, **_) -> str:
+    def get_races_url(self, year: int, **_: Any) -> str:
         return f"https://www.liga-arc.com/es/calendario/{year}"
 
     @override
-    def validate_url(self, url: str):
+    def validate_url(self, url: str) -> None:
         super().validate_url(url)
         pattern = re.compile(
             r"^(https?:\/\/)?"  # Scheme (http, https, or empty)

@@ -1,6 +1,6 @@
 from collections.abc import Generator
 from datetime import datetime
-from typing import Protocol
+from typing import Any, Protocol
 
 from parsel.selector import Selector
 
@@ -10,7 +10,7 @@ from rscraping.data.models import Datasource, Race, RaceName
 class HtmlParser(Protocol):
     DATASOURCE: Datasource
 
-    def parse_race(self, selector: Selector, *, race_id: str, **kwargs) -> Race:
+    def parse_race(self, selector: Selector, *, race_id: str, **kwargs: Any) -> Race:
         """
         Parse the given Selector to retrieve the race object.
 
@@ -23,7 +23,7 @@ class HtmlParser(Protocol):
         """
         ...
 
-    def parse_race_ids(self, selector: Selector, **kwargs) -> Generator[str]:
+    def parse_race_ids(self, selector: Selector, **kwargs: Any) -> Generator[str]:
         """
         Parse the given Selector to retrieve the IDs of the races.
 
@@ -35,7 +35,7 @@ class HtmlParser(Protocol):
         """
         ...
 
-    def parse_race_ids_by_days(self, selector: Selector, days: list[datetime], **kwargs) -> Generator[str]:
+    def parse_race_ids_by_days(self, selector: Selector, days: list[datetime], **kwargs: Any) -> Generator[str]:
         """
         Parse the given Selector to retrieve the IDs of the races that took place on the given days.
 
@@ -48,7 +48,7 @@ class HtmlParser(Protocol):
         """
         ...
 
-    def parse_race_names(self, selector: Selector, **kwargs) -> Generator[RaceName]:
+    def parse_race_names(self, selector: Selector, **kwargs: Any) -> Generator[RaceName]:
         """
         Parse the given Selector to retrieve the names of the races.
 
