@@ -106,7 +106,7 @@ class LGTHtmlParser(HtmlParser):
                     lane=self.get_lane(row),
                     series=self.get_series(results_selector, row),
                     laps=self.get_laps(row),
-                    distance=self.get_distance(),
+                    distance=self.get_distance(is_female=gender == GENDER_FEMALE, t_date=t_date),
                     handicap=None,
                     participant=normalize_club_name(self.get_club_name(row)),
                     race=race,
@@ -246,8 +246,8 @@ class LGTHtmlParser(HtmlParser):
         name = participant.xpath("//*/td[2]/text()").get()
         return whitespaces_clean(name).upper() if name else ""
 
-    def get_distance(self) -> int:
-        return 5556
+    def get_distance(self, is_female: bool, t_date: date) -> int:
+        return 2778 if is_female and t_date.year >= 2026 else 5556
 
     def get_laps(self, participant: Selector) -> list[str]:
         laps = participant.xpath("//*/td/text()").getall()[2:]
