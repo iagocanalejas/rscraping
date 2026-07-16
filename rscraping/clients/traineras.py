@@ -1,7 +1,7 @@
 import itertools
 import re
 from collections.abc import Generator
-from typing import override
+from typing import Any, override
 
 import requests
 from parsel.selector import Selector
@@ -31,7 +31,7 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
 
     _category: str = CATEGORY_ABSOLUT
 
-    def __init__(self, category: str = CATEGORY_ABSOLUT, **kwargs) -> None:
+    def __init__(self, category: str = CATEGORY_ABSOLUT, **kwargs: Any) -> None:
         self._category = category
         super().__init__(**kwargs)
 
@@ -58,11 +58,11 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
         return gender in [GENDER_MALE, GENDER_FEMALE, GENDER_MIX, GENDER_ALL]
 
     @override
-    def get_race_details_url(self, race_id: str, **_) -> str:
+    def get_race_details_url(self, race_id: str, **_: Any) -> str:
         return f"https://traineras.es/clasificaciones/{race_id}"
 
     @override
-    def get_races_url(self, year: int, page: int = 1, **_) -> str:
+    def get_races_url(self, year: int, page: int = 1, **_: Any) -> str:
         return f"https://traineras.es/regatas/{year}?page={page}&cat={self.tag}"
 
     @staticmethod
@@ -74,14 +74,14 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
         return f"https://traineras.es/banderas/{flag_id}"
 
     @staticmethod
-    def get_rower_url(rower_id: str, **_) -> str:
+    def get_rower_url(rower_id: str, **_: Any) -> str:
         return f"https://traineras.es/personas/{rower_id}"
 
-    def get_club_races_url(self, club_id: str, year: int, **_) -> str:
+    def get_club_races_url(self, club_id: str, year: int, **_: Any) -> str:
         return f"https://traineras.es/clubregatas/{club_id}?anyo={year}-{self.tag}"
 
     @override
-    def validate_url(self, url: str):
+    def validate_url(self, url: str) -> None:
         super().validate_url(url)
         pattern = re.compile(
             r"^(https?:\/\/)?"  # Scheme (http, https, or empty)
@@ -113,7 +113,7 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
             yield from self._html_parser.parse_flag_race_ids(content, gender=gender, category=category)
 
     @override
-    def get_race_by_id(self, race_id: str, **kwargs) -> Race | None:
+    def get_race_by_id(self, race_id: str, **kwargs: Any) -> Race | None:
         """
         Retrieve race details by ID parsing data from 'traineras.es'.
         This method also retrieves the flag edition for the race if available.
@@ -150,24 +150,24 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
         return race
 
     @override
-    def get_race_names_by_year(self, year: int, **_) -> Generator[RaceName]:
+    def get_race_names_by_year(self, year: int, **_: Any) -> Generator[RaceName]:
         self.validate_year(year)
         for page in self._get_pages(year):
             yield from self._html_parser.parse_race_names(page)
 
     @override
-    def get_race_ids_by_year(self, year: int, **_) -> Generator[str]:
+    def get_race_ids_by_year(self, year: int, **_: Any) -> Generator[str]:
         self.validate_year(year)
         for page in self._get_pages(year):
             yield from self._html_parser.parse_race_ids(page)
 
     @override
-    def get_race_ids_by_club(self, club_id: str, year: int, **kwargs) -> Generator[str]:
+    def get_race_ids_by_club(self, club_id: str, year: int, **_: Any) -> Generator[str]:
         response = requests.get(url=self.get_club_races_url(club_id, year), headers=HTTP_HEADERS())
         response.raise_for_status()
         yield from self._html_parser.parse_club_race_ids(Selector(response.content.decode("utf-8")))
 
-    def get_race_ids_by_rower(self, rower_id: str, year: str | None = None, **_) -> Generator[str]:
+    def get_race_ids_by_rower(self, rower_id: str, year: str | None = None, **_: Any) -> Generator[str]:
         """
         Find the race IDs associated with a specific rower.
 
@@ -180,7 +180,7 @@ class TrainerasClient(Client, source=Datasource.TRAINERAS):
         content = requests.get(url=self.get_rower_url(rower_id), headers=HTTP_HEADERS()).content.decode("utf-8")
         yield from self._html_parser.parse_rower_race_ids(Selector(content), year=year)
 
-    def get_club_details_by_url(self, url: str, **kwargs) -> Club | None:
+    def get_club_details_by_url(self, url: str, **kwargs: Any) -> Club | None:
         selector = Selector(requests.get(url=url, headers=HTTP_HEADERS()).content.decode("utf-8"))
         return self._html_parser.parse_club_details(selector, **kwargs)
 

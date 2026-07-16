@@ -3,7 +3,7 @@ import os
 import re
 from collections.abc import Generator
 from datetime import date, datetime
-from typing import override
+from typing import Any, override
 
 from parsel.selector import Selector
 
@@ -44,7 +44,9 @@ class LGTHtmlParser(HtmlParser):
     DATASOURCE = Datasource.LGT
 
     @override
-    def parse_race(self, selector: Selector, *, race_id: str, results_selector: Selector | None = None, **_) -> Race:
+    def parse_race(
+        self, selector: Selector, *, race_id: str, results_selector: Selector | None = None, **_: Any
+    ) -> Race:
         assert results_selector is not None, f"{self.DATASOURCE}: 'results_selector' is required to parse a race"
 
         name = self.get_name(selector)
@@ -122,12 +124,12 @@ class LGTHtmlParser(HtmlParser):
         return race
 
     @override
-    def parse_race_ids(self, selector: Selector, **_) -> Generator[str]:
+    def parse_race_ids(self, selector: Selector, **_: Any) -> Generator[str]:
         urls = selector.xpath("//*/div/div/div[*]/div/a/@href").getall()
         return (u.split("/")[-1].split("-")[0] for u in urls[0:])
 
     @override
-    def parse_race_ids_by_days(self, selector: Selector, days: list[datetime], **kwargs) -> Generator[str]:
+    def parse_race_ids_by_days(self, selector: Selector, days: list[datetime], **_: Any) -> Generator[str]:
         assert len(days) > 0, "days must have at least one element"
         assert all(d.year == days[0].year for d in days), "all days must be from the same year"
 
@@ -153,7 +155,7 @@ class LGTHtmlParser(HtmlParser):
                     yield div.xpath("//*/div/a/@href").get("").split("/")[-1].split("-")[0]
 
     @override
-    def parse_race_names(self, selector: Selector, **_) -> Generator[RaceName]:
+    def parse_race_names(self, selector: Selector, **_: Any) -> Generator[RaceName]:
         values = [Selector(u) for u in selector.xpath("//*/div/div/div[*]/div").getall()]
         return (
             RaceName(

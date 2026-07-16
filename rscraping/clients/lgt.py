@@ -1,7 +1,7 @@
 import re
 from collections.abc import Generator
 from datetime import date, datetime, timedelta
-from typing import override
+from typing import Any, override
 
 import requests
 from parsel.selector import Selector
@@ -31,7 +31,7 @@ class LGTClient(Client, source=Datasource.LGT):
         return LGTHtmlParser()
 
     @override
-    def get_race_details_url(self, race_id: str, **_) -> str:
+    def get_race_details_url(self, race_id: str, **_: Any) -> str:
         return f"https://www.ligalgt.com/principal/regata/{race_id}"
 
     def get_results_selector(self, race_id: str) -> Selector:
@@ -48,7 +48,7 @@ class LGTClient(Client, source=Datasource.LGT):
         return Selector(requests.post(url=url, headers=HTTP_HEADERS(), data=data).content.decode("utf-8"))
 
     @override
-    def validate_url(self, url: str):
+    def validate_url(self, url: str) -> None:
         super().validate_url(url)
         pattern = re.compile(
             r"^(https?:\/\/)?"  # Scheme (http, https, or empty)
@@ -61,7 +61,7 @@ class LGTClient(Client, source=Datasource.LGT):
             raise ValueError(f"invalid {url=}")
 
     @override
-    def get_race_by_id(self, race_id: str, *_, **kwargs) -> Race | None:
+    def get_race_by_id(self, race_id: str, *_: Any, **kwargs: Any) -> Race | None:
         if race_id in self._excluded_ids:
             return None
 
@@ -69,7 +69,7 @@ class LGTClient(Client, source=Datasource.LGT):
         return super().get_race_by_id(race_id, **kwargs)
 
     @override
-    def get_race_by_url(self, url: str, race_id: str, **kwargs):
+    def get_race_by_url(self, url: str, race_id: str, **kwargs: Any) -> Race | None:
         if race_id in self._excluded_ids:
             return None
 
@@ -77,7 +77,7 @@ class LGTClient(Client, source=Datasource.LGT):
         return super().get_race_by_url(url, race_id, **kwargs)
 
     @override
-    def get_race_names_by_year(self, year: int, **_) -> Generator[RaceName]:
+    def get_race_names_by_year(self, year: int, **_: Any) -> Generator[RaceName]:
         today = date.today().year
         if today == year:
             race_names = self._html_parser.parse_race_names(selector=self.get_calendar_selector())
@@ -93,7 +93,7 @@ class LGTClient(Client, source=Datasource.LGT):
                 yield RaceName(race_id=id, name=whitespaces_clean(name).upper())
 
     @override
-    def get_race_ids_by_year(self, year: int, **_) -> Generator[str]:
+    def get_race_ids_by_year(self, year: int, **_: Any) -> Generator[str]:
         """
         Find the IDs of the races that took place in a given year.
 
@@ -152,7 +152,7 @@ class LGTClient(Client, source=Datasource.LGT):
         yield from (str(r) for r in range(lower_race_id, (upper_race_id + 1)) if r not in self._excluded_ids)
 
     @override
-    def get_last_weekend_race_ids(self, **kwargs) -> Generator[str]:
+    def get_last_weekend_race_ids(self, **kwargs: Any) -> Generator[str]:
         today = datetime.today()
         last_saturday = today - timedelta(days=(today.weekday() + 1) % 7 + 1)
         last_sunday = today - timedelta(days=(today.weekday()) % 7 + 1)

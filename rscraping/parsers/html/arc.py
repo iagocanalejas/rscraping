@@ -3,7 +3,7 @@ import os
 import re
 from collections.abc import Generator
 from datetime import date, datetime
-from typing import override
+from typing import Any, override
 
 from parsel.selector import Selector
 
@@ -40,7 +40,7 @@ class ARCHtmlParser(HtmlParser):
     DATASOURCE = Datasource.ARC
 
     @override
-    def parse_race(self, selector: Selector, *, race_id: str, is_female: bool = False, **_) -> Race:
+    def parse_race(self, selector: Selector, *, race_id: str, is_female: bool = False, **_: Any) -> Race:
         name = self.get_name(selector)
         assert name, f"{self.DATASOURCE}: no name found for {race_id=}"
 
@@ -114,7 +114,7 @@ class ARCHtmlParser(HtmlParser):
         return race
 
     @override
-    def parse_race_ids(self, selector: Selector, **_) -> Generator[str]:
+    def parse_race_ids(self, selector: Selector, **_: Any) -> Generator[str]:
         urls = (
             selector.xpath('//*[@id="main"]/div[6]/table/tbody/tr[*]/td[2]/span/a/@href').getall()
             if selector.xpath('//*[@id="proximas-regatas"]').get()
@@ -123,7 +123,7 @@ class ARCHtmlParser(HtmlParser):
         return (url_parts[-2] for url_parts in (url.split("/") for url in urls))
 
     @override
-    def parse_race_ids_by_days(self, selector: Selector, days: list[datetime], **kwargs) -> Generator[str]:
+    def parse_race_ids_by_days(self, selector: Selector, days: list[datetime], **_: Any) -> Generator[str]:
         assert len(days) > 0, "days must have at least one element"
         assert all(d.year == days[0].year for d in days), "all days must be from the same year"
 
@@ -141,7 +141,7 @@ class ARCHtmlParser(HtmlParser):
         return (s.xpath("//*/td[2]/span/a/@href").get("").split("/")[-2] for s in selectors if _find_date(s) in days)
 
     @override
-    def parse_race_names(self, selector: Selector, **_) -> Generator[RaceName]:
+    def parse_race_names(self, selector: Selector, **_: Any) -> Generator[RaceName]:
         hrefs = (
             selector.xpath('//*[@id="main"]/div[6]/table/tbody/tr[*]/td[2]/span/a').getall()
             if selector.xpath('//*[@id="proximas-regatas"]').get()
