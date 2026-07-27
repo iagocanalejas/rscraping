@@ -20,6 +20,7 @@ _MISSPELLINGS = {
     "PIRATA.COM": ["PIRATA COM"],
     "PlAY OFF": ["PAY OFF"],
     "CASTILLA LA": ["CASTILLA - LA"],
+    "EXCELENTISIMO": ["EXMO"],
     "AYUNTAMIENTO": ["AYTO"],
     "TRAIÑEIRAS": ["TRAIEIRAS"],
     "RIVEIRA": ["RIBEIRA"],
@@ -160,13 +161,16 @@ def split_by_edition_parts(normalized_name: str, editions: list[str]) -> list[st
     """
     name_parts = []
     if len(editions) > 1:
-        previous_end_idx = 0
+        previous_start_idx = 0
+        previous_edition_len = 0  # avoid errors when a edition is subpart of another (ex. "III" in "XIII")
         for edition in editions:
-            start_idx = normalized_name.find(edition, previous_end_idx)
+            start_idx = normalized_name[previous_edition_len:].find(edition, previous_start_idx)
+            start_idx += previous_edition_len
             if start_idx > 0:
-                name_parts.append(whitespaces_clean(normalized_name[previous_end_idx:start_idx]))
-                previous_end_idx = start_idx
-        name_parts.append(whitespaces_clean(normalized_name[previous_end_idx:]))
+                name_parts.append(whitespaces_clean(normalized_name[previous_start_idx:start_idx]))
+                previous_start_idx = start_idx
+            previous_edition_len = len(edition)
+        name_parts.append(whitespaces_clean(normalized_name[previous_start_idx:]))
     return name_parts
 
 

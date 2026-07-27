@@ -78,6 +78,10 @@ from rscraping.data.normalization import normalize_name_parts, normalize_race_na
             "REGATA LIGA ARC",
             "REGATA LIGA ARC",
         ),
+        (
+            "BANDERA EXMO. AYTO. DE LAREDO",
+            "BANDERA EXCELENTISIMO AYUNTAMIENTO DE LAREDO",
+        ),
     ],
 )
 def test_race_name_normalization(name, expected) -> None:
@@ -104,8 +108,8 @@ def test_race_name_normalization(name, expected) -> None:
             [("GETXOKO ESTROPADEN IKURRIÑA", 45), ("JOSE ANTONIO AGIRRE LEHENDAKARIAREN OMENALDIA", 19)],
         ),
         (
-            "XVII BANDEIRA CIDADE DE FERROL III MEMORIAL MIGUEL DERUNGS CRIADO",
-            [("BANDEIRA CIDADE DE FERROL", 17), ("MEMORIAL MIGUEL DERUNGS CRIADO", 3)],
+            "XVIII BANDEIRA CIDADE DE FERROL VIII MEMORIAL MIGUEL DERUNGS CRIADO",
+            [("BANDEIRA CIDADE DE FERROL", 18), ("MEMORIAL MIGUEL DERUNGS CRIADO", 8)],
         ),
         (
             "X BANDERA ILLA DO SAMERTOLAMEU-FANDICOSTA",

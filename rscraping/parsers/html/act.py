@@ -173,7 +173,9 @@ class ACTHtmlParser(HtmlParser):
         organizer = whitespaces_clean(
             selector.xpath('//*[@id="col-a"]/div/section/div[2]/table/tbody/tr/td[1]/text()').get("")
         ).upper()
-        return organizer if organizer else None
+        if not organizer:
+            return None
+        return "ACT" if "ACT " in organizer else organizer
 
     def get_race_lanes(self, selector: Selector, participants: list[Selector]) -> int:
         if self.get_type(selector, participants) == RACE_TIME_TRIAL:

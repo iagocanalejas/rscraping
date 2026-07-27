@@ -59,8 +59,8 @@ class TrainerasHtmlParser(HtmlParser):
     DATASOURCE = Datasource.TRAINERAS
 
     _FEMALE = ["SF", "VF", "JF", "F"]
-    _MIX = ["M"]
-    _VETERAN = ["VF", "VM"]
+    _MIX = ["M", "VX", "SX"]
+    _VETERAN = ["VF", "VM", "VX"]
     _SCHOOL = ["JM", "JF", "CM", "CF"]
 
     @override
