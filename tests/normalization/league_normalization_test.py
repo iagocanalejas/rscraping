@@ -13,16 +13,22 @@ def test_league_name_normalization(name, expected) -> None:
     assert normalize_league_name(name) == expected
 
 
-def test_find_league() -> None:
-    assert find_league("LGT PLAY OFF") == "LGT"
-    assert find_league("ARC PLAY OFF") == "ARC"
-    assert find_league("ACT PLAY OFF") == "ACT"
-    assert find_league("LGT AND ARC PLAY OFF") == "ACT"
-    assert find_league("LGT A") == "LIGA GALEGA DE TRAIÑAS A"
-    assert find_league("LGT B") == "LIGA GALEGA DE TRAIÑAS B"
-    assert find_league("LGT F") == "LIGA GALEGA DE TRAIÑAS FEMENINA"
-    assert find_league("EUSKO LABEL LIGA") == "EUSKO LABEL LIGA"
-    assert find_league("EUSKOTREN LIGA") == "LIGA EUSKOTREN"
-    assert find_league("ARC") == "ASOCIACIÓN DE REMO DEL CANTÁBRICO 1"
-    assert find_league("ARC2") == "ASOCIACIÓN DE REMO DEL CANTÁBRICO 2"
-    assert find_league("ETE COMPETITION") == "EMAKUMEZKO TRAINERUEN ELKARTEA"
+@pytest.mark.parametrize(
+    ("text", "league"),
+    [
+        ("LGT PLAY OFF", "LGT"),
+        ("ARC PLAY OFF", "ARC"),
+        ("ACT PLAY OFF", "ACT"),
+        ("LGT AND ARC PLAY OFF", "ACT"),
+        ("LGT A", "LIGA GALEGA DE TRAIÑAS A"),
+        ("LGT B", "LIGA GALEGA DE TRAIÑAS B"),
+        ("LGT F", "LIGA GALEGA DE TRAIÑAS FEMENINA"),
+        ("EUSKO LABEL LIGA", "EUSKO LABEL LIGA"),
+        ("EUSKOTREN LIGA", "LIGA EUSKOTREN"),
+        ("ARC", "ASOCIACIÓN DE REMO DEL CANTÁBRICO 1"),
+        ("ARC2", "ASOCIACIÓN DE REMO DEL CANTÁBRICO 2"),
+        ("ETE COMPETITION", "EMAKUMEZKO TRAINERUEN ELKARTEA"),
+    ],
+)
+def test_find_league(text, league) -> None:
+    assert find_league(text) == league

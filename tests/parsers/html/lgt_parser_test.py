@@ -24,8 +24,7 @@ class TestLGTParser(unittest.TestCase):
                 race_id="1234",
                 results_selector=Selector(results.read()),
             )
-        if not race:
-            raise ValueError("unable to parse race")
+        assert race is not None
 
         participants = race.participants
         race.participants = []

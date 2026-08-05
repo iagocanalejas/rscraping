@@ -21,8 +21,7 @@ class TestACTParser(unittest.TestCase):
                 race_id="1234",
                 is_female=False,
             )
-        if not race:
-            raise ValueError("unable to parse race")
+        assert race is not None
 
         participants = race.participants
         race.participants = []

@@ -82,12 +82,11 @@ class TestTrainerasParser(unittest.TestCase):
                 self.parser.parse_race(selector, race_id="1234", table=2),
             ]
 
-        self.assertEqual(len(races), 2)
-        for idx, race in enumerate(races):
+        for i, race in enumerate(races):
             assert race is not None
             race.participants = []
 
-            self.assertEqual(race, self._RACES_DOUBLE_1[idx])
+            self.assertEqual(race, self._RACES_DOUBLE_1[i])
 
     def test_parse_race_triple(self) -> None:
         # race_id=2503

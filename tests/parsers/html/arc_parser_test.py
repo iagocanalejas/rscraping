@@ -21,8 +21,7 @@ class TestARCParser(unittest.TestCase):
                 race_id="1234",
                 is_female=False,
             )
-        if not race:
-            raise ValueError("unable to parse race")
+        assert race is not None
 
         participants = race.participants
         race.participants = []
@@ -40,7 +39,7 @@ class TestARCParser(unittest.TestCase):
         with open(os.path.join(self.fixtures, "arc_races.html")) as file:
             ids = self.parser.parse_race_ids_by_days(
                 Selector(file.read()),
-                days=[datetime.strptime(f"19 JUNE {datetime.now().year}", "%d %B %Y")],
+                days=[datetime.strptime("19 JUNE 2009", "%d %B %Y")],
             )
 
         self.assertEqual(list(ids), ["446"])
