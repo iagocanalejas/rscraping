@@ -329,8 +329,7 @@ class TrainerasHtmlParser(HtmlParser):
         return len([lap for lap in laps if len(lap) == 0]) >= len(participants) // 2
 
     def get_participants(self, selector: Selector, table: int) -> list[Selector]:
-        modifier = 1 if self._has_label(selector) else 0
-        rows = selector.xpath(f"/html/body/div[1]/main/div/div/div/div[{(table * 2) + modifier}]/table/tr").getall()
+        rows = selector.xpath(f"/html/body/div[1]/main/div/div/div/div[{(table * 2) + 1}]/table/tr").getall()
         return [Selector(t) for t in rows[1:]]
 
     def get_lane(self, participant: Selector) -> int | None:
@@ -375,12 +374,8 @@ class TrainerasHtmlParser(HtmlParser):
     #                     PRIVATE                      #
     ####################################################
 
-    def _has_label(self, selector: Selector) -> bool:
-        target_div = selector.xpath("/html/body/div[1]/main/div/div/div/div[2]")
-        return bool(target_div[0].xpath(".//p"))
-
     def _get_race_title(self, selector: Selector, table: int) -> str:
-        modifier = 0 if self._has_label(selector) and table > 1 else 1
+        modifier = 0 if table > 1 else 1
         date_path = f"div[{(table * 2) - modifier}]/h2"
         return selector.xpath(f"/html/body/div[1]/main/div/div/div/{date_path}/text()").get("")
 
