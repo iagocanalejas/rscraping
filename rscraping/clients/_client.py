@@ -16,7 +16,7 @@ from ._protocol import ClientProtocol
 
 
 class Client(ClientProtocol):
-    _registry: dict[Datasource, type["Client"]] = {}
+    _registry: dict[Datasource, type[Client]] = {}
     _gender: str = GENDER_MALE
 
     DATASOURCE: Datasource
@@ -29,7 +29,7 @@ class Client(ClientProtocol):
         if source:
             cls._registry[source] = cls
 
-    def __new__(cls, source: Datasource, gender: str = GENDER_MALE, **_: Any) -> "Client":
+    def __new__(cls, source: Datasource, gender: str = GENDER_MALE, **_: Any) -> Client:
         subclass = cls._registry[source]
         final_obj = object.__new__(subclass)
         if not final_obj._is_valid_gender(gender):

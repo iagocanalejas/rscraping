@@ -23,10 +23,10 @@ repos:
     rev: v3.21.2
     hooks:
       - id: pyupgrade
-        args: [--py313-plus]
+        args: [--py314-plus]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.11
+    rev: v0.16.4
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]

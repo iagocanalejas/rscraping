@@ -25,7 +25,7 @@ class Datasource(StrEnum):
         return value is not None and value.lower() in [d for d in cls]
 
     @classmethod
-    def _missing_(cls, value: Any) -> "Datasource | None":
+    def _missing_(cls, value: Any) -> Datasource | None:
         if not isinstance(value, str):
             return None
         value = value.lower()
@@ -51,7 +51,7 @@ class Penalty:
         return self.to_json()
 
     @staticmethod
-    def from_json(json_str: str) -> "Penalty":
+    def from_json(json_str: str) -> Penalty:
         values = json.loads(json_str)
         return Penalty(**values)
 
@@ -84,7 +84,7 @@ class Race:
     gender: str | None
     category: str | None
 
-    participants: list["Participant"]
+    participants: list[Participant]
 
     # not available in all the datasource
     race_notes: str | None = None
@@ -100,7 +100,7 @@ class Race:
         return self.to_json()
 
     @staticmethod
-    def from_json(json_str: str) -> "Race":
+    def from_json(json_str: str) -> Race:
         values = json.loads(json_str)
         participants = values["participants"]
         values["participants"] = []
@@ -145,7 +145,7 @@ class Participant:
         return self.to_json()
 
     @staticmethod
-    def from_json(json_str: str) -> "Participant":
+    def from_json(json_str: str) -> Participant:
         values = json.loads(json_str)
         if "race" not in values:
             values["race"] = None
